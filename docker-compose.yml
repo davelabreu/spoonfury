@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: spoonfury
+      POSTGRES_USER: spoonfury
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-spoonfury}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    restart: always
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-change-me}
+      DEBUG: ${DEBUG:-False}
+      DB_HOST: db
+      DB_PORT: 5432
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost}
+    depends_on:
+      - db
+    volumes:
+      - media_data:/app/media
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  frontend:
+    build: ./frontend
+    restart: always
+    ports:
+      - "8055:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  media_data:
