@@ -19,5 +19,11 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Prototype: untyped API responses are expected
+      '@typescript-eslint/no-explicit-any': 'warn',
+      // Context files export both providers and hooks — not a correctness issue
+      'react-refresh/only-export-components': 'warn',
+    },
   },
 ])
