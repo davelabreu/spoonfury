@@ -9,13 +9,15 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ username: "", email: "", password1: "", password2: "" });
   const [error, setError] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.password1 !== form.password2) { setError("Passwords don't match."); return; }
     try {
       await register(form.username, form.email, form.password1, form.password2);
-      navigate("/");
+      setIsSuccess(true);
+      setTimeout(() => navigate("/"), 1500);
     } catch (err: unknown) {
       const e = err as { data?: unknown };
       setError(JSON.stringify(e.data || "Registration failed."));
@@ -38,7 +40,10 @@ export function RegisterPage() {
             {field("password1", "Password", "password")}
             {field("password2", "Confirm password", "password")}
             {error && <p className="text-sm text-red-500">{error}</p>}
-            <Button type="submit" className="w-full">Create account</Button>
+            {isSuccess && <p className="text-sm text-green-600">Welcome to Spoonfury! Redirecting...</p>}
+            <Button type="submit" className="w-full" disabled={isSuccess}>
+              {isSuccess ? "Redirecting..." : "Create account"}
+            </Button>
           </form>
         </CardContent>
       </Card>

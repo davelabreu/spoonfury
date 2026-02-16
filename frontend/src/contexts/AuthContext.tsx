@@ -26,9 +26,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (username: string, email: string, password1: string, password2: string) => {
     const data = await api.post("/auth/registration/", { username, email, password1, password2 });
-    localStorage.setItem("token", data.key);
+    
+    let authToken = data?.key;
+
+    // If registration didn't return a token (e.g. 204 No Content), perform login
+    if (!authToken) {
+      const loginData = await api.post("/auth/login/", { username, password: password1 });
+      authToken = loginData.key;
+    }
+
+    localStorage.setItem("token", authToken);
     localStorage.setItem("username", username);
-    setToken(data.key);
+    setToken(authToken);
     setUsername(username);
   };
 

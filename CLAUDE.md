@@ -6,33 +6,21 @@ This file provides guidance to Claude Code when working with the Spoonfury codeb
 
 **Before writing any code**, load the relevant context:
 1. Read this file (system overview)
-2. Read `docs/context-scopes/<service>.md` for the layer you're modifying
-3. Read `docs/CONVENTIONS.md` if writing new code
-4. Check `docs/DECISIONS.md` if changing an existing pattern
-
-Full documentation index: `docs/README.md`
+2. Read `GEMINI.md` for Gemini-specific context and patterns
+3. Read `docs/plans/` for the latest implementation status
+4. Read `docs/CONVENTIONS.md` if writing new code (if available)
 
 ## Project Overview
 
-Spoonfury — a recipe-first social platform. Core mechanic: fork a recipe, make it yours (constrained edits), build a curated digital recipe book to share with family and friends. Instacart integration lets users buy ingredients directly from a recipe page.
+Spoonfury — a recipe-first social platform. Core mechanic: fork a recipe, make it yours, build curated digital recipe books.
 
-**Status**: Prototype v0.1 — in active development.
+**Status**: Prototype v0.2 — Improved data quality, fork-to-book loop, and ownership security.
 
 ## Architecture
 
-**backend** — Django + Django REST Framework. REST APIs consumed by React frontend. PostgreSQL database. Django Allauth for auth.
-
-**frontend** — React 19 + Vite + Tailwind 4 + Shadcn UI. Same stack as home_ai_project web_monitor. Django serves the production build from `frontend/dist/`.
-
+**backend** — Django + DRF. REST APIs. Ownership enforced on write/delete.
+**frontend** — React 19 + Vite + Tailwind 4 + Shadcn UI. Markdown rendering via `react-markdown`.
 **database** — PostgreSQL, containerized.
-
-## Port Mapping (host → container)
-
-| Service | Host Port | Container Port |
-|---|---|---|
-| backend (Django) | 8000 | 8000 |
-| frontend (Vite dev) | 5173 | 5173 |
-| postgres | 5432 | 5432 |
 
 ## Build & Run Commands
 
@@ -40,33 +28,32 @@ Spoonfury — a recipe-first social platform. Core mechanic: fork a recipe, make
 ```bash
 # Backend
 cd backend
-python3 -m venv .venv && source .venv/Scripts/activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
+# Use root .venv: ../.venv/Scripts/python manage.py runserver
 
 # Frontend
 cd frontend
 npm install
-npm run dev       # Vite dev server at localhost:5173
-npm run build     # Production build → frontend/dist/
-```
-
-### Docker (Jetson)
-```bash
-docker compose up --build -d
-./deploy.sh
+npm run dev
 ```
 
 ## Key Conventions
 
-- **Recipe data**: ingredients stored as `JSONField` `[{quantity, unit, name, note}]`. All other fields (instructions, notes) are markdown text blobs.
-- **Fork constraints**: max ±3 ingredient changes, category locked, enforced by UI + validated on backend save.
-- **Instacart integration**: pure frontend URL construction from checked ingredient list. No API key for prototype.
-- **Frontend stack**: React 19, Tailwind 4, Shadcn UI (same as web_monitor). Hooks in `src/hooks/`, components in `src/components/`.
-- **Auth**: Django Allauth, email/password for prototype.
-- **Git**: Semantic commits on `master`. Feature branches for larger work.
+### Backend
+- **Security**: Ownership check enforced in `RecipeViewSet` for `update` and `destroy`.
+- **Actions**: Custom actions (e.g., `add-recipe`, `remove-recipe`) use `POST` to handle request bodies reliably.
 
-## Design Doc
+### Frontend
+- **Recipe Data**: Blank ingredient rows (empty name) are filtered before submission and rendering.
+- **Forking**: Simplified flow — "Fork" creates a copy and saves it to a selected book. No ingredient editing during the fork step.
+- **Action Bar**: Compact header area for recipe actions (`bg-indigo-50/50`).
+- **Modal UI**: `ForkModal` uses `backdrop-blur-[2px]` and solid `bg-white` card.
+- **Markdown**: Styled via `@tailwindcss/typography` (`prose` classes). Plugin imported in `index.css`.
+- **Navigation**: Use `navigate(-1)` or `ChevronLeft` for "Back" links to maintain user context.
 
-Full prototype design: `docs/plans/2026-02-15-spoonfury-design.md`
+### Git
+- **Commits**: Semantic commits on `master`.
+- **Worktrees**: Use `.worktrees/` for feature development.
+
+## Design Docs
+- v0.1 Design: `docs/plans/2026-02-15-spoonfury-design.md`
+- v0.2 Improvements: `docs/plans/2026-02-16-v0.2-improvements.md`
