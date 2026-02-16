@@ -20,6 +20,8 @@ def api_client():
 
 
 @pytest.fixture
-def auth_client(api_client, user):
-    api_client.force_authenticate(user=user)
-    return api_client
+def auth_client(user):
+    from rest_framework.test import APIClient
+    client = APIClient()
+    client.force_authenticate(user=user)
+    return client
