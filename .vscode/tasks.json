@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Postgres (WSL2)",
+      "type": "shell",
+      "command": "wsl -e bash -c \"cd /mnt/g/Projects/dev/1.work/Spoonfury && echo '' && echo '=== Postgres (WSL2) ===' && echo 'Run: docker compose -f docker-compose.dev.yml up -d' && echo '' && exec bash\"",
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": { "panel": "dedicated", "reveal": "always", "showReuseMessage": false }
+    },
+    {
+      "label": "Frontend",
+      "type": "shell",
+      "command": "cd frontend && echo '' && echo '=== Frontend ===' && echo 'Run: npm run dev' && echo '' && bash",
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": { "panel": "dedicated", "reveal": "always", "showReuseMessage": false }
+    },
+    {
+      "label": "Backend",
+      "type": "shell",
+      "command": "cd backend && echo '' && echo '=== Backend ===' && echo '1. source ../.venv/Scripts/activate' && echo '2. python manage.py runserver' && echo '' && bash",
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": { "panel": "dedicated", "reveal": "always", "showReuseMessage": false }
+    },
+
+  ]
+}
