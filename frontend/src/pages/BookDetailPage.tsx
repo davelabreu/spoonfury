@@ -4,25 +4,57 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 
 export function BookDetailPage({ shared = false }: { shared?: boolean }) {
   const { id, token: shareToken } = useParams<{ id?: string; token?: string }>();
-  const { token } = useAuth();
+  const { token, username } = useAuth();
   const [book, setBook] = useState<any>(null);
+  const [error, setError] = useState("");
   const [copyMsg, setCopyMsg] = useState("");
 
-  useEffect(() => {
+  const loadBook = () => {
     if (shared && shareToken) {
-      api.get(`/books/share/${shareToken}/`).then(setBook);
+      api.get(`/books/share/${shareToken}/`)
+        .then(setBook)
+        .catch(() => setError("Failed to load book."));
     } else if (id && token) {
-      api.get(`/books/${id}/`, token).then(setBook);
+      api.get(`/books/${id}/`, token)
+        .then(setBook)
+        .catch(() => setError("Failed to load book."));
     }
-  }, [id, shareToken, token]);
+  };
+
+  useEffect(() => {
+    loadBook();
+  }, [id, shareToken, token, shared]);
 
   const togglePublic = async () => {
     if (!token || !id) return;
-    const updated = await api.patch(`/books/${id}/`, { is_public: !book.is_public }, token);
-    setBook((b: any) => ({ ...b, is_public: updated.is_public }));
+    try {
+      const updated = await api.patch(`/books/${id}/`, { is_public: !book.is_public }, token);
+      setBook((b: any) => ({ ...b, is_public: updated.is_public }));
+    } catch {
+      setError("Failed to update visibility.");
+    }
+  };
+
+  const removeFromBook = async (e: React.MouseEvent, recipeSlug: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!token || !id) return;
+    
+    if (!window.confirm("Remove this recipe from the book?")) return;
+
+    try {
+      await api.post(`/books/${id}/remove-recipe/`, { recipe_slug: recipeSlug }, token);
+      setBook((b: any) => ({
+        ...b,
+        recipes: b.recipes.filter((r: any) => r.slug !== recipeSlug)
+      }));
+    } catch {
+      alert("Failed to remove recipe from book.");
+    }
   };
 
   const copyShareLink = () => {
@@ -32,7 +64,10 @@ export function BookDetailPage({ shared = false }: { shared?: boolean }) {
     setTimeout(() => setCopyMsg(""), 2000);
   };
 
-  if (!book) return <p className="text-muted-foreground">Loading...</p>;
+  const isOwner = book && username && book.owner_username === username;
+
+  if (!book && !error) return <p className="text-muted-foreground">Loading…</p>;
+  if (error) return <p className="text-destructive">{error}</p>;
 
   return (
     <div className="space-y-6">
@@ -41,7 +76,7 @@ export function BookDetailPage({ shared = false }: { shared?: boolean }) {
           <h1 className="text-2xl font-bold">{book.title}</h1>
           <p className="text-sm text-muted-foreground">by @{book.owner_username}</p>
         </div>
-        {!shared && (
+        {!shared && isOwner && (
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={togglePublic}>
               {book.is_public ? "Make private" : "Make public"}
@@ -58,12 +93,26 @@ export function BookDetailPage({ shared = false }: { shared?: boolean }) {
       <div className="space-y-3">
         {(book.recipes || []).map((r: any) => (
           <Link key={r.slug} to={`/recipes/${r.slug}`}
-            className="flex items-center justify-between border rounded-lg p-3 hover:bg-accent transition-colors">
-            <div>
-              <p className="font-medium text-sm">{r.title}</p>
-              <p className="text-xs text-muted-foreground">by @{r.author_username}</p>
+            className="group flex items-center justify-between border rounded-lg p-3 hover:bg-accent transition-colors">
+            <div className="flex items-center gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-sm">{r.title}</p>
+                  <Badge variant="secondary" className="text-[10px] h-4 px-1.5">{r.category}</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">by @{r.author_username}</p>
+              </div>
             </div>
-            <Badge variant="secondary" className="text-xs">{r.category}</Badge>
+
+            {isOwner && !shared && (
+              <button
+                onClick={(e) => removeFromBook(e, r.slug)}
+                className="flex items-center gap-1.5 p-1.5 rounded-md text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 whitespace-nowrap"
+              >
+                <X className="w-3.5 h-3.5" />
+                <span className="text-[10px] font-bold uppercase tracking-tight">Remove recipe from book</span>
+              </button>
+            )}
           </Link>
         ))}
         {book.recipes?.length === 0 && (

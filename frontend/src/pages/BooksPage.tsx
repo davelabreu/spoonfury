@@ -9,19 +9,31 @@ export function BooksPage() {
   const { token } = useAuth();
   const [books, setBooks] = useState<any[]>([]);
   const [newTitle, setNewTitle] = useState("");
+  const [error, setError] = useState("");
 
-  const load = () => token && api.get("/books/", token).then(d => setBooks(d.results || d));
+  const load = () => {
+    if (token) {
+      api.get("/books/", token)
+        .then(d => setBooks(d.results || d))
+        .catch(() => setError("Failed to load books. Try refreshing."));
+    }
+  };
 
   useEffect(() => { load(); }, [token]);
 
   const createBook = async () => {
     if (!newTitle.trim() || !token) return;
-    await api.post("/books/", { title: newTitle }, token);
-    setNewTitle("");
-    load();
+    try {
+      await api.post("/books/", { title: newTitle }, token);
+      setNewTitle("");
+      load();
+    } catch {
+      setError("Failed to create book.");
+    }
   };
 
   if (!token) return <p>Please <a href="/login" className="underline">sign in</a> to manage your books.</p>;
+  if (error) return <p className="text-destructive">{error}</p>;
 
   return (
     <div className="space-y-6">

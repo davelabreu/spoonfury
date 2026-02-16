@@ -40,7 +40,7 @@ class RecipeBookViewSet(viewsets.ModelViewSet):
         BookRecipe.objects.get_or_create(book=book, recipe=recipe, defaults={"order": order})
         return Response({"status": "added"}, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=["delete"], url_path="remove-recipe")
+    @action(detail=True, methods=["post"], url_path="remove-recipe")
     def remove_recipe(self, request, pk=None):
         book = self.get_object()
         recipe_slug = request.data.get("recipe_slug")
