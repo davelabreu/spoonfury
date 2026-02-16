@@ -1,0 +1,54 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - link "🥄 Spoonfury" [ref=e4] [cursor=pointer]:
+      - /url: /
+    - generic [ref=e5]:
+      - generic [ref=e22]: "@gemini_tester"
+      - link "My Books" [ref=e23] [cursor=pointer]:
+        - /url: /books
+        - button "My Books" [ref=e24]
+      - link "+ Recipe" [ref=e25] [cursor=pointer]:
+        - /url: /recipes/new
+        - button "+ Recipe" [ref=e26]
+      - button "Sign out" [ref=e27]
+  - main [ref=e10]:
+    - generic [ref=e82]:
+      - generic [ref=e84]: New Recipe
+      - generic [ref=e86]:
+        - textbox "Title (max 100 chars)" [ref=e87]: Gemini Test Pasta
+        - textbox "Description (max 280 chars — the elevator pitch)" [ref=e88]: A simple test pasta for the CLI agent.
+        - generic [ref=e89]:
+          - textbox "Serves" [ref=e90]: "2"
+          - combobox [ref=e91]:
+            - option "Soup"
+            - option "Pasta" [selected]
+            - option "Bake"
+            - option "Salad"
+            - option "Grill"
+            - option "Breakfast"
+            - option "Dessert"
+            - option "Drink"
+            - option "Snack"
+            - option "Other"
+        - generic [ref=e92]:
+          - heading "Ingredients" [level=3] [ref=e93]
+          - generic [ref=e94]:
+            - textbox "Qty" [ref=e95]: "200"
+            - textbox "Unit" [ref=e96]: g
+            - textbox "Name" [ref=e97]: Pasta
+            - textbox "Note" [ref=e98]
+            - button "✕" [ref=e107]
+          - generic [ref=e108]:
+            - textbox "Qty" [ref=e109]
+            - textbox "Unit" [ref=e110]
+            - textbox "Name" [ref=e111]
+            - textbox "Note" [ref=e112]
+            - button "✕" [ref=e113]
+          - button "+ Add ingredient" [active] [ref=e99]
+        - generic [ref=e100]:
+          - heading "Instructions (markdown)" [level=3] [ref=e101]
+          - textbox [ref=e102]: 1. Boil water. 2. Cook pasta. 3. Add sauce.
+        - generic [ref=e103]:
+          - heading "Notes (optional markdown)" [level=3] [ref=e104]
+          - textbox [ref=e105]
+        - button "Publish Recipe" [ref=e106]

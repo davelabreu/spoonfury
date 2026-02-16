@@ -16,6 +16,7 @@ frontend/dist/
 
 # Env
 .env
+.gemini/
 
 # Docker
 *.log

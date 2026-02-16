@@ -45,7 +45,8 @@ This project is built using a hybrid AI workflow, leveraging both Claude and Gem
 
 ### Developer Workflow
 1. **Planning**: Design docs are stored in `docs/plans/`.
-2. **Implementation**: AI agents follow the respective `CLAUDE.md` or `GEMINI.md` guides.
+2. **Context**: Targeted architectural flows and system scopes are in `docs/context-scopes/`.
+3. **Implementation**: AI agents follow the respective `CLAUDE.md` or `GEMINI.md` guides.
 3. **Verification**: Backend tests use `pytest`. Frontend is verified via Vite dev server.
 4. **Deployment**: Uses Docker Compose for consistent environments across development and production.
 

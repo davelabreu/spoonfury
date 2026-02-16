@@ -23,6 +23,9 @@ Spoonfury is a recipe-first social platform focusing on the **fork** mechanic.
 - **Ownership Security**: `RecipeViewSet` enforces ownership on `PATCH` and `DELETE` via `perform_update` and `perform_destroy`.
 - **Action Pattern**: Custom actions like `add-recipe` and `remove-recipe` use `POST` to handle request bodies (recipe slugs) reliably.
 
+### Auth Patterns
+- **Registration Flow**: Some configurations return `204 No Content` on registration. The frontend `AuthContext` is designed to catch this and perform a background `login` automatically to ensure the user is immediately authenticated.
+
 ### Frontend
 - **Action Bar**: Compact header area for recipe actions (Edit, Add to Book, Delete). 
   - **Styling**: `bg-indigo-50/50`, `border-indigo-100/50`, `px-4 py-2.5`.
