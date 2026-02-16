@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,23 +8,76 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { IngredientChecklist } from "@/components/IngredientChecklist";
 import { ForkModal } from "@/components/ForkModal";
+import { ChevronLeft } from "lucide-react";
+
+interface Book {
+  id: number;
+  title: string;
+}
 
 export function RecipePage() {
   const { slug } = useParams<{ slug: string }>();
-  const { token } = useAuth();
+  const { token, username } = useAuth();
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState<any>(null);
+  const [error, setError] = useState("");
   const [forking, setForking] = useState(false);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [saveMsg, setSaveMsg] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
-    api.get(`/recipes/${slug}/`).then(setRecipe);
+    api.get(`/recipes/${slug}/`).then(setRecipe).catch(() => setError("Recipe not found."));
   }, [slug]);
 
-  if (!recipe) return <p className="text-muted-foreground">Loading...</p>;
+  useEffect(() => {
+    if (token) {
+      api.get("/books/", token).then((data: any) => setBooks(data.results ?? data));
+    }
+  }, [token]);
+
+  const isOwner = recipe && username && recipe.author_username === username;
+
+  const addToBook = async (bookId: number) => {
+    if (!token || !recipe) return;
+    try {
+      await api.post(`/books/${bookId}/add-recipe/`, { recipe_slug: recipe.slug }, token);
+      setSaveMsg("Saved!");
+      setTimeout(() => setSaveMsg(""), 2000);
+    } catch {
+      setSaveMsg("Failed to save.");
+      setTimeout(() => setSaveMsg(""), 2000);
+    }
+  };
+
+  const deleteRecipe = async () => {
+    if (!token || !slug || !isOwner) return;
+    if (!window.confirm("Are you sure you want to delete this recipe? This cannot be undone.")) return;
+
+    setDeleting(true);
+    try {
+      await api.delete(`/recipes/${slug}/`, token);
+      navigate("/");
+    } catch {
+      setError("Failed to delete recipe.");
+      setDeleting(false);
+    }
+  };
+
+  if (error) return <div className="max-w-2xl mx-auto py-12"><p className="text-destructive font-medium">{error}</p><Button variant="link" onClick={() => navigate("/")} className="mt-4 p-0">← Back to home</Button></div>;
+  if (!recipe) return <p className="text-muted-foreground">Loading…</p>;
 
   return (
     <article className="max-w-2xl mx-auto space-y-6">
+      {/* Navigation */}
+      <div className="flex items-center -ml-2 mb-2">
+        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground">
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          Back
+        </Button>
+      </div>
+
       {/* Header */}
       <div>
         <div className="flex items-start justify-between gap-4">
@@ -34,26 +87,84 @@ export function RecipePage() {
         {recipe.parent_recipe_slug && (
           <p className="text-sm text-muted-foreground mt-1">
             Forked from{" "}
-            <a href={`/recipes/${recipe.parent_recipe_slug}`} className="underline">
+            <Link to={`/recipes/${recipe.parent_recipe_slug}`} className="underline">
               @{recipe.parent_recipe_author}'s {recipe.parent_recipe_title}
-            </a>
+            </Link>
           </p>
         )}
         <p className="text-sm text-muted-foreground mt-1">
           by @{recipe.author_username}
-          {recipe.fork_count > 0 && (
-            <span className="ml-3">🍴 {recipe.fork_count} fork{recipe.fork_count !== 1 ? "s" : ""}</span>
-          )}
         </p>
+        
+        {recipe.fork_count > 0 && (
+          <div className="mt-2">
+            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+              🍴 {recipe.fork_count} FORK{recipe.fork_count !== 1 ? "S" : ""}
+            </Badge>
+          </div>
+        )}
+
+        {/* Action bar — shown only when logged in */}
+        {token && (
+          <div className="flex flex-wrap items-center gap-3 mt-4 px-4 py-2.5 bg-indigo-50/50 rounded-lg border border-indigo-100/50">
+            {isOwner ? (
+              <div className="flex flex-col gap-1 w-full">
+                <span className="text-[10px] uppercase font-bold text-indigo-400/80 tracking-wider">Owner Actions</span>
+                <div className="flex items-center gap-2 w-full">
+                  <Button variant="outline" size="sm" asChild className="bg-white/50 border-indigo-100">
+                    <Link to={`/recipes/${slug}/edit`}>Edit recipe</Link>
+                  </Button>
+                  
+                  <div className="h-4 w-px bg-indigo-200/50 mx-1" />
+                  
+                  {books.length > 0 ? (
+                    <div className="flex items-center gap-2">
+                      <select
+                        className="border border-indigo-100 rounded px-2 py-1 text-sm bg-white/50 text-indigo-900 focus:outline-none"
+                        defaultValue=""
+                        onChange={e => { if (e.target.value) addToBook(Number(e.target.value)); e.target.value = ""; }}
+                      >
+                        <option value="" disabled>Add to book…</option>
+                        {books.map(b => <option key={b.id} value={b.id}>{b.title}</option>)}
+                      </select>
+                      {saveMsg && <span className="text-sm font-medium text-indigo-600 animate-in fade-in slide-in-from-left-1">{saveMsg}</span>}
+                    </div>
+                  ) : (
+                    <Button variant="ghost" size="sm" asChild className="text-indigo-400">
+                      <Link to="/books" className="underline underline-offset-4">Create a book first</Link>
+                    </Button>
+                  )}
+
+                  <div className="flex-1" />
+
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={deleteRecipe} 
+                    disabled={deleting} 
+                    className="bg-white/50 border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600"
+                  >
+                    {deleting ? "Deleting..." : "Delete"}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1 w-full sm:w-auto">
+                <span className="text-[10px] uppercase font-bold text-indigo-400/80 tracking-wider">Actions</span>
+                <Button variant="outline" size="sm" onClick={() => setForking(true)} className="w-full sm:w-auto border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50">
+                  🍴 Make it mine
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <p className="text-base leading-relaxed">{recipe.description}</p>
       <p className="text-sm text-muted-foreground">Serves: {recipe.serves}</p>
 
       <Separator />
-
       <IngredientChecklist ingredients={recipe.ingredients} />
-
       <Separator />
 
       <div>
@@ -75,20 +186,12 @@ export function RecipePage() {
         </>
       )}
 
-      {token && (
-        <div className="pt-4">
-          <Button onClick={() => setForking(true)} className="w-full" size="lg">
-            🍴 Make it mine
-          </Button>
-        </div>
-      )}
-
       {forking && (
         <ForkModal
           recipe={recipe}
           token={token!}
           onClose={() => setForking(false)}
-          onSuccess={(slug: string) => navigate(`/recipes/${slug}`)}
+          onSuccess={(bookId: number) => navigate(`/books/${bookId}`)}
         />
       )}
     </article>

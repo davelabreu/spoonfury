@@ -22,7 +22,10 @@ export function CreateRecipePage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const data = await api.post("/recipes/", { ...form, ingredients }, token);
+      const data = await api.post("/recipes/", { 
+        ...form, 
+        ingredients: ingredients.filter(i => i.name.trim() !== "") 
+      }, token);
       navigate(`/recipes/${data.slug}`);
     } catch (err: unknown) {
       const e = err as { data?: unknown };

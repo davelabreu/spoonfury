@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { RecipePage } from "@/pages/RecipePage";
+import { EditRecipePage } from "@/pages/EditRecipePage";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { BooksPage } from "@/pages/BooksPage";
@@ -18,6 +19,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/recipes/new" element={<CreateRecipePage />} />
+            <Route path="/recipes/:slug/edit" element={<EditRecipePage />} />
             <Route path="/recipes/:slug" element={<RecipePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />

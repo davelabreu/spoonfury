@@ -5,10 +5,15 @@ import { Badge } from "@/components/ui/badge";
 
 export function HomePage() {
   const [recipes, setRecipes] = useState<any[]>([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    api.get("/recipes/").then(data => setRecipes(data.results || []));
+    api.get("/recipes/")
+      .then(data => setRecipes(data.results || []))
+      .catch(() => setError("Failed to load recipes. Try refreshing."));
   }, []);
+
+  if (error) return <p className="text-destructive">{error}</p>;
 
   return (
     <div>
