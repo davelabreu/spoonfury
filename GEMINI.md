@@ -6,32 +6,39 @@ This file provides guidance to the Gemini CLI agent when working with the Spoonf
 
 **Before writing any code**, load the relevant context:
 1. Read `CLAUDE.md` for the system overview and build/run commands.
-2. Read `docs/context-scopes/<service>.md` for the layer you're modifying.
-3. Read `docs/plans/` for recent design and implementation details.
-4. Follow project-specific conventions as detailed in `CLAUDE.md` and `docs/plans/2026-02-15-spoonfury-design.md`.
+2. Read `docs/context-scopes/` for the layer you're modifying.
+3. Read `docs/plans/` for the most recent development status.
 
 ## Project Context Summary
 
-Spoonfury is a recipe-first social platform focusing on the **fork** mechanic — users can clone and modify recipes within constraints. It integrates with Instacart for easy ingredient purchasing.
+Spoonfury is a recipe-first social platform focusing on the **fork** mechanic.
 
 - **Stack**: Django (REST API) + PostgreSQL + React 19 (Vite/Tailwind 4/Shadcn).
 - **Core Models**: `Recipe`, `User`, `RecipeBook`.
-- **Key Feature**: Recipe forking with ±3 ingredient change constraint.
-- **Deployment**: Docker-compose for Jetson deployment.
+- **Key Feature**: Recipe forking with save-to-book flow.
 
-## Workflow Integration
+## Architecture & UI Patterns
 
-This project uses a hybrid workflow involving both Claude and Gemini.
-- **Claude**: Used for initial scaffolding and major feature implementations following `CLAUDE.md`.
-- **Gemini**: Used for ongoing development, reviews, and specific tasks using this `GEMINI.md` and the `gemini-superpowers` extension.
+### Backend
+- **Ownership Security**: `RecipeViewSet` enforces ownership on `PATCH` and `DELETE` via `perform_update` and `perform_destroy`.
+- **Action Pattern**: Custom actions like `add-recipe` and `remove-recipe` use `POST` to handle request bodies (recipe slugs) reliably.
+
+### Frontend
+- **Action Bar**: Compact header area for recipe actions (Edit, Add to Book, Delete). 
+  - **Styling**: `bg-indigo-50/50`, `border-indigo-100/50`, `px-4 py-2.5`.
+  - **Owner Actions**: Clearly labeled with `Owner Actions` in small caps.
+- **Modal Pattern**: `ForkModal` uses `backdrop-blur-[2px]`, `bg-black/50` overlay, and a brilliant `bg-white` card.
+- **Markdown Rendering**: Uses `react-markdown` with the `@tailwindcss/typography` plugin (`prose` classes).
+- **Navigation**: Uses `navigate(-1)` for "Back" affordances to maintain context.
+- **Data Filtering**: Blank ingredient rows (empty `name`) must be filtered out before API submission and during rendering.
 
 ## Environment-Specific Reminders
 
-- **Git**: Always use semantic commits on `master` (or feature branches for large work).
-- **Testing**: Use `pytest` for backend and verify frontend changes locally.
-- **Architecture**: Mimic the style and structure established in the `backend/spoonfury/apps/` and `frontend/src/` directories.
+- **Git**: Always use semantic commits on `master`.
+- **Worktrees**: Use `.worktrees/` for isolated feature work. Note that `.env` files and `.venv` must be manually managed in new worktrees.
+- **Tailwind 4**: Typography plugin is imported via `@plugin "@tailwindcss/typography";` in `index.css`.
 
 ## Key Files to Watch
-- `CLAUDE.md`: System overview and commands.
-- `docker-compose.yml`: Single source of truth for deployment.
-- `backend/requirements.txt` & `frontend/package.json`: Dependencies.
+- `backend/spoonfury/apps/books/views.py`: Book management logic.
+- `frontend/src/pages/RecipePage.tsx`: Main UI container for recipes.
+- `frontend/src/index.css`: Global styles and tailwind plugins.
