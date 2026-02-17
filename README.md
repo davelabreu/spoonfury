@@ -24,6 +24,7 @@ The project follows a modern full-stack architecture optimized for deployment on
 - **Framework**: [React 19](https://react.dev/)
 - **Build Tool**: [Vite](https://vitejs.dev/)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
 - **UI Components**: [Shadcn UI](https://ui.shadcn.com/)
 - **Location**: `/frontend`
 

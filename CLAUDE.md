@@ -19,7 +19,7 @@ Spoonfury — a recipe-first social platform. Core mechanic: fork a recipe, make
 ## Architecture
 
 **backend** — Django + DRF. REST APIs. Ownership enforced on write/delete.
-**frontend** — React 19 + Vite + Tailwind 4 + Shadcn UI. Markdown rendering via `react-markdown`. QR codes via `qrcode.react`.
+**frontend** — React 19 + Vite + Tailwind 4 + Shadcn UI. Animations via `framer-motion`. Markdown via `react-markdown`. QR via `qrcode.react`.
 **database** — PostgreSQL, containerized.
 
 ## Build & Run Commands

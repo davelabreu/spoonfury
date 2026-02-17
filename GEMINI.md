@@ -13,7 +13,7 @@ This file provides guidance to the Gemini CLI agent when working with the Spoonf
 
 Spoonfury is a recipe-first social platform focusing on the **fork** mechanic.
 
-- **Stack**: Django (REST API) + PostgreSQL + React 19 (Vite/Tailwind 4/Shadcn).
+- **Stack**: Django (REST API) + PostgreSQL + React 19 (Vite/Tailwind 4/Shadcn/Framer Motion).
 - **Core Models**: `Recipe`, `User`, `RecipeBook`.
 - **Key Feature**: Recipe forking with save-to-book flow.
 
