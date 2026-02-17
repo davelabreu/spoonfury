@@ -11,99 +11,134 @@ const STICKERS = [
   { label: "+ Recipe", to: "/recipes/new", color: "bg-[#FFE66D]", authRequired: true },
 ];
 
-const AUTH_STICKERS = [
-  { label: "Sign in", to: "/login", color: "bg-[#A29BFE]", guestOnly: true },
-  { label: "Join", to: "/register", color: "bg-[#primary]", guestOnly: true, isPrimary: true },
-];
-
 interface NavStickerProps {
   label: string;
-  to: string;
+  to?: string;
   color: string;
   icon?: any;
   isSpecial?: boolean;
-  isActive: boolean;
+  isActive?: boolean;
   onClick?: () => void;
   className?: string;
+  variant?: "tab" | "button";
 }
 
-function NavSticker({ label, to, color, icon: Icon, isSpecial, isActive, onClick, className }: NavStickerProps) {
+function NavSticker({ label, to, color, icon: Icon, isSpecial, isActive, onClick, className, variant = "tab" }: NavStickerProps) {
   const [isHovered, setIsHovered] = useState(false);
+
+  const isTab = variant === "tab";
+
+  // The lift amount
+  const lift = isHovered ? (isTab ? -6 : -4) : (isActive ? (isTab ? -3 : -2) : 0);
+  
+  // Dynamic clip-path logic (ONLY for tabs)
+  const clipBottom = 12 + lift;
+  const clipPath = isTab ? `inset(-500px -500px ${clipBottom}px -500px)` : "none";
+
+  const content = (
+    <span className="relative z-10 flex items-center gap-2 h-5">
+      {Icon && (
+        <motion.span
+          animate={isActive ? { rotate: [0, 15, -15, 0] } : {}}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          className="flex items-center justify-center w-5"
+        >
+          <Icon size={18} strokeWidth={2.5} />
+        </motion.span>
+      )}
+      <span className="leading-none flex items-center h-full pt-0.5">{label}</span>
+    </span>
+  );
+
+  const sharedClasses = `
+    relative flex items-center justify-center gap-2 px-5 transition-all duration-200 font-bold border-black
+    ${color} 
+    ${isTab ? "pt-2.5 pb-4 rounded-t-xl border-x-[2.5px] border-t-[2.5px] text-sm" : "py-3 rounded-xl border-[2.5px] text-base"}
+    ${isActive || isHovered 
+      ? (isTab ? "shadow-[0px_-2px_0px_0px_rgba(0,0,0,1)]" : "shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]") 
+      : (isTab ? "" : "shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]")}
+    ${isSpecial ? "overflow-visible" : ""}
+    ${className || ""}
+  `;
 
   return (
     <motion.div
       animate={{ 
-        y: (isActive || isHovered) ? -8 : 0, // Lifted more to show it's a tab being pulled out
-        rotate: (isSpecial && isHovered) ? [0, -0.5, 0.5, -0.5, 0] : 0
+        y: lift,
+        rotate: (isSpecial && isHovered) ? [0, -0.8, 0.8, -0.8, 0] : 0
       }}
-      whileTap={{ scale: 0.95 }}
+      whileTap={{ scale: 0.96 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className="relative"
+      className="relative z-10"
     >
       {/* Aggressive Steam Particles */}
       {isSpecial && isHovered && (
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 pointer-events-none z-[999] w-24 h-48 flex justify-center">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
+        <div className={`absolute left-1/2 -translate-x-1/2 pointer-events-none z-[100] w-32 h-56 flex justify-center ${isTab ? "-top-32" : "-top-24"}`}>
+          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <motion.span
               key={i}
-              initial={{ opacity: 0, y: 80, scale: 1 }}
+              initial={{ opacity: 0, y: 100, scale: 1 }}
               animate={{ 
-                opacity: [0, 0.8, 0.6, 0], 
-                y: [70, 0, -100], 
-                x: (i - 2.5) * 15,
-                scale: [1, 2.5, 4]
+                opacity: [0, 1, 0.8, 0], 
+                y: [80, -40, -150], 
+                x: (i - 4) * 18,
+                scale: [1, 3, 5]
               }}
               transition={{ 
-                duration: 1.4, 
+                duration: 1.0, 
                 repeat: Infinity, 
-                delay: i * 0.25,
+                delay: i * 0.12,
                 ease: "easeOut" 
               }}
-              className="absolute bottom-0 w-8 h-8 bg-gray-300/60 rounded-full blur-[7px]"
+              className="absolute bottom-0 w-10 h-10 bg-gray-300/60 rounded-full blur-[10px]"
             />
           ))}
         </div>
       )}
 
-      <Link
-        to={to}
-        onClick={onClick}
-        className={`
-          relative flex items-center gap-2 px-4 pt-2 pb-5 rounded-t-xl text-sm font-bold border-x-[2.5px] border-t-[2.5px] border-black transition-all duration-200
-          ${color} 
-          ${isActive || isHovered 
-            ? "shadow-[0px_-2px_0px_0px_rgba(0,0,0,1)]" 
-            : ""}
-          ${isSpecial ? "overflow-visible" : ""}
-          ${className || ""}
-        `}
-        style={{ marginBottom: "-2.5px" }} // Overlap the bottom border of the nav
-      >
-        {/* Special Simmering Background for Stir the Pot */}
-        {isSpecial && (
-          <motion.div 
-            className="absolute inset-0 rounded-t-[9px]"
-            animate={{ 
-              backgroundColor: ["#FF6B6B", "#FF8E53", "#FFAB4C", "#FF8E53", "#FF6B6B"] 
-            }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          />
-        )}
-
-        <span className="relative z-10 flex items-center gap-2">
-          {Icon && (
-            <motion.span
-              animate={isActive ? { rotate: [0, 15, -15, 0] } : {}}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              <Icon size={16} strokeWidth={2.5} />
-            </motion.span>
+      {to ? (
+        <Link 
+          to={to} 
+          onClick={onClick} 
+          style={{ clipPath, marginBottom: isTab ? "-12px" : "0px" }} 
+          className={sharedClasses}
+        >
+          {isSpecial && (
+            <motion.div 
+              className={`absolute inset-0 ${isTab ? "rounded-t-[9px]" : "rounded-[9px]"}`}
+              animate={{ backgroundColor: ["#FF6B6B", "#FF8E53", "#FFAB4C", "#FF8E53", "#FF6B6B"] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            />
           )}
-          {label}
-        </span>
-      </Link>
+          {content}
+        </Link>
+      ) : (
+        <button 
+          type="button" 
+          onClick={onClick} 
+          style={{ clipPath, marginBottom: isTab ? "-12px" : "0px" }} 
+          className={sharedClasses}
+        >
+          {content}
+        </button>
+      )}
     </motion.div>
+  );
+}
+
+function UsernameBadge({ username, className }: { username: string; className?: string }) {
+  return (
+    <div
+      className={`
+        inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-black 
+        bg-[#E9D8FD] text-[10px] font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] 
+        ${className || ""}
+      `}
+    >
+      <span className="text-sm leading-none">👨‍🍳</span>
+      <span className="leading-none">@{username}</span>
+    </div>
   );
 }
 
@@ -141,30 +176,33 @@ export function NavBar() {
   const visibleStickers = STICKERS.filter(s => !s.authRequired || username);
 
   return (
-    <nav ref={navRef} className="border-b-[2.5px] border-black bg-background sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4 flex items-end h-14">
+    <nav ref={navRef} className="bg-background sticky top-0 z-50">
+      <div className="max-w-6xl mx-auto px-4 flex items-end h-14 relative">
         {/* Column 1: Logo */}
         <Link
           to="/"
-          className="text-2xl font-black tracking-tighter flex-shrink-0 hover:rotate-2 transition-transform mr-8 mb-3"
+          className="text-2xl font-black tracking-tighter flex-shrink-0 hover:rotate-2 transition-transform mr-8 mb-2.5 z-30"
           onClick={() => setMobileOpen(false)}
         >
           🥄 Spoonfury
         </Link>
 
         {isMobile ? (
-          <button
-            type="button"
-            className="ml-auto p-2 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white active:translate-y-[2px] active:shadow-none transition-all mb-2"
-            onClick={() => setMobileOpen((o) => !o)}
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          >
-            {mobileOpen ? <X size={22} strokeWidth={2.5} /> : <Menu size={22} strokeWidth={2.5} />}
-          </button>
+          <div className="ml-auto flex items-center gap-3 mb-2.5 z-30">
+            {username && <UsernameBadge username={username} />}
+            <button
+              type="button"
+              className="p-2 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white active:translate-y-[2px] active:shadow-none transition-all"
+              onClick={() => setMobileOpen((o) => !o)}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            >
+              {mobileOpen ? <X size={22} strokeWidth={2.5} /> : <Menu size={22} strokeWidth={2.5} />}
+            </button>
+          </div>
         ) : (
           <>
-            {/* Column 2: Stickers (grounded on bottom border) */}
-            <div className="flex-1 flex items-end justify-center gap-4 h-full">
+            {/* Column 2: Stickers (grounded in the z-slot) */}
+            <div className="flex-1 flex items-end justify-center gap-4 h-full relative z-10">
               {visibleStickers.map((sticker) => (
                 <NavSticker
                   key={sticker.to}
@@ -175,24 +213,20 @@ export function NavBar() {
             </div>
 
             {/* Column 3: Identity / auth actions */}
-            <div className="flex-shrink-0 flex items-center gap-4 mb-2">
+            <div className="flex-shrink-0 flex items-end gap-4 h-full z-30">
               {username ? (
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-black bg-muted px-3 py-1.5 rounded-lg border-2 border-black">
-                    @{username}
-                  </span>
-                  <motion.button
-                    type="button"
-                    whileHover={{ y: 2, shadow: "1px 1px 0px 0px rgba(0,0,0,1)" }}
-                    whileTap={{ scale: 0.98 }}
+                <div className="flex items-end gap-3 h-full">
+                  <div className="mb-3.5">
+                    <UsernameBadge username={username} />
+                  </div>
+                  <NavSticker
+                    label="Sign out"
+                    color="bg-white"
                     onClick={handleSignOut}
-                    className="text-sm font-bold px-3 py-2 rounded-xl border-2 border-black bg-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
-                  >
-                    Sign out
-                  </motion.button>
+                  />
                 </div>
               ) : (
-                <div className="flex items-center gap-3">
+                <div className="flex items-end gap-3 h-full">
                   <NavSticker
                     label="Sign in"
                     to="/login"
@@ -211,6 +245,9 @@ export function NavBar() {
             </div>
           </>
         )}
+
+        {/* The Slot Edge: A black line that sits ABOVE the stickers but BELOW the logo/auth */}
+        <div className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-black z-[25]" />
       </div>
 
       {/* ── Mobile drawer ── */}
@@ -220,39 +257,37 @@ export function NavBar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="border-t bg-background px-4 py-6 overflow-hidden"
+            className="border-t-[2.5px] border-black bg-background px-4 py-8 overflow-hidden"
           >
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-6 max-w-sm mx-auto">
               {visibleStickers.map((sticker) => (
                 <NavSticker
                   key={sticker.to}
                   {...sticker}
+                  variant="button"
                   isActive={location.pathname === sticker.to}
                   onClick={() => setMobileOpen(false)}
                 />
               ))}
               
-              <div className="h-px bg-black my-2" />
+              <div className="h-[2.5px] bg-black/10 my-2" />
 
               {username ? (
-                <>
-                  <div className="text-sm font-black bg-muted px-4 py-2 rounded-xl border-2 border-black self-start">
-                    @{username}
-                  </div>
-                  <button
-                    type="button"
+                <div className="flex flex-col gap-6">
+                  <NavSticker
+                    label="Sign out"
+                    color="bg-white"
+                    variant="button"
                     onClick={handleSignOut}
-                    className="text-left px-4 py-3 rounded-xl border-2 border-black bg-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] font-bold"
-                  >
-                    Sign out
-                  </button>
-                </>
+                  />
+                </div>
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-6">
                   <NavSticker
                     label="Sign in"
                     to="/login"
                     color="bg-[#A29BFE]"
+                    variant="button"
                     isActive={location.pathname === "/login"}
                     onClick={() => setMobileOpen(false)}
                   />
@@ -260,6 +295,7 @@ export function NavBar() {
                     label="Join"
                     to="/register"
                     color="bg-primary"
+                    variant="button"
                     isActive={location.pathname === "/register"}
                     onClick={() => setMobileOpen(false)}
                     className="text-primary-foreground"
