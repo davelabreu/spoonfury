@@ -32,44 +32,63 @@ function NavSticker({ label, to, color, icon: Icon, isSpecial, isActive, onClick
 
   return (
     <motion.div
-      whileHover={{ y: -4, rotate: isSpecial ? [0, -0.5, 0.5, -0.5, 0] : 0 }}
+      animate={{ 
+        y: (isActive || isHovered) ? -8 : 0, // Lifted more to show it's a tab being pulled out
+        rotate: (isSpecial && isHovered) ? [0, -0.5, 0.5, -0.5, 0] : 0
+      }}
       whileTap={{ scale: 0.95 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       className="relative"
     >
+      {/* Aggressive Steam Particles */}
+      {isSpecial && isHovered && (
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 pointer-events-none z-[999] w-24 h-48 flex justify-center">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <motion.span
+              key={i}
+              initial={{ opacity: 0, y: 80, scale: 1 }}
+              animate={{ 
+                opacity: [0, 0.8, 0.6, 0], 
+                y: [70, 0, -100], 
+                x: (i - 2.5) * 15,
+                scale: [1, 2.5, 4]
+              }}
+              transition={{ 
+                duration: 1.4, 
+                repeat: Infinity, 
+                delay: i * 0.25,
+                ease: "easeOut" 
+              }}
+              className="absolute bottom-0 w-8 h-8 bg-gray-300/60 rounded-full blur-[7px]"
+            />
+          ))}
+        </div>
+      )}
+
       <Link
         to={to}
         onClick={onClick}
         className={`
-          relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border-[2.5px] border-black transition-all
-          ${color} ${isActive ? "translate-y-[-4px] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]" : "shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"}
+          relative flex items-center gap-2 px-4 pt-2 pb-5 rounded-t-xl text-sm font-bold border-x-[2.5px] border-t-[2.5px] border-black transition-all duration-200
+          ${color} 
+          ${isActive || isHovered 
+            ? "shadow-[0px_-2px_0px_0px_rgba(0,0,0,1)]" 
+            : ""}
           ${isSpecial ? "overflow-visible" : ""}
           ${className || ""}
         `}
+        style={{ marginBottom: "-2.5px" }} // Overlap the bottom border of the nav
       >
-        {/* Special Gradient for Stir the Pot */}
+        {/* Special Simmering Background for Stir the Pot */}
         {isSpecial && (
           <motion.div 
-            className="absolute inset-0 bg-linear-to-r from-orange-400 via-red-400 to-orange-400 bg-[length:200%_100%] rounded-[9px]"
-            animate={{ backgroundPosition: ["0% 0%", "100% 0%"] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0 rounded-t-[9px]"
+            animate={{ 
+              backgroundColor: ["#FF6B6B", "#FF8E53", "#FFAB4C", "#FF8E53", "#FF6B6B"] 
+            }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           />
-        )}
-
-        {/* Steam Particles */}
-        {isSpecial && isHovered && (
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 pointer-events-none z-20">
-            {[0, 1, 2].map((i) => (
-              <motion.span
-                key={i}
-                initial={{ opacity: 0, y: 0, scale: 0.5 }}
-                animate={{ opacity: [0, 1, 0], y: -25, x: (i - 1) * 8 }}
-                transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.4 }}
-                className="absolute w-2 h-2 bg-white/80 rounded-full blur-[1.5px]"
-              />
-            ))}
-          </div>
         )}
 
         <span className="relative z-10 flex items-center gap-2">
@@ -92,7 +111,7 @@ export function NavBar() {
   const { username, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const isMobile = useMediaQuery("(max-width: 850px)"); // Adjusted to show on desktop earlier
+  const isMobile = useMediaQuery("(max-width: 850px)");
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navRef = useRef<HTMLElement>(null);
@@ -122,12 +141,12 @@ export function NavBar() {
   const visibleStickers = STICKERS.filter(s => !s.authRequired || username);
 
   return (
-    <nav ref={navRef} className="border-b bg-background sticky top-0 z-50 py-1">
-      <div className="max-w-6xl mx-auto px-4 py-2 flex items-center">
+    <nav ref={navRef} className="border-b-[2.5px] border-black bg-background sticky top-0 z-50">
+      <div className="max-w-6xl mx-auto px-4 flex items-end h-14">
         {/* Column 1: Logo */}
         <Link
           to="/"
-          className="text-2xl font-black tracking-tighter flex-shrink-0 hover:rotate-2 transition-transform mr-8"
+          className="text-2xl font-black tracking-tighter flex-shrink-0 hover:rotate-2 transition-transform mr-8 mb-3"
           onClick={() => setMobileOpen(false)}
         >
           🥄 Spoonfury
@@ -136,7 +155,7 @@ export function NavBar() {
         {isMobile ? (
           <button
             type="button"
-            className="ml-auto p-2 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white active:translate-y-[2px] active:shadow-none transition-all"
+            className="ml-auto p-2 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white active:translate-y-[2px] active:shadow-none transition-all mb-2"
             onClick={() => setMobileOpen((o) => !o)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
           >
@@ -144,8 +163,8 @@ export function NavBar() {
           </button>
         ) : (
           <>
-            {/* Column 2: Stickers (centered) */}
-            <div className="flex-1 flex items-center justify-center gap-4">
+            {/* Column 2: Stickers (grounded on bottom border) */}
+            <div className="flex-1 flex items-end justify-center gap-4 h-full">
               {visibleStickers.map((sticker) => (
                 <NavSticker
                   key={sticker.to}
@@ -156,19 +175,21 @@ export function NavBar() {
             </div>
 
             {/* Column 3: Identity / auth actions */}
-            <div className="flex-shrink-0 flex items-center gap-4">
+            <div className="flex-shrink-0 flex items-center gap-4 mb-2">
               {username ? (
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-black bg-muted px-3 py-1.5 rounded-lg border-2 border-black">
                     @{username}
                   </span>
-                  <button
+                  <motion.button
                     type="button"
+                    whileHover={{ y: 2, shadow: "1px 1px 0px 0px rgba(0,0,0,1)" }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={handleSignOut}
-                    className="text-sm font-bold px-3 py-2 rounded-xl border-2 border-black bg-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-none transition-all"
+                    className="text-sm font-bold px-3 py-2 rounded-xl border-2 border-black bg-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
                   >
                     Sign out
-                  </button>
+                  </motion.button>
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
