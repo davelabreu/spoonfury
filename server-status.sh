@@ -15,7 +15,7 @@ VITE_PORT=5173
 # Helper to find PID with verbose output
 find_pid_verbose() {
     local port=$1
-    echo -e "${GRAY}Running: netstat -ano | grep :$port | grep LISTENING | awk '{print \$5}'${NC}"
+    echo -e "${GRAY}Running: netstat -ano | grep :$port | grep LISTENING | awk '{print \$5}'${NC}" >&2
     pid=$(netstat -ano | grep ":$port " | grep "LISTENING" | awk '{print $5}' | head -n 1)
     echo $pid
 }
