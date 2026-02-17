@@ -11,14 +11,14 @@
     {
       "label": "Frontend",
       "type": "shell",
-      "command": "cd frontend && echo '' && echo '=== Frontend ===' && echo 'Run: npm run dev' && echo '' && bash",
+      "command": "cd frontend && echo '' && echo '=== Frontend ===' && echo 'Run: npm run dev:network' && echo '' && bash",
       "runOptions": { "runOn": "folderOpen" },
       "presentation": { "panel": "dedicated", "reveal": "always", "showReuseMessage": false }
     },
     {
       "label": "Backend",
       "type": "shell",
-      "command": "cd backend && echo '' && echo '=== Backend ===' && echo '1. source ../.venv/Scripts/activate' && echo '2. python manage.py runserver' && echo '' && bash",
+      "command": "cd backend && echo '' && echo '=== Backend ===' && echo '1. source ../.venv/Scripts/activate' && echo '2. python manage.py runserver 0.0.0.0:8000' && echo '' && bash",
       "runOptions": { "runOn": "folderOpen" },
       "presentation": { "panel": "dedicated", "reveal": "always", "showReuseMessage": false }
     },
