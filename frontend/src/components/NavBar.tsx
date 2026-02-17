@@ -41,6 +41,7 @@ export function NavBar() {
         {isMobile ? (
           /* ── Mobile: hamburger (pushed to far right) ── */
           <button
+            type="button"
             className="ml-auto p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors"
             onClick={() => setMobileOpen((o) => !o)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
@@ -61,6 +62,7 @@ export function NavBar() {
                     <Link
                       key={tab.to}
                       to={tab.to}
+                      aria-current={isActive ? "page" : undefined}
                       className="relative px-3 py-1.5 rounded-md text-sm font-medium outline-none"
                       onMouseEnter={() => setHoveredTab(tab.to)}
                     >
@@ -100,6 +102,7 @@ export function NavBar() {
                     @{username}
                   </span>
                   <button
+                    type="button"
                     onClick={handleSignOut}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted"
                   >
@@ -157,6 +160,7 @@ export function NavBar() {
                   </Link>
                 ))}
                 <button
+                  type="button"
                   onClick={handleSignOut}
                   className="text-left px-2 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
@@ -175,7 +179,7 @@ export function NavBar() {
                 <Link
                   to="/register"
                   onClick={() => setMobileOpen(false)}
-                  className="block px-2 py-2 rounded-md text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                  className="block px-2 py-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                 >
                   Join
                 </Link>
