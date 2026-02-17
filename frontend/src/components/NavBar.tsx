@@ -188,29 +188,33 @@ export function NavBar() {
           onMouseLeave={() => setLogoHovered(false)}
         >
           <div className="relative flex items-center">
-            {/* Fire Particles */}
+            {/* Fire Particles - More flame-like teardrop shapes */}
             <AnimatePresence>
               {logoHovered && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 pointer-events-none w-8 h-8 flex justify-center">
-                  {[0, 1, 2].map((i) => (
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 pointer-events-none w-12 h-12 flex justify-center">
+                  {[0, 1, 2, 3, 4].map((i) => (
                     <motion.span
                       key={i}
-                      initial={{ opacity: 0, y: 10, scale: 0.5 }}
+                      initial={{ opacity: 0, y: 20, scale: 0.3 }}
                       animate={{ 
-                        opacity: [0, 1, 0], 
-                        y: [-5, -20, -35], 
-                        x: (i - 1) * 6,
-                        scale: [0.5, 1.2, 0.2]
+                        opacity: [0, 1, 0.8, 0], 
+                        y: [15, -15, -45], 
+                        x: [(i - 2) * 3, (i - 2) * 6 + (Math.sin(i) * 10), (i - 2) * 10],
+                        scale: [0.5, 1.8, 0.1],
+                        rotate: [0, (i % 2 === 0 ? 20 : -20), 0]
                       }}
                       exit={{ opacity: 0 }}
                       transition={{ 
-                        duration: 0.6, 
+                        duration: 0.8, 
                         repeat: Infinity, 
-                        delay: i * 0.15,
+                        delay: i * 0.12,
                         ease: "easeOut" 
                       }}
-                      className="absolute bottom-0 w-3 h-3 bg-orange-500 rounded-full blur-[2px]"
-                      style={{ backgroundColor: i % 2 === 0 ? "#FF4D00" : "#FF9100" }}
+                      className="absolute bottom-0 w-2.5 h-6 rounded-t-full rounded-b-[40%] blur-[1px]"
+                      style={{ 
+                        backgroundColor: i % 3 === 0 ? "#FFF000" : (i % 3 === 1 ? "#FF8E53" : "#FF4D00"),
+                        boxShadow: i % 2 === 0 ? "0 0 12px #FF4D00" : "0 0 8px #FFD700"
+                      }}
                     />
                   ))}
                 </div>
@@ -219,16 +223,16 @@ export function NavBar() {
             
             <motion.span 
               animate={logoHovered ? { 
-                scale: [1, 1.1, 1.05, 1.15, 1],
+                scale: [1, 1.15, 1.08, 1.2, 1],
                 filter: [
                   "drop-shadow(0 0 0px transparent)",
-                  "drop-shadow(0 0 8px #FF4D00)",
-                  "drop-shadow(0 0 4px #FF9100)",
-                  "drop-shadow(0 0 10px #FF4D00)",
+                  "drop-shadow(0 0 12px #FF4D00)",
+                  "drop-shadow(0 0 6px #FFF000)",
+                  "drop-shadow(0 0 15px #FF4D00)",
                   "drop-shadow(0 0 0px transparent)"
                 ]
               } : {}}
-              transition={{ duration: 0.4, repeat: Infinity }}
+              transition={{ duration: 0.3, repeat: Infinity, ease: "linear" }}
               className="relative z-10"
             >
               🥄
