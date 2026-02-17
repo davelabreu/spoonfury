@@ -1,27 +1,98 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Utensils } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
-const PUBLIC_TABS = [
-  { label: "Stir the Pot", to: "/" },
+const STICKERS = [
+  { label: "Stir the Pot", to: "/", color: "bg-[#FF6B6B]", icon: Utensils, isSpecial: true },
+  { label: "My Books", to: "/books", color: "bg-[#4ECDC4]", authRequired: true },
+  { label: "+ Recipe", to: "/recipes/new", color: "bg-[#FFE66D]", authRequired: true },
 ];
 
-const AUTH_TABS = [
-  { label: "My Books", to: "/books" },
-  { label: "+ Recipe", to: "/recipes/new" },
+const AUTH_STICKERS = [
+  { label: "Sign in", to: "/login", color: "bg-[#A29BFE]", guestOnly: true },
+  { label: "Join", to: "/register", color: "bg-[#primary]", guestOnly: true, isPrimary: true },
 ];
 
-const SPRING = { type: "spring", stiffness: 300, damping: 30 } as const;
+interface NavStickerProps {
+  label: string;
+  to: string;
+  color: string;
+  icon?: any;
+  isSpecial?: boolean;
+  isActive: boolean;
+  onClick?: () => void;
+  className?: string;
+}
+
+function NavSticker({ label, to, color, icon: Icon, isSpecial, isActive, onClick, className }: NavStickerProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.div
+      whileHover={{ y: -4, rotate: isSpecial ? [0, -0.5, 0.5, -0.5, 0] : 0 }}
+      whileTap={{ scale: 0.95 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      className="relative"
+    >
+      <Link
+        to={to}
+        onClick={onClick}
+        className={`
+          relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border-[2.5px] border-black transition-all
+          ${color} ${isActive ? "translate-y-[-4px] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]" : "shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"}
+          ${isSpecial ? "overflow-visible" : ""}
+          ${className || ""}
+        `}
+      >
+        {/* Special Gradient for Stir the Pot */}
+        {isSpecial && (
+          <motion.div 
+            className="absolute inset-0 bg-linear-to-r from-orange-400 via-red-400 to-orange-400 bg-[length:200%_100%] rounded-[9px]"
+            animate={{ backgroundPosition: ["0% 0%", "100% 0%"] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          />
+        )}
+
+        {/* Steam Particles */}
+        {isSpecial && isHovered && (
+          <div className="absolute -top-1 left-1/2 -translate-x-1/2 pointer-events-none z-20">
+            {[0, 1, 2].map((i) => (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, y: 0, scale: 0.5 }}
+                animate={{ opacity: [0, 1, 0], y: -25, x: (i - 1) * 8 }}
+                transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.4 }}
+                className="absolute w-2 h-2 bg-white/80 rounded-full blur-[1.5px]"
+              />
+            ))}
+          </div>
+        )}
+
+        <span className="relative z-10 flex items-center gap-2">
+          {Icon && (
+            <motion.span
+              animate={isActive ? { rotate: [0, 15, -15, 0] } : {}}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <Icon size={16} strokeWidth={2.5} />
+            </motion.span>
+          )}
+          {label}
+        </span>
+      </Link>
+    </motion.div>
+  );
+}
 
 export function NavBar() {
   const { username, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const isMobile = useMediaQuery("(max-width: 767px)");
-  const [hoveredTab, setHoveredTab] = useState<string | null>(null);
+  const isMobile = useMediaQuery("(max-width: 850px)"); // Adjusted to show on desktop earlier
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navRef = useRef<HTMLElement>(null);
@@ -48,109 +119,73 @@ export function NavBar() {
     setMobileOpen(false);
   }
 
+  const visibleStickers = STICKERS.filter(s => !s.authRequired || username);
+
   return (
-    <nav ref={navRef} className="border-b bg-background sticky top-0 z-50">
-      <div className="max-w-5xl mx-auto px-4 py-3 flex items-center">
+    <nav ref={navRef} className="border-b bg-background sticky top-0 z-50 py-1">
+      <div className="max-w-6xl mx-auto px-4 py-2 flex items-center">
         {/* Column 1: Logo */}
         <Link
           to="/"
-          className="text-xl font-bold tracking-tight flex-shrink-0"
+          className="text-2xl font-black tracking-tighter flex-shrink-0 hover:rotate-2 transition-transform mr-8"
           onClick={() => setMobileOpen(false)}
         >
           🥄 Spoonfury
         </Link>
 
         {isMobile ? (
-          /* ── Mobile: hamburger (pushed to far right) ── */
           <button
             type="button"
-            className="ml-auto p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors"
+            className="ml-auto p-2 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white active:translate-y-[2px] active:shadow-none transition-all"
             onClick={() => setMobileOpen((o) => !o)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
           >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+            {mobileOpen ? <X size={22} strokeWidth={2.5} /> : <Menu size={22} strokeWidth={2.5} />}
           </button>
         ) : (
           <>
-            {/* Column 2: Tabs (centered) */}
-            <div
-              className="flex-1 flex items-center justify-center gap-1"
-              onMouseLeave={() => setHoveredTab(null)}
-            >
-              {[...PUBLIC_TABS, ...(username ? AUTH_TABS : [])].map((tab) => {
-                  const isActive = location.pathname === tab.to;
-                  return (
-                    <Link
-                      key={tab.to}
-                      to={tab.to}
-                      aria-current={isActive ? "page" : undefined}
-                      className="relative px-3 py-1.5 rounded-md text-sm font-medium outline-none"
-                      onMouseEnter={() => setHoveredTab(tab.to)}
-                    >
-                      <AnimatePresence>
-                        {hoveredTab === tab.to && (
-                          <motion.span
-                            key="hoverBubble"
-                            layoutId="hoverBubble"
-                            className="absolute inset-0 rounded-md bg-muted"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={SPRING}
-                          />
-                        )}
-                      </AnimatePresence>
-                      {isActive && (
-                        <motion.span
-                          layoutId="activeUnderline"
-                          className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-primary"
-                          transition={SPRING}
-                        />
-                      )}
-                      <span
-                        className={`relative z-10 transition-colors ${
-                          isActive
-                            ? "text-foreground"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        {tab.label}
-                      </span>
-                    </Link>
-                  );
-                })}
+            {/* Column 2: Stickers (centered) */}
+            <div className="flex-1 flex items-center justify-center gap-4">
+              {visibleStickers.map((sticker) => (
+                <NavSticker
+                  key={sticker.to}
+                  {...sticker}
+                  isActive={location.pathname === sticker.to}
+                />
+              ))}
             </div>
 
             {/* Column 3: Identity / auth actions */}
-            <div className="flex-shrink-0 flex items-center gap-2">
+            <div className="flex-shrink-0 flex items-center gap-4">
               {username ? (
-                <>
-                  <span className="text-sm text-muted-foreground">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-black bg-muted px-3 py-1.5 rounded-lg border-2 border-black">
                     @{username}
                   </span>
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted"
+                    className="text-sm font-bold px-3 py-2 rounded-xl border-2 border-black bg-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-none transition-all"
                   >
                     Sign out
                   </button>
-                </>
+                </div>
               ) : (
-                <>
-                  <Link
+                <div className="flex items-center gap-3">
+                  <NavSticker
+                    label="Sign in"
                     to="/login"
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-md hover:bg-muted"
-                  >
-                    Sign in
-                  </Link>
-                  <Link
+                    color="bg-[#A29BFE]"
+                    isActive={location.pathname === "/login"}
+                  />
+                  <NavSticker
+                    label="Join"
                     to="/register"
-                    className="text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-3 py-1.5 rounded-md"
-                  >
-                    Join
-                  </Link>
-                </>
+                    color="bg-primary"
+                    isActive={location.pathname === "/register"}
+                    className="text-primary-foreground"
+                  />
+                </div>
               )}
             </div>
           </>
@@ -161,71 +196,56 @@ export function NavBar() {
       <AnimatePresence>
         {isMobile && mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-            className="border-t bg-background px-4 py-3 flex flex-col gap-1"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="border-t bg-background px-4 py-6 overflow-hidden"
           >
-            {PUBLIC_TABS.map((tab) => (
-              <Link
-                key={tab.to}
-                to={tab.to}
-                onClick={() => setMobileOpen(false)}
-                className={`block px-2 py-2 rounded-md text-sm font-medium transition-colors ${
-                  location.pathname === tab.to
-                    ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
-              >
-                {tab.label}
-              </Link>
-            ))}
-            {username ? (
-              <>
-                <div className="text-sm text-muted-foreground px-2 py-1">
-                  @{username}
-                </div>
-                {AUTH_TABS.map((tab) => (
-                  <Link
-                    key={tab.to}
-                    to={tab.to}
-                    onClick={() => setMobileOpen(false)}
-                    className={`block px-2 py-2 rounded-md text-sm font-medium transition-colors ${
-                      location.pathname === tab.to
-                        ? "bg-muted text-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`}
+            <div className="flex flex-col gap-4">
+              {visibleStickers.map((sticker) => (
+                <NavSticker
+                  key={sticker.to}
+                  {...sticker}
+                  isActive={location.pathname === sticker.to}
+                  onClick={() => setMobileOpen(false)}
+                />
+              ))}
+              
+              <div className="h-px bg-black my-2" />
+
+              {username ? (
+                <>
+                  <div className="text-sm font-black bg-muted px-4 py-2 rounded-xl border-2 border-black self-start">
+                    @{username}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="text-left px-4 py-3 rounded-xl border-2 border-black bg-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] font-bold"
                   >
-                    {tab.label}
-                  </Link>
-                ))}
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="text-left px-2 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                >
-                  Sign out
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="block px-2 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                >
-                  Sign in
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={() => setMobileOpen(false)}
-                  className="block px-2 py-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                >
-                  Join
-                </Link>
-              </>
-            )}
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <NavSticker
+                    label="Sign in"
+                    to="/login"
+                    color="bg-[#A29BFE]"
+                    isActive={location.pathname === "/login"}
+                    onClick={() => setMobileOpen(false)}
+                  />
+                  <NavSticker
+                    label="Join"
+                    to="/register"
+                    color="bg-primary"
+                    isActive={location.pathname === "/register"}
+                    onClick={() => setMobileOpen(false)}
+                    className="text-primary-foreground"
+                  />
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
