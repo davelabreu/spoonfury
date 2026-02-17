@@ -1,0 +1,455 @@
+# Stir the Pot & Share Modal Implementation Plan
+
+> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+
+**Goal:** Add a "Stir the Pot" public nav tab and a Share modal (URL + QR code + WhatsApp) on recipe pages.
+
+**Architecture:** NavBar gets a `PUBLIC_TABS` constant rendered for all users alongside the auth-gated `AUTH_TABS`. A new `ShareModal` component follows the `ForkModal` pattern. RecipePage gets a Share button outside the auth gate that opens it.
+
+**Tech Stack:** React 19, Framer Motion (existing), qrcode.react (new), Tailwind CSS 4, react-router-dom `useLocation`
+
+**Design doc:** `docs/plans/2026-02-17-stir-the-pot-and-share-design.md`
+
+---
+
+## Pre-flight
+
+```bash
+cd /g/Projects/dev/1.work/Spoonfury/frontend && npm run dev
+# Verify Vite starts cleanly at http://localhost:5173
+```
+
+---
+
+### Task 1: Install qrcode.react
+
+**Files:**
+- Modify: `frontend/package.json`
+
+**Step 1: Install**
+
+```bash
+cd /g/Projects/dev/1.work/Spoonfury/frontend && npm install qrcode.react
+```
+
+Expected: `qrcode.react` in `package.json` dependencies, no peer-dep warnings.
+
+**Step 2: Verify TypeScript sees the types**
+
+```bash
+cd /g/Projects/dev/1.work/Spoonfury/frontend && npx tsc --noEmit 2>&1 | head -5
+```
+
+Expected: clean (qrcode.react ships its own types).
+
+**Step 3: Commit**
+
+```bash
+cd /g/Projects/dev/1.work/Spoonfury && git add frontend/package.json frontend/package-lock.json && git commit -m "feat(deps): add qrcode.react for share modal"
+```
+
+---
+
+### Task 2: Add "Stir the Pot" to NavBar
+
+**Files:**
+- Modify: `frontend/src/components/NavBar.tsx`
+
+**Context:** The current NavBar has `AUTH_TABS` (My Books, + Recipe) that only render when `username` is set. We need a `PUBLIC_TABS` constant that renders for everyone.
+
+**Step 1: Read the current file**
+
+```bash
+cat /g/Projects/dev/1.work/Spoonfury/frontend/src/components/NavBar.tsx
+```
+
+**Step 2: Make the changes**
+
+**Change A** — Add `PUBLIC_TABS` constant directly after `AUTH_TABS`:
+
+Find:
+```ts
+const AUTH_TABS = [
+  { label: "My Books", to: "/books" },
+  { label: "+ Recipe", to: "/recipes/new" },
+];
+```
+
+Replace with:
+```ts
+const PUBLIC_TABS = [
+  { label: "Stir the Pot", to: "/" },
+];
+
+const AUTH_TABS = [
+  { label: "My Books", to: "/books" },
+  { label: "+ Recipe", to: "/recipes/new" },
+];
+```
+
+**Change B** — Desktop Column 2: render `PUBLIC_TABS` unconditionally, then `AUTH_TABS` when logged in.
+
+Find the entire Column 2 div (it currently starts with):
+```tsx
+            {/* Column 2: Tabs (centered) */}
+            <div
+              className="flex-1 flex items-center justify-center gap-1"
+              onMouseLeave={() => setHoveredTab(null)}
+            >
+              {username &&
+                AUTH_TABS.map((tab) => {
+```
+
+Replace the entire Column 2 block with:
+```tsx
+            {/* Column 2: Tabs (centered) */}
+            <div
+              className="flex-1 flex items-center justify-center gap-1"
+              onMouseLeave={() => setHoveredTab(null)}
+            >
+              {[...PUBLIC_TABS, ...(username ? AUTH_TABS : [])].map((tab) => {
+                  const isActive = location.pathname === tab.to;
+                  return (
+                    <Link
+                      key={tab.to}
+                      to={tab.to}
+                      aria-current={isActive ? "page" : undefined}
+                      className="relative px-3 py-1.5 rounded-md text-sm font-medium outline-none"
+                      onMouseEnter={() => setHoveredTab(tab.to)}
+                    >
+                      {hoveredTab === tab.to && (
+                        <AnimatePresence>
+                          <motion.span
+                            key="hoverBubble"
+                            layoutId="hoverBubble"
+                            className="absolute inset-0 rounded-md bg-muted"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={SPRING}
+                          />
+                        </AnimatePresence>
+                      )}
+                      {isActive && (
+                        <motion.span
+                          layoutId="activeUnderline"
+                          className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-primary"
+                          transition={SPRING}
+                        />
+                      )}
+                      <span
+                        className={`relative z-10 transition-colors ${
+                          isActive
+                            ? "text-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {tab.label}
+                      </span>
+                    </Link>
+                  );
+                })}
+            </div>
+```
+
+**Change C** — Mobile drawer: add `PUBLIC_TABS` at the top of the drawer, always visible.
+
+In the mobile drawer section, find the opening of the `{username ? (` conditional and insert PUBLIC_TABS before it:
+
+Find (inside `<motion.div ... className="border-t bg-background ..."`):
+```tsx
+            {username ? (
+              <>
+                <div className="text-sm text-muted-foreground px-2 py-1">
+```
+
+Replace with:
+```tsx
+            {PUBLIC_TABS.map((tab) => (
+              <Link
+                key={tab.to}
+                to={tab.to}
+                onClick={() => setMobileOpen(false)}
+                className={`block px-2 py-2 rounded-md text-sm font-medium transition-colors ${
+                  location.pathname === tab.to
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                }`}
+              >
+                {tab.label}
+              </Link>
+            ))}
+            {username ? (
+              <>
+                <div className="text-sm text-muted-foreground px-2 py-1">
+```
+
+**Step 3: TypeScript check**
+
+```bash
+cd /g/Projects/dev/1.work/Spoonfury/frontend && npx tsc --noEmit 2>&1
+```
+
+Expected: clean.
+
+**Step 4: Visual check**
+
+Open http://localhost:5173 — confirm:
+- [ ] "Stir the Pot" visible even when logged out, in the animated tab center column
+- [ ] Active underline appears on "Stir the Pot" when on `/`
+- [ ] "My Books" and "+ Recipe" still appear after login
+- [ ] On mobile: "Stir the Pot" appears at top of drawer
+
+**Step 5: Commit**
+
+```bash
+cd /g/Projects/dev/1.work/Spoonfury && git add frontend/src/components/NavBar.tsx && git commit -m "feat(nav): add Stir the Pot public explore tab"
+```
+
+---
+
+### Task 3: Create ShareModal component
+
+**Files:**
+- Create: `frontend/src/components/ShareModal.tsx`
+
+**Step 1: Write the file**
+
+Create `frontend/src/components/ShareModal.tsx` with exactly this content:
+
+```tsx
+import { useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
+import { X, Copy, Check } from "lucide-react";
+
+interface ShareModalProps {
+  url: string;
+  title: string;
+  onClose: () => void;
+}
+
+export function ShareModal({ url, title, onClose }: ShareModalProps) {
+  const [copied, setCopied] = useState(false);
+
+  function handleCopy() {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  const waUrl = `https://wa.me/?text=${encodeURIComponent(`${title} — ${url}`)}`;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]"
+      onClick={onClose}
+    >
+      <div
+        className="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4 space-y-5"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-base">Share recipe</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="Close"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* QR Code */}
+        <div className="flex justify-center py-2">
+          <QRCodeSVG value={url} size={180} />
+        </div>
+
+        {/* Copyable URL */}
+        <div className="flex items-center gap-2">
+          <input
+            readOnly
+            value={url}
+            className="flex-1 text-sm border rounded-md px-3 py-1.5 bg-muted/40 text-foreground truncate focus:outline-none"
+            onFocus={(e) => e.target.select()}
+          />
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="shrink-0 flex items-center gap-1 text-sm px-3 py-1.5 rounded-md border bg-white hover:bg-muted transition-colors"
+          >
+            {copied ? (
+              <>
+                <Check size={14} className="text-green-600" />
+                <span className="text-green-600">Copied</span>
+              </>
+            ) : (
+              <>
+                <Copy size={14} />
+                <span>Copy</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* WhatsApp */}
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-2 rounded-md bg-[#25D366] hover:bg-[#1ebe5d] text-white text-sm font-medium transition-colors"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+          </svg>
+          Share on WhatsApp
+        </a>
+      </div>
+    </div>
+  );
+}
+```
+
+**Step 2: TypeScript check**
+
+```bash
+cd /g/Projects/dev/1.work/Spoonfury/frontend && npx tsc --noEmit 2>&1
+```
+
+Expected: clean.
+
+**Step 3: Commit**
+
+```bash
+cd /g/Projects/dev/1.work/Spoonfury && git add frontend/src/components/ShareModal.tsx && git commit -m "feat(share): add ShareModal with QR code, copy URL, and WhatsApp"
+```
+
+---
+
+### Task 4: Wire Share button into RecipePage
+
+**Files:**
+- Modify: `frontend/src/pages/RecipePage.tsx`
+
+**Step 1: Read the current file**
+
+```bash
+cat /g/Projects/dev/1.work/Spoonfury/frontend/src/pages/RecipePage.tsx
+```
+
+**Step 2: Add the import**
+
+Find the imports block at the top. After the existing `ForkModal` import line:
+```tsx
+import { ForkModal } from "@/components/ForkModal";
+```
+
+Add:
+```tsx
+import { ShareModal } from "@/components/ShareModal";
+```
+
+**Step 3: Add sharing state**
+
+Find the existing state declarations (they start around line 22):
+```tsx
+  const [deleting, setDeleting] = useState(false);
+```
+
+Add after it:
+```tsx
+  const [sharing, setSharing] = useState(false);
+```
+
+**Step 4: Add Share button before the action bar**
+
+Find this comment + block:
+```tsx
+        {/* Action bar — shown only when logged in */}
+        {token && (
+```
+
+Insert the Share button *immediately before* it:
+```tsx
+        {/* Share — visible to all visitors */}
+        <div className="mt-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setSharing(true)}
+            className="gap-1.5"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+              <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Share
+          </Button>
+        </div>
+
+        {/* Action bar — shown only when logged in */}
+        {token && (
+```
+
+**Step 5: Add ShareModal and the sharing close handler at the bottom**
+
+Find the `ForkModal` block near the bottom:
+```tsx
+      {forking && (
+        <ForkModal
+          recipe={recipe}
+          token={token!}
+          onClose={() => setForking(false)}
+          onSuccess={(bookId: number) => navigate(`/books/${bookId}`)}
+        />
+      )}
+```
+
+Add the ShareModal right after it:
+```tsx
+      {sharing && (
+        <ShareModal
+          url={window.location.href}
+          title={recipe.title}
+          onClose={() => setSharing(false)}
+        />
+      )}
+```
+
+**Step 6: TypeScript check**
+
+```bash
+cd /g/Projects/dev/1.work/Spoonfury/frontend && npx tsc --noEmit 2>&1
+```
+
+Expected: clean.
+
+**Step 7: Visual check**
+
+Navigate to any recipe at http://localhost:5173. Confirm:
+- [ ] "Share" button is visible above the action bar (and visible when logged out too)
+- [ ] Clicking Share opens the modal
+- [ ] Modal shows QR code, URL field, Copy button, WhatsApp button
+- [ ] Clicking Copy shows "Copied ✓" for 2 seconds
+- [ ] Clicking the backdrop or X closes the modal
+- [ ] WhatsApp button opens `https://wa.me/?text=...` in a new tab
+
+**Step 8: Commit**
+
+```bash
+cd /g/Projects/dev/1.work/Spoonfury && git add frontend/src/pages/RecipePage.tsx && git commit -m "feat(recipe): add Share button with URL, QR code, and WhatsApp"
+```
+
+---
+
+## Done
+
+Final build check:
+
+```bash
+cd /g/Projects/dev/1.work/Spoonfury/frontend && npm run build 2>&1 | tail -8
+```
+
+Expected: build succeeds, no TypeScript errors.
