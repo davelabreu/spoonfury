@@ -188,7 +188,6 @@ export function RecipePage() {
           )}
         </div>
       </div>
-      </div>
 
       <p className="text-base leading-relaxed">{recipe.description}</p>
       <p className="text-sm text-muted-foreground">Serves: {recipe.serves}</p>
