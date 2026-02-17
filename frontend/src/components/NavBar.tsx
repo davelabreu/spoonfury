@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -20,6 +20,19 @@ export function NavBar() {
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    function handleOutside(e: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setMobileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [mobileOpen]);
+
   function handleSignOut() {
     logout();
     navigate("/");
@@ -27,7 +40,7 @@ export function NavBar() {
   }
 
   return (
-    <nav className="border-b bg-background sticky top-0 z-50">
+    <nav ref={navRef} className="border-b bg-background sticky top-0 z-50">
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center">
         {/* Column 1: Logo */}
         <Link
