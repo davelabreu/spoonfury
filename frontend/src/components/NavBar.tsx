@@ -5,6 +5,10 @@ import { Menu, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
+const PUBLIC_TABS = [
+  { label: "Stir the Pot", to: "/" },
+];
+
 const AUTH_TABS = [
   { label: "My Books", to: "/books" },
   { label: "+ Recipe", to: "/recipes/new" },
@@ -72,8 +76,7 @@ export function NavBar() {
               className="flex-1 flex items-center justify-center gap-1"
               onMouseLeave={() => setHoveredTab(null)}
             >
-              {username &&
-                AUTH_TABS.map((tab) => {
+              {[...PUBLIC_TABS, ...(username ? AUTH_TABS : [])].map((tab) => {
                   const isActive = location.pathname === tab.to;
                   return (
                     <Link
@@ -163,6 +166,20 @@ export function NavBar() {
             transition={{ duration: 0.18, ease: "easeOut" }}
             className="border-t bg-background px-4 py-3 flex flex-col gap-1"
           >
+            {PUBLIC_TABS.map((tab) => (
+              <Link
+                key={tab.to}
+                to={tab.to}
+                onClick={() => setMobileOpen(false)}
+                className={`block px-2 py-2 rounded-md text-sm font-medium transition-colors ${
+                  location.pathname === tab.to
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                }`}
+              >
+                {tab.label}
+              </Link>
+            ))}
             {username ? (
               <>
                 <div className="text-sm text-muted-foreground px-2 py-1">
