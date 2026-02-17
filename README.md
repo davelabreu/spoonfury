@@ -4,6 +4,8 @@ Spoonfury is a recipe-first social platform. Users can discover, create, and **f
 
 ## Core Features
 - **Recipe Forking**: Clone recipes and make personal tweaks (constrained to ±3 ingredient changes).
+- **Stir the Pot**: A public explore feed to discover the latest community recipes.
+- **Easy Sharing**: Share recipes instantly via QR codes, WhatsApp, or direct URL copy.
 - **Instacart Integration**: Order ingredients directly from a recipe page.
 - **Recipe Books**: Organize and share collections of recipes.
 - **Mobile-First Design**: Optimized for use in the kitchen.

@@ -5,6 +5,7 @@ React 19 single-page application built with Vite, Tailwind CSS 4, and Shadcn UI.
 ## Core Technologies
 - **Framework**: React 19 (using the new `use` hook patterns where applicable)
 - **Styling**: Tailwind CSS 4 (using the `@theme` and `@plugin` syntax)
+- **Sharing**: `qrcode.react` for in-app QR code generation
 - **Routing**: React Router 7
 - **UI Components**: Shadcn UI (Radix primitives)
 - **Markdown**: `react-markdown` with Tailwind Typography
