@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+import socket
+
 load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,6 +11,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-insecure-key-change-in-prod")
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+# Helper to add local IP for mobile testing
+if DEBUG:
+    try:
+        hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+        for ip in ips:
+            if ip not in ALLOWED_HOSTS:
+                ALLOWED_HOSTS.append(ip)
+    except Exception:
+        pass
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -104,6 +116,21 @@ ACCOUNT_EMAIL_VERIFICATION = "none"  # Skip email verification for prototype
 CORS_ALLOWED_ORIGINS = os.environ.get(
     "CORS_ALLOWED_ORIGINS", "http://localhost:5173"
 ).split(",")
+
+if DEBUG:
+    # Also allow common mobile testing origins
+    CORS_ALLOWED_ORIGINS.extend([
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
+    ])
+    try:
+        _, _, ips = socket.gethostbyname_ex(socket.gethostname())
+        for ip in ips:
+            origin = f"http://{ip}:5173"
+            if origin not in CORS_ALLOWED_ORIGINS:
+                CORS_ALLOWED_ORIGINS.append(origin)
+    except Exception:
+        pass
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
