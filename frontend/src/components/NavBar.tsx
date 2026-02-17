@@ -178,6 +178,17 @@ export function NavBar() {
 
   return (
     <nav ref={navRef} className="bg-background sticky top-0 z-50">
+      {/* 1. SVG Gooey Filter Definition - Sharpened for more "licking" definition */}
+      <svg className="absolute h-0 w-0 pointer-events-none">
+        <defs>
+          <filter id="goo">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+          </filter>
+        </defs>
+      </svg>
+
       <div className="max-w-6xl mx-auto px-4 flex items-end h-14 relative">
         {/* Column 1: Logo */}
         <Link
@@ -187,33 +198,37 @@ export function NavBar() {
           onMouseEnter={() => setLogoHovered(true)}
           onMouseLeave={() => setLogoHovered(false)}
         >
-          <div className="relative flex items-center">
-            {/* Fire Particles - More flame-like teardrop shapes */}
+          <div className="relative flex items-center justify-center w-10 h-10">
+            {/* Turbo Fire Effect - 24 particles, 'Bed of Flames' base, massive lift */}
             <AnimatePresence>
               {logoHovered && (
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 pointer-events-none w-12 h-12 flex justify-center">
-                  {[0, 1, 2, 3, 4].map((i) => (
+                <div 
+                  className="absolute inset-0 pointer-events-none flex justify-center items-end"
+                  style={{ filter: "url(#goo)" }}
+                >
+                  {[...Array(24)].map((_, i) => (
                     <motion.span
                       key={i}
-                      initial={{ opacity: 0, y: 20, scale: 0.3 }}
+                      initial={{ opacity: 0, y: 10, scale: 0.2 }}
                       animate={{ 
-                        opacity: [0, 1, 0.8, 0], 
-                        y: [15, -15, -45], 
-                        x: [(i - 2) * 3, (i - 2) * 6 + (Math.sin(i) * 10), (i - 2) * 10],
-                        scale: [0.5, 1.8, 0.1],
-                        rotate: [0, (i % 2 === 0 ? 20 : -20), 0]
+                        opacity: [0, 1, 1, 0], 
+                        y: [20, -10, -85], // Reduced vertical reach
+                        x: [(i - 11.5) * 0.8, (i - 11.5) * 1.5, (i - 11.5) * 3],
+                        scaleY: [0.4, 5, 0.1],
+                        scaleX: [1.8, 0.5, 0.1],
                       }}
-                      exit={{ opacity: 0 }}
+                      exit={{ opacity: 0, transition: { duration: 0.1 } }} // Snappy exit
                       transition={{ 
-                        duration: 0.8, 
+                        duration: 0.4 + Math.random() * 0.6, 
                         repeat: Infinity, 
-                        delay: i * 0.12,
+                        delay: i * 0.02,
                         ease: "easeOut" 
                       }}
-                      className="absolute bottom-0 w-2.5 h-6 rounded-t-full rounded-b-[40%] blur-[1px]"
+                      className="absolute w-6 h-12 rounded-full" // Increased height
                       style={{ 
-                        backgroundColor: i % 3 === 0 ? "#FFF000" : (i % 3 === 1 ? "#FF8E53" : "#FF4D00"),
-                        boxShadow: i % 2 === 0 ? "0 0 12px #FF4D00" : "0 0 8px #FFD700"
+                        backgroundColor: i % 3 === 0 ? "#FFD700" : (i % 3 === 1 ? "#FF8E53" : "#FF4D00"),
+                        bottom: "-25%", // Moved spawn point up
+                        mixBlendMode: "screen"
                       }}
                     />
                   ))}
@@ -223,17 +238,29 @@ export function NavBar() {
             
             <motion.span 
               animate={logoHovered ? { 
-                scale: [1, 1.15, 1.08, 1.2, 1],
+                scale: [1, 1.1, 1.05, 1.15, 1],
+                x: [0, -0.8, 0.8, -0.8, 0], 
+                y: [0, 0.8, -0.8, 0.8, 0],
                 filter: [
-                  "drop-shadow(0 0 0px transparent)",
-                  "drop-shadow(0 0 12px #FF4D00)",
-                  "drop-shadow(0 0 6px #FFF000)",
-                  "drop-shadow(0 0 15px #FF4D00)",
-                  "drop-shadow(0 0 0px transparent)"
+                  "drop-shadow(0 0 8px #FF4D00)",
+                  "drop-shadow(0 0 20px #FF4D00)",
+                  "drop-shadow(0 0 12px #FFD700)",
+                  "drop-shadow(0 0 25px #FF4D00)",
+                  "drop-shadow(0 0 8px #FF4D00)"
                 ]
-              } : {}}
-              transition={{ duration: 0.3, repeat: Infinity, ease: "linear" }}
-              className="relative z-10"
+              } : {
+                // Intensified idle pulse/glow
+                filter: [
+                  "drop-shadow(0 0 4px #FF4D00)",
+                  "drop-shadow(0 0 15px #FF9100)",
+                  "drop-shadow(0 0 4px #FF4D00)"
+                ]
+              }}
+              transition={logoHovered 
+                ? { duration: 0.25, repeat: Infinity } 
+                : { duration: 2, repeat: Infinity, ease: "easeInOut" }
+              }
+              className="relative z-10 text-2xl"
             >
               🥄
             </motion.span>

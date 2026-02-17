@@ -27,6 +27,8 @@ Spoonfury is a recipe-first social platform focusing on the **fork** mechanic.
 - **Registration Flow**: Some configurations return `204 No Content` on registration. The frontend `AuthContext` is designed to catch this and perform a background `login` automatically to ensure the user is immediately authenticated.
 
 ### Frontend
+- **NavBar**: "Fridge Sticker" / "Cookbook Tab" aesthetic. Uses `NavSticker` component with `tab` (PC) and `button` (Mobile) variants. Bottom edges are anchored to the nav border via dynamic `clip-path`.
+- **Logo**: Spoon emoji features a "Pro" fire effect using an SVG gooey filter (`#goo`) and screen blend mode on hover.
 - **Action Bar**: Compact header area for recipe actions (Edit, Add to Book, Share, Delete). 
   - **Styling**: `bg-indigo-50/50`, `border-indigo-100/50`, `px-4 py-2.5`.
   - **Visibility**: Action bar is visible to all users (shows Share action). Auth-gated actions (Fork, Edit, Delete) appear inside based on role.

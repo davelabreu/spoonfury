@@ -18,7 +18,23 @@
       "Bash(npx shadcn@latest add:*)",
       "Bash(npm run build:*)",
       "Bash(chmod:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(\"G:/Projects/dev/1.work/Spoonfury/frontend/src/hooks/useMediaQuery.ts\":*)",
+      "mcp__playwright__playwright_screenshot",
+      "mcp__playwright__playwright_navigate",
+      "mcp__playwright__playwright_fill",
+      "mcp__playwright__playwright_click",
+      "mcp__playwright__playwright_hover",
+      "mcp__playwright__playwright_console_logs",
+      "mcp__playwright__playwright_evaluate",
+      "Bash(npx tsc:*)",
+      "Bash(printf:*)",
+      "Bash(node:*)",
+      "Bash(/g/Projects/dev/1.work/Spoonfury/_test.js:*)",
+      "Bash(/g/Projects/dev/1.work/Spoonfury/_transform_navbar.js:*)",
+      "Bash(__NEW_LINE_099071e3b9d68f18__ cat)",
+      "Bash(/g/Projects/dev/1.work/Spoonfury/_fix_indent.js:*)",
+      "Bash(/g/Projects/dev/1.work/Spoonfury/_fix_indent2.js:*)"
     ]
   }
 }

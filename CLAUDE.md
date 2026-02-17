@@ -46,6 +46,8 @@ npm run dev
 - **Recipe Data**: Blank ingredient rows (empty name) are filtered before submission and rendering.
 - **Forking**: Simplified flow — "Fork" creates a copy and saves it to a selected book. No ingredient editing during the fork step.
 - **Action Bar**: Compact header area for recipe actions (`bg-indigo-50/50`). Now includes a universal **Share** button.
+- **NavBar**: "Fridge Sticker" / "Cookbook Tab" aesthetic. Rounded-t stickers anchored to a black bottom line with stationary `clip-path` animations.
+- **Logo**: Spoon emoji set on "Pro" fire using a gooey SVG filter on hover. Subtle idle pulsing glow.
 - **Modal UI**: `ForkModal` and `ShareModal` use `backdrop-blur-[2px]` and solid `bg-white` card.
 - **Sharing**: QR code generation and direct WhatsApp links for social sharing.
 - **Markdown**: Styled via `@tailwindcss/typography` (`prose` classes). Plugin imported in `index.css`.
@@ -59,3 +61,4 @@ npm run dev
 - v0.1 Design: `docs/plans/2026-02-15-spoonfury-design.md`
 - v0.2 Improvements: `docs/plans/2026-02-16-v0.2-improvements.md`
 - v0.3 Stir the Pot & Sharing: `docs/plans/2026-02-17-stir-the-pot-and-share-design.md`
+- v0.3.1 Fridge Sticker NavBar: `docs/plans/2026-02-17-fridge-sticker-navbar-design.md`
