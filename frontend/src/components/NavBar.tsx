@@ -33,6 +33,10 @@ export function NavBar() {
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [mobileOpen]);
 
+  useEffect(() => {
+    if (!isMobile) setMobileOpen(false);
+  }, [isMobile]);
+
   function handleSignOut() {
     logout();
     navigate("/");
@@ -79,13 +83,19 @@ export function NavBar() {
                       className="relative px-3 py-1.5 rounded-md text-sm font-medium outline-none"
                       onMouseEnter={() => setHoveredTab(tab.to)}
                     >
-                      {hoveredTab === tab.to && (
-                        <motion.span
-                          layoutId="hoverBubble"
-                          className="absolute inset-0 rounded-md bg-muted"
-                          transition={SPRING}
-                        />
-                      )}
+                      <AnimatePresence>
+                        {hoveredTab === tab.to && (
+                          <motion.span
+                            key="hoverBubble"
+                            layoutId="hoverBubble"
+                            className="absolute inset-0 rounded-md bg-muted"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={SPRING}
+                          />
+                        )}
+                      </AnimatePresence>
                       {isActive && (
                         <motion.span
                           layoutId="activeUnderline"
