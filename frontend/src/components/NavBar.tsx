@@ -38,8 +38,9 @@ export function NavBar() {
   }, [mobileOpen]);
 
   useEffect(() => {
-    if (!isMobile) setMobileOpen(false);
-  }, [isMobile]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!isMobile && mobileOpen) setMobileOpen(false);
+  }, [isMobile, mobileOpen]);
 
   function handleSignOut() {
     logout();
