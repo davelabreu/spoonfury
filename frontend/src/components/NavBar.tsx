@@ -148,6 +148,7 @@ export function NavBar() {
   const location = useLocation();
   const isMobile = useMediaQuery("(max-width: 850px)");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [logoHovered, setLogoHovered] = useState(false);
 
   const navRef = useRef<HTMLElement>(null);
 
@@ -181,10 +182,59 @@ export function NavBar() {
         {/* Column 1: Logo */}
         <Link
           to="/"
-          className="text-2xl font-black tracking-tighter flex-shrink-0 hover:rotate-2 transition-transform mr-8 mb-2.5 z-30"
+          className="text-2xl font-black tracking-tighter flex-shrink-0 mr-8 mb-2.5 z-30 group flex items-center"
           onClick={() => setMobileOpen(false)}
+          onMouseEnter={() => setLogoHovered(true)}
+          onMouseLeave={() => setLogoHovered(false)}
         >
-          🥄 Spoonfury
+          <div className="relative flex items-center">
+            {/* Fire Particles */}
+            <AnimatePresence>
+              {logoHovered && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 pointer-events-none w-8 h-8 flex justify-center">
+                  {[0, 1, 2].map((i) => (
+                    <motion.span
+                      key={i}
+                      initial={{ opacity: 0, y: 10, scale: 0.5 }}
+                      animate={{ 
+                        opacity: [0, 1, 0], 
+                        y: [-5, -20, -35], 
+                        x: (i - 1) * 6,
+                        scale: [0.5, 1.2, 0.2]
+                      }}
+                      exit={{ opacity: 0 }}
+                      transition={{ 
+                        duration: 0.6, 
+                        repeat: Infinity, 
+                        delay: i * 0.15,
+                        ease: "easeOut" 
+                      }}
+                      className="absolute bottom-0 w-3 h-3 bg-orange-500 rounded-full blur-[2px]"
+                      style={{ backgroundColor: i % 2 === 0 ? "#FF4D00" : "#FF9100" }}
+                    />
+                  ))}
+                </div>
+              )}
+            </AnimatePresence>
+            
+            <motion.span 
+              animate={logoHovered ? { 
+                scale: [1, 1.1, 1.05, 1.15, 1],
+                filter: [
+                  "drop-shadow(0 0 0px transparent)",
+                  "drop-shadow(0 0 8px #FF4D00)",
+                  "drop-shadow(0 0 4px #FF9100)",
+                  "drop-shadow(0 0 10px #FF4D00)",
+                  "drop-shadow(0 0 0px transparent)"
+                ]
+              } : {}}
+              transition={{ duration: 0.4, repeat: Infinity }}
+              className="relative z-10"
+            >
+              🥄
+            </motion.span>
+          </div>
+          <span className="ml-1">Spoonfury</span>
         </Link>
 
         {isMobile ? (
