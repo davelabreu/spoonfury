@@ -136,7 +136,7 @@ def test_unauthenticated_cannot_access(api_client):
 
 
 @pytest.mark.django_db
-def test_cannot_modify_another_users_item(auth_client, recipe, ingredients, db):
+def test_cannot_modify_another_users_item(auth_client, recipe, ingredients):
     """A user cannot PATCH or DELETE another user's items."""
     from django.contrib.auth import get_user_model
     from rest_framework.test import APIClient
