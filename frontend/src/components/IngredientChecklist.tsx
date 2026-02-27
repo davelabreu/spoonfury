@@ -1,8 +1,5 @@
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { buildInstacartUrl } from "@/lib/instacart";
 
 interface Ingredient {
   quantity: string;
@@ -11,112 +8,74 @@ interface Ingredient {
   note: string;
 }
 
-export function IngredientChecklist({ ingredients }: { ingredients: Ingredient[] }) {
-
-  const validIngredients = ingredients.filter(i => i.name.trim() !== "");
-
-  const [checked, setChecked] = useState<Set<number>>(
-
-    new Set(validIngredients.map((_, i) => i)) // all checked by default
-
-  );
-
-
-
-  const toggle = (i: number) =>
-
-    setChecked(prev => {
-
-      const next = new Set(prev);
-
-      if (next.has(i)) { next.delete(i); } else { next.add(i); }
-
-      return next;
-
-    });
-
-
-
-  const checkedIngredients = validIngredients.filter((_, i) => checked.has(i));
-
-
-
-  const openInstacart = () => {
-
-    const url = buildInstacartUrl(checkedIngredients);
-
-    window.open(url, "_blank", "noopener,noreferrer");
-
-  };
-
-
-
-  return (
-
-    <div className="space-y-3">
-
-      <h2 className="font-semibold text-lg">Ingredients</h2>
-
-      <p className="text-xs text-muted-foreground">Uncheck items you already have.</p>
-
-      <ul className="space-y-2">
-
-        {validIngredients.map((ing, i) => (
-
-          <li key={i} className="flex items-center gap-3">
-
-            <Checkbox
-
-              id={`ing-${i}`}
-
-              checked={checked.has(i)}
-
-              onCheckedChange={() => toggle(i)}
-
-            />
-
-            <label
-
-              htmlFor={`ing-${i}`}
-
-              className={`text-sm cursor-pointer select-none ${!checked.has(i) ? "line-through text-muted-foreground" : ""}`}
-
-            >
-
-              <span className="font-medium">{ing.quantity} {ing.unit}</span> {ing.name}
-
-              {ing.note && <span className="text-muted-foreground"> — {ing.note}</span>}
-
-            </label>
-
-          </li>
-
-        ))}
-
-      </ul>
-
-      <Separator />
-
-      <Button
-
-        onClick={openInstacart}
-
-        disabled={checkedIngredients.length === 0}
-
-        className="w-full"
-
-        variant="outline"
-
-      >
-
-        🛒 Order {checkedIngredients.length} item{checkedIngredients.length !== 1 ? "s" : ""} on Instacart →
-
-      </Button>
-
-    </div>
-
-  );
-
+interface Props {
+  ingredients: Ingredient[];
+  onAddToList?: (needed: Ingredient[]) => void;
+  onBuyNow?: (needed: Ingredient[]) => void;
 }
 
+export function IngredientChecklist({ ingredients, onAddToList, onBuyNow }: Props) {
+  const valid = ingredients.filter(i => i.name.trim() !== "");
 
+  // checked = "I already have this" — start empty (assume you need everything)
+  const [haveAlready, setHaveAlready] = useState<Set<number>>(new Set());
+
+  const toggle = (i: number) =>
+    setHaveAlready(prev => {
+      const next = new Set(prev);
+      if (next.has(i)) { next.delete(i); } else { next.add(i); }
+      return next;
+    });
+
+  const needed = valid.filter((_, i) => !haveAlready.has(i));
+
+  return (
+    <div className="space-y-3">
+      <h2 className="font-semibold text-lg">Ingredients</h2>
+      <p className="text-xs text-muted-foreground">Tick ingredients you already have.</p>
+      <ul className="space-y-2">
+        {valid.map((ing, i) => (
+          <li key={i} className="flex items-center gap-3">
+            <Checkbox
+              id={`ing-${i}`}
+              checked={haveAlready.has(i)}
+              onCheckedChange={() => toggle(i)}
+            />
+            <label
+              htmlFor={`ing-${i}`}
+              className={`text-sm cursor-pointer select-none ${haveAlready.has(i) ? "line-through text-muted-foreground" : ""}`}
+            >
+              <span className="font-medium">{ing.quantity} {ing.unit}</span> {ing.name}
+              {ing.note && <span className="text-muted-foreground"> — {ing.note}</span>}
+            </label>
+          </li>
+        ))}
+      </ul>
+
+      {(onAddToList || onBuyNow) && (
+        <div className="flex gap-2 pt-1">
+          {onAddToList && (
+            <button
+              type="button"
+              disabled={needed.length === 0}
+              onClick={() => onAddToList(needed)}
+              className="flex-1 text-sm border border-indigo-200 rounded-md px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              + Add {needed.length} to Shopping List
+            </button>
+          )}
+          {onBuyNow && (
+            <button
+              type="button"
+              disabled={needed.length === 0}
+              onClick={() => onBuyNow(needed)}
+              className="flex-1 text-sm border border-amber-200 rounded-md px-3 py-2 bg-amber-50 text-amber-800 hover:bg-amber-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold transition-colors"
+            >
+              🛒 Buy it NOW!
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
