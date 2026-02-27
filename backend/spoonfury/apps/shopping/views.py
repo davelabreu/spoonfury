@@ -12,7 +12,7 @@ class ShoppingListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        shopping_list, _ = ShoppingList.objects.get_or_create(owner=request.user)
+        shopping_list, _ = ShoppingList.objects.prefetch_related("items").get_or_create(owner=request.user)
         return Response(ShoppingListSerializer(shopping_list).data)
 
 
@@ -25,28 +25,36 @@ class ShoppingListAddView(APIView):
         recipe_title = request.data.get("recipe_title", "")
         ingredients = request.data.get("ingredients", [])
 
-        recipe = Recipe.objects.filter(slug=recipe_slug).first()
-        added = 0
+        if not recipe_slug:
+            return Response({"error": "recipe_slug is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+        recipe = Recipe.objects.filter(slug=recipe_slug).first()
+
+        # Pre-fetch existing names for this recipe to avoid N+1 EXISTS queries
+        existing_names = set(
+            shopping_list.items.filter(recipe_slug=recipe_slug)
+            .values_list("name", flat=True)
+        )
+
+        added = 0
         for ing in ingredients:
             name = ing.get("name", "").strip()
-            if not name:
+            if not name or name in existing_names:
                 continue
-            # Skip duplicates within the same recipe
-            if not shopping_list.items.filter(recipe_slug=recipe_slug, name=name).exists():
-                ShoppingListItem.objects.create(
-                    shopping_list=shopping_list,
-                    recipe=recipe,
-                    recipe_title=recipe_title,
-                    recipe_slug=recipe_slug,
-                    name=name,
-                    quantity=ing.get("quantity", ""),
-                    unit=ing.get("unit", ""),
-                    note=ing.get("note", ""),
-                )
-                added += 1
+            ShoppingListItem.objects.create(
+                shopping_list=shopping_list,
+                recipe=recipe,
+                recipe_title=recipe_title,
+                recipe_slug=recipe_slug,
+                name=name,
+                quantity=ing.get("quantity", ""),
+                unit=ing.get("unit", ""),
+                note=ing.get("note", ""),
+            )
+            existing_names.add(name)
+            added += 1
 
-        return Response({"added": added}, status=status.HTTP_200_OK)
+        return Response({"added": added}, status=status.HTTP_201_CREATED)
 
 
 class ShoppingListClearView(APIView):
@@ -55,6 +63,7 @@ class ShoppingListClearView(APIView):
     def post(self, request):
         shopping_list, _ = ShoppingList.objects.get_or_create(owner=request.user)
         shopping_list.items.all().delete()
+        shopping_list.save(update_fields=["updated_at"])
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -68,9 +77,12 @@ class ShoppingListItemView(APIView):
         item = self._get_item(pk, request.user)
         item.is_checked = request.data.get("is_checked", item.is_checked)
         item.save(update_fields=["is_checked"])
+        item.shopping_list.save(update_fields=["updated_at"])
         return Response(ShoppingListItemSerializer(item).data)
 
     def delete(self, request, pk):
         item = self._get_item(pk, request.user)
+        shopping_list = item.shopping_list
         item.delete()
+        shopping_list.save(update_fields=["updated_at"])
         return Response(status=status.HTTP_204_NO_CONTENT)

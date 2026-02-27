@@ -26,7 +26,7 @@ class ShoppingListSerializer(serializers.ModelSerializer):
         fields = ["updated_at", "total_items", "items_by_recipe"]
 
     def get_total_items(self, obj):
-        return obj.items.count()
+        return len(obj.items.all())  # Uses prefetch cache if prefetch_related("items") was called
 
     def get_items_by_recipe(self, obj):
         groups: dict[str, list] = defaultdict(list)
