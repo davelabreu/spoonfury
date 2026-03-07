@@ -5,13 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft } from "lucide-react";
-
-interface Ingredient {
-  quantity: string;
-  unit: string;
-  name: string;
-  note: string;
-}
+import type { Ingredient } from "@/types";
 
 export function EditRecipePage() {
   const { slug } = useParams<{ slug: string }>();

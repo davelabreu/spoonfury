@@ -1,21 +1,19 @@
-interface Ingredient {
-  quantity: string;
-  unit: string;
-  name: string;
-  note: string;
-}
+import type { Ingredient } from "@/types";
 
 /**
  * Builds an Instacart search URL for a list of ingredients.
- * Uses Instacart's search page as a simple entry point.
- * Real affiliate API integration comes post-prototype.
+ * One search term per ingredient (newline-separated) for better product matching.
+ * fulfillment param reserved for Instacart Shoppable Recipe API (post-v0.4).
  */
-export function buildInstacartUrl(ingredients: Ingredient[]): string {
+export function buildInstacartUrl(
+  ingredients: Ingredient[],
+  _fulfillment: "pickup" | "delivery" = "delivery"
+): string {
   if (ingredients.length === 0) return "https://www.instacart.com";
 
-  const query = ingredients
+  const terms = ingredients
     .map(i => `${i.quantity} ${i.unit} ${i.name}`.trim().replace(/\s+/g, " "))
-    .join(", ");
+    .join("\n");
 
-  return `https://www.instacart.com/store/search_v3/term?term=${encodeURIComponent(query)}`;
+  return `https://www.instacart.com/store/search_v3/term?term=${encodeURIComponent(terms)}`;
 }

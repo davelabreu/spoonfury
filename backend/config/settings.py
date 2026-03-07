@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "spoonfury.apps.users",
     "spoonfury.apps.recipes",
     "spoonfury.apps.books",
+    "spoonfury.apps.shopping",
 ]
 
 MIDDLEWARE = [
