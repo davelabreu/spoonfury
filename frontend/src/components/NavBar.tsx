@@ -5,6 +5,7 @@ import { Menu, X, Utensils, ShoppingCart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useNavTheme } from "@/hooks/useNavTheme";
+import { api } from "@/lib/api";
 
 const STICKERS = [
   { label: "Stir the Pot", to: "/", color: "bg-[#FF6B6B]", icon: Utensils, isSpecial: true },
@@ -144,16 +145,47 @@ function UsernameBadge({ username, className }: { username: string; className?: 
   );
 }
 
+function useShoppingCount(token: string | null | undefined, locationKey: string) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!token) { setCount(0); return; }
+    api.get("/shopping-list/", token)
+      .then((d: any) => setCount(d.total_items ?? 0))
+      .catch(() => {});
+  }, [token, locationKey]);
+  return count;
+}
+
+function CartButton({ count, onClick }: { count: number; onClick?: () => void }) {
+  return (
+    <Link
+      to="/shopping-list"
+      onClick={onClick}
+      className="relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-muted transition-colors"
+      aria-label={`Shopping list${count > 0 ? ` (${count} items)` : ""}`}
+    >
+      <ShoppingCart className="w-5 h-5" />
+      {count > 0 && (
+        <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-green-500 text-white text-[10px] font-black leading-none">
+          {count > 99 ? "99+" : count}
+        </span>
+      )}
+    </Link>
+  );
+}
+
 type StickerDef = typeof STICKERS[number];
 
 function MinimalNav({
   visibleStickers,
   username,
+  cartCount,
   onSignOut,
   onSwitchTheme,
 }: {
   visibleStickers: StickerDef[];
   username: string | null | undefined;
+  cartCount: number;
   onSignOut: () => void;
   onSwitchTheme: () => void;
 }) {
@@ -231,6 +263,7 @@ function MinimalNav({
 
             {/* Auth + theme toggle */}
             <div className="flex items-center gap-3 shrink-0">
+              {username && <CartButton count={cartCount} />}
               {username ? (
                 <>
                   <UsernameBadge username={username} />
@@ -327,13 +360,14 @@ function MinimalNav({
 }
 
 export function NavBar() {
-  const { username, logout } = useAuth();
+  const { username, logout, token } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useMediaQuery("(max-width: 850px)");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoHovered, setLogoHovered] = useState(false);
   const { theme, setTheme } = useNavTheme();
+  const cartCount = useShoppingCount(token, location.key);
 
   const navRef = useRef<HTMLElement>(null);
 
@@ -366,6 +400,7 @@ export function NavBar() {
       <MinimalNav
         visibleStickers={visibleStickers}
         username={username}
+        cartCount={cartCount}
         onSignOut={handleSignOut}
         onSwitchTheme={() => setTheme("sticker")}
       />
@@ -466,6 +501,7 @@ export function NavBar() {
 
         {isMobile ? (
           <div className="ml-auto flex items-center gap-3 mb-2.5 z-30">
+            {username && <CartButton count={cartCount} onClick={() => setMobileOpen(false)} />}
             {username && <UsernameBadge username={username} />}
             <button
               type="button"
@@ -491,6 +527,11 @@ export function NavBar() {
 
             {/* Column 3: Identity / auth actions */}
             <div className="flex-shrink-0 flex items-end gap-2 h-full z-30">
+              {username && (
+                <div className="mb-3.5">
+                  <CartButton count={cartCount} />
+                </div>
+              )}
               {username ? (
                 <div className="flex items-end gap-3 h-full">
                   <div className="mb-3.5">
