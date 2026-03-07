@@ -183,17 +183,15 @@ export function RecipePage() {
                   Share
                 </Button>
 
-                {cookNow.supported && (
-                  <Button
-                    type="button"
-                    variant={cookNow.active ? "default" : "outline"}
-                    size="sm"
-                    onClick={cookNow.active ? cookNow.release : cookNow.acquire}
-                    className={cookNow.active ? "bg-amber-400 text-amber-900 hover:bg-amber-500 border-0" : "bg-white/50 border-indigo-100"}
-                  >
-                    🍳 {cookNow.active ? "Stop" : "Cook Now"}
-                  </Button>
-                )}
+                <Button
+                  type="button"
+                  variant={cookNow.active ? "default" : "outline"}
+                  size="sm"
+                  onClick={cookNow.active ? cookNow.release : cookNow.acquire}
+                  className={cookNow.active ? "bg-amber-400 text-amber-900 hover:bg-amber-500 border-0" : "bg-white/50 border-indigo-100"}
+                >
+                  🍳 {cookNow.active ? "Stop" : "Cook Now"}
+                </Button>
 
                 <Button
                   variant="outline"
@@ -228,17 +226,15 @@ export function RecipePage() {
                   Share
                 </Button>
 
-                {cookNow.supported && (
-                  <Button
-                    type="button"
-                    variant={cookNow.active ? "default" : "outline"}
-                    size="sm"
-                    onClick={cookNow.active ? cookNow.release : cookNow.acquire}
-                    className={cookNow.active ? "bg-amber-400 text-amber-900 hover:bg-amber-500 border-0" : "border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50"}
-                  >
-                    🍳 {cookNow.active ? "Stop" : "Cook Now"}
-                  </Button>
-                )}
+                <Button
+                  type="button"
+                  variant={cookNow.active ? "default" : "outline"}
+                  size="sm"
+                  onClick={cookNow.active ? cookNow.release : cookNow.acquire}
+                  className={cookNow.active ? "bg-amber-400 text-amber-900 hover:bg-amber-500 border-0" : "border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50"}
+                >
+                  🍳 {cookNow.active ? "Stop" : "Cook Now"}
+                </Button>
               </div>
             </div>
           )}
