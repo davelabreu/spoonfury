@@ -34,7 +34,10 @@
       "Bash(/g/Projects/dev/1.work/Spoonfury/_transform_navbar.js:*)",
       "Bash(__NEW_LINE_099071e3b9d68f18__ cat)",
       "Bash(/g/Projects/dev/1.work/Spoonfury/_fix_indent.js:*)",
-      "Bash(/g/Projects/dev/1.work/Spoonfury/_fix_indent2.js:*)"
+      "Bash(/g/Projects/dev/1.work/Spoonfury/_fix_indent2.js:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(G:/Projects/dev/1.work/Spoonfury/.venv/Scripts/python:*)",
+      "mcp__playwright__playwright_get"
     ]
   }
 }
