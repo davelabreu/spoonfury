@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Utensils } from "lucide-react";
+import { Menu, X, Utensils, ShoppingCart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useNavTheme } from "@/hooks/useNavTheme";
 
 const STICKERS = [
   { label: "Stir the Pot", to: "/", color: "bg-[#FF6B6B]", icon: Utensils, isSpecial: true },
   { label: "My Books", to: "/books", color: "bg-[#4ECDC4]", authRequired: true },
+  { label: "Shopping List", to: "/shopping-list", color: "bg-[#95D5B2]", icon: ShoppingCart, authRequired: true },
   { label: "+ Recipe", to: "/recipes/new", color: "bg-[#FFE66D]", authRequired: true },
 ];
 
@@ -142,6 +144,188 @@ function UsernameBadge({ username, className }: { username: string; className?: 
   );
 }
 
+type StickerDef = typeof STICKERS[number];
+
+function MinimalNav({
+  visibleStickers,
+  username,
+  onSignOut,
+  onSwitchTheme,
+}: {
+  visibleStickers: StickerDef[];
+  username: string | null | undefined;
+  onSignOut: () => void;
+  onSwitchTheme: () => void;
+}) {
+  const location = useLocation();
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 850px)");
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    function handleOutside(e: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setMobileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [mobileOpen]);
+
+  return (
+    <nav ref={navRef} className="sticky top-0 z-50 bg-background border-b border-border">
+      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-1">
+        {/* Logo */}
+        <Link to="/" className="text-xl font-black tracking-tighter mr-6 flex items-center gap-1 shrink-0">
+          <span>🥄</span>
+          <span>Spoonfury</span>
+        </Link>
+
+        {isMobile ? (
+          <div className="ml-auto flex items-center gap-3">
+            {username && <UsernameBadge username={username} />}
+            <button
+              type="button"
+              className="p-2 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white active:translate-y-[2px] active:shadow-none transition-all"
+              onClick={() => setMobileOpen((o) => !o)}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            >
+              {mobileOpen ? <X size={22} strokeWidth={2.5} /> : <Menu size={22} strokeWidth={2.5} />}
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Nav tabs */}
+            <div className="flex items-center gap-0.5 flex-1">
+              {visibleStickers.map((sticker) => {
+                const isActive = location.pathname === sticker.to;
+                return (
+                  <Link
+                    key={sticker.to}
+                    to={sticker.to!}
+                    className="relative px-3 py-1.5 text-sm font-medium rounded-md transition-colors"
+                    onMouseEnter={() => setHovered(sticker.to!)}
+                    onMouseLeave={() => setHovered(null)}
+                  >
+                    {hovered === sticker.to && (
+                      <motion.div
+                        layoutId="hoverBubble"
+                        className="absolute inset-0 bg-muted rounded-md"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.3 }}
+                      />
+                    )}
+                    <span className="relative z-10">{sticker.label}</span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeUnderline"
+                        className="absolute bottom-0.5 left-2 right-2 h-0.5 bg-foreground rounded-full"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.3 }}
+                      />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Auth + theme toggle */}
+            <div className="flex items-center gap-3 shrink-0">
+              {username ? (
+                <>
+                  <UsernameBadge username={username} />
+                  <button
+                    type="button"
+                    onClick={onSignOut}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                    Sign in
+                  </Link>
+                  <Link to="/register" className="text-sm font-medium px-3 py-1.5 bg-foreground text-background rounded-md hover:opacity-90 transition-opacity">
+                    Join
+                  </Link>
+                </>
+              )}
+              <button
+                type="button"
+                onClick={onSwitchTheme}
+                title="Switch to Fridge Sticker theme"
+                className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-base"
+                aria-label="Switch to Fridge Sticker theme"
+              >
+                🏷️
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {isMobile && mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="border-t border-border bg-background px-4 py-6 overflow-hidden"
+          >
+            <div className="flex flex-col gap-2 max-w-sm mx-auto">
+              {visibleStickers.map((sticker) => (
+                <Link
+                  key={sticker.to}
+                  to={sticker.to!}
+                  onClick={() => setMobileOpen(false)}
+                  className={`px-4 py-3 text-base font-semibold rounded-lg transition-colors ${
+                    location.pathname === sticker.to ? "bg-muted" : "hover:bg-muted/50"
+                  }`}
+                >
+                  {sticker.label}
+                </Link>
+              ))}
+              <div className="h-px bg-border my-2" />
+              {username ? (
+                <>
+                  <div className="px-4 py-2"><UsernameBadge username={username} /></div>
+                  <button
+                    type="button"
+                    onClick={() => { onSignOut(); setMobileOpen(false); }}
+                    className="px-4 py-3 text-base font-semibold rounded-lg text-left hover:bg-muted/50 transition-colors"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-base font-semibold rounded-lg hover:bg-muted/50 transition-colors">
+                    Sign in
+                  </Link>
+                  <Link to="/register" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-base font-semibold rounded-lg bg-foreground text-background text-center hover:opacity-90 transition-opacity">
+                    Join
+                  </Link>
+                </>
+              )}
+              <div className="h-px bg-border my-2" />
+              <button
+                type="button"
+                onClick={() => { onSwitchTheme(); setMobileOpen(false); }}
+                className="px-4 py-3 text-sm font-medium text-muted-foreground rounded-lg hover:bg-muted/50 transition-colors text-left"
+              >
+                🏷️ Switch to Fridge Sticker theme
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+}
+
 export function NavBar() {
   const { username, logout } = useAuth();
   const navigate = useNavigate();
@@ -149,6 +333,7 @@ export function NavBar() {
   const isMobile = useMediaQuery("(max-width: 850px)");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoHovered, setLogoHovered] = useState(false);
+  const { theme, setTheme } = useNavTheme();
 
   const navRef = useRef<HTMLElement>(null);
 
@@ -175,6 +360,17 @@ export function NavBar() {
   }
 
   const visibleStickers = STICKERS.filter(s => !s.authRequired || username);
+
+  if (theme === "minimal") {
+    return (
+      <MinimalNav
+        visibleStickers={visibleStickers}
+        username={username}
+        onSignOut={handleSignOut}
+        onSwitchTheme={() => setTheme("sticker")}
+      />
+    );
+  }
 
   return (
     <nav ref={navRef} className="bg-background sticky top-0 z-50">
@@ -294,7 +490,7 @@ export function NavBar() {
             </div>
 
             {/* Column 3: Identity / auth actions */}
-            <div className="flex-shrink-0 flex items-end gap-4 h-full z-30">
+            <div className="flex-shrink-0 flex items-end gap-2 h-full z-30">
               {username ? (
                 <div className="flex items-end gap-3 h-full">
                   <div className="mb-3.5">
@@ -323,6 +519,17 @@ export function NavBar() {
                   />
                 </div>
               )}
+              <div className="mb-3.5">
+                <button
+                  type="button"
+                  onClick={() => setTheme("minimal")}
+                  title="Switch to Minimal theme"
+                  className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-base"
+                  aria-label="Switch to Minimal theme"
+                >
+                  ☰
+                </button>
+              </div>
             </div>
           </>
         )}
@@ -383,6 +590,15 @@ export function NavBar() {
                   />
                 </div>
               )}
+
+              <div className="h-[2.5px] bg-black/10 my-2" />
+              <button
+                type="button"
+                onClick={() => { setTheme("minimal"); setMobileOpen(false); }}
+                className="text-left px-1 text-sm font-medium text-muted-foreground"
+              >
+                ☰ Switch to Minimal theme
+              </button>
             </div>
           </motion.div>
         )}
