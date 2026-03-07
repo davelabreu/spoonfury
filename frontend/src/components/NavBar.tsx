@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Utensils, ShoppingCart } from "lucide-react";
@@ -145,14 +145,21 @@ function UsernameBadge({ username, className }: { username: string; className?: 
   );
 }
 
+export const SHOPPING_LIST_UPDATED = "shopping-list-updated";
+
 function useShoppingCount(token: string | null | undefined, locationKey: string) {
   const [count, setCount] = useState(0);
-  useEffect(() => {
+  const refresh = useCallback(() => {
     if (!token) { setCount(0); return; }
     api.get("/shopping-list/", token)
       .then((d: any) => setCount(d.total_items ?? 0))
       .catch(() => {});
-  }, [token, locationKey]);
+  }, [token]);
+  useEffect(() => { refresh(); }, [refresh, locationKey]);
+  useEffect(() => {
+    window.addEventListener(SHOPPING_LIST_UPDATED, refresh);
+    return () => window.removeEventListener(SHOPPING_LIST_UPDATED, refresh);
+  }, [refresh]);
   return count;
 }
 

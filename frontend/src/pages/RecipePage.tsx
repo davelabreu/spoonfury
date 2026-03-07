@@ -13,6 +13,7 @@ import { ChevronLeft } from "lucide-react";
 import type { Ingredient } from "@/types";
 import { BuyNowSheet } from "@/components/BuyNowSheet";
 import { useWakeLock } from "@/hooks/useWakeLock";
+import { SHOPPING_LIST_UPDATED } from "@/components/NavBar";
 
 interface Book {
   id: number;
@@ -83,6 +84,7 @@ export function RecipePage() {
       );
       setListMsg(`Added ${res.added} item${res.added !== 1 ? "s" : ""} to your list`);
       setTimeout(() => setListMsg(""), 2500);
+      window.dispatchEvent(new CustomEvent(SHOPPING_LIST_UPDATED));
     } catch {
       setListMsg("Failed to add to list.");
       setTimeout(() => setListMsg(""), 2500);
