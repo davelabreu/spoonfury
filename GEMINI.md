@@ -42,6 +42,15 @@ Spoonfury is a recipe-first social platform focusing on the **fork** mechanic.
 
 - **Git**: Always use semantic commits on `master`.
 - **Worktrees**: Use `.worktrees/` for isolated feature work. Note that `.env` files and `.venv` must be manually managed in new worktrees.
+- **Dev server in worktrees**: When working in a worktree, **both** the frontend and backend must be started from inside the worktree — not the main repo. Also run `migrate` before starting the backend if the branch adds new models or migrations. Remind the user of this before they test changes.
+  ```bash
+  # Frontend
+  cd .worktrees/<branch>/frontend && npm run dev
+  # Backend
+  cd .worktrees/<branch>/backend
+  ../../.venv/Scripts/python manage.py migrate
+  ../../.venv/Scripts/python manage.py runserver
+  ```
 - **Tailwind 4**: Typography plugin is imported via `@plugin "@tailwindcss/typography";` in `index.css`.
 
 ## Key Files to Watch

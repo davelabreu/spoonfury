@@ -56,6 +56,15 @@ npm run dev
 ### Git
 - **Commits**: Semantic commits on `master`.
 - **Worktrees**: Use `.worktrees/` for feature development.
+- **Dev server in worktrees**: Always remind the user to start **both** the frontend AND backend from inside the worktree, not the main repo. Failure to do so means running old `master` code. Remind before testing and before merging.
+  ```bash
+  # Frontend
+  cd .worktrees/<branch>/frontend && npm run dev
+  # Backend (also run migrate first if the branch adds new models/migrations)
+  cd .worktrees/<branch>/backend
+  ../../.venv/Scripts/python manage.py migrate
+  ../../.venv/Scripts/python manage.py runserver
+  ```
 
 ## Design Docs
 - v0.1 Design: `docs/plans/2026-02-15-spoonfury-design.md`
