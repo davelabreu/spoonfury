@@ -1,11 +1,5 @@
 import { buildInstacartUrl } from "@/lib/instacart";
-
-interface Ingredient {
-  quantity: string;
-  unit: string;
-  name: string;
-  note: string;
-}
+import type { Ingredient } from "@/types";
 
 interface Props {
   ingredients: Ingredient[];

@@ -1,9 +1,4 @@
-interface Ingredient {
-  quantity: string;
-  unit: string;
-  name: string;
-  note: string;
-}
+import type { Ingredient } from "@/types";
 
 /**
  * Builds an Instacart search URL for a list of ingredients.

@@ -1,12 +1,6 @@
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-
-interface Ingredient {
-  quantity: string;
-  unit: string;
-  name: string;
-  note: string;
-}
+import type { Ingredient } from "@/types";
 
 interface Props {
   ingredients: Ingredient[];

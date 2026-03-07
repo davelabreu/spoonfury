@@ -10,6 +10,9 @@ import { IngredientChecklist } from "@/components/IngredientChecklist";
 import { ForkModal } from "@/components/ForkModal";
 import { ShareModal } from "@/components/ShareModal";
 import { ChevronLeft } from "lucide-react";
+import type { Ingredient } from "@/types";
+import { BuyNowSheet } from "@/components/BuyNowSheet";
+import { useWakeLock } from "@/hooks/useWakeLock";
 
 interface Book {
   id: number;
@@ -27,6 +30,9 @@ export function RecipePage() {
   const [saveMsg, setSaveMsg] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const cookNow = useWakeLock();
+  const [buyNowIngredients, setBuyNowIngredients] = useState<Ingredient[] | null>(null);
+  const [listMsg, setListMsg] = useState("");
 
   useEffect(() => {
     if (!slug) return;
@@ -67,11 +73,37 @@ export function RecipePage() {
     }
   };
 
+  const addToList = async (needed: Ingredient[]) => {
+    if (!token || !recipe) return;
+    try {
+      const res = await api.post(
+        "/shopping-list/add/",
+        { recipe_slug: recipe.slug, recipe_title: recipe.title, ingredients: needed },
+        token
+      );
+      setListMsg(`Added ${res.added} item${res.added !== 1 ? "s" : ""} to your list`);
+      setTimeout(() => setListMsg(""), 2500);
+    } catch {
+      setListMsg("Failed to add to list.");
+      setTimeout(() => setListMsg(""), 2500);
+    }
+  };
+
   if (error) return <div className="max-w-2xl mx-auto py-12"><p className="text-destructive font-medium">{error}</p><Button variant="link" onClick={() => navigate("/")} className="mt-4 p-0">← Back to home</Button></div>;
   if (!recipe) return <p className="text-muted-foreground">Loading…</p>;
 
   return (
     <article className="max-w-2xl mx-auto space-y-6">
+      {/* Cook Now banner */}
+      {cookNow.active && (
+        <div className="flex items-center justify-between px-4 py-2.5 bg-amber-400 rounded-lg text-amber-900 font-semibold text-sm">
+          <span>🍳 Screen will stay on while you cook</span>
+          <Button size="sm" variant="ghost" onClick={cookNow.release} className="text-amber-900 hover:bg-amber-500">
+            Done cooking
+          </Button>
+        </div>
+      )}
+
       {/* Navigation */}
       <div className="flex items-center -ml-2 mb-2">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground">
@@ -151,11 +183,23 @@ export function RecipePage() {
                   Share
                 </Button>
 
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={deleteRecipe} 
-                  disabled={deleting} 
+                {cookNow.supported && (
+                  <Button
+                    type="button"
+                    variant={cookNow.active ? "default" : "outline"}
+                    size="sm"
+                    onClick={cookNow.active ? cookNow.release : cookNow.acquire}
+                    className={cookNow.active ? "bg-amber-400 text-amber-900 hover:bg-amber-500 border-0" : "bg-white/50 border-indigo-100"}
+                  >
+                    🍳 {cookNow.active ? "Stop" : "Cook Now"}
+                  </Button>
+                )}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={deleteRecipe}
+                  disabled={deleting}
                   className="bg-white/50 border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600"
                 >
                   {deleting ? "Deleting..." : "Delete"}
@@ -183,6 +227,18 @@ export function RecipePage() {
                   </svg>
                   Share
                 </Button>
+
+                {cookNow.supported && (
+                  <Button
+                    type="button"
+                    variant={cookNow.active ? "default" : "outline"}
+                    size="sm"
+                    onClick={cookNow.active ? cookNow.release : cookNow.acquire}
+                    className={cookNow.active ? "bg-amber-400 text-amber-900 hover:bg-amber-500 border-0" : "border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50"}
+                  >
+                    🍳 {cookNow.active ? "Stop" : "Cook Now"}
+                  </Button>
+                )}
               </div>
             </div>
           )}
@@ -193,7 +249,14 @@ export function RecipePage() {
       <p className="text-sm text-muted-foreground">Serves: {recipe.serves}</p>
 
       <Separator />
-      <IngredientChecklist ingredients={recipe.ingredients} />
+      <IngredientChecklist
+        ingredients={recipe.ingredients}
+        onAddToList={token ? addToList : undefined}
+        onBuyNow={setBuyNowIngredients}
+      />
+      {listMsg && (
+        <p className="text-sm font-medium text-indigo-600 animate-in fade-in slide-in-from-bottom-1">{listMsg}</p>
+      )}
       <Separator />
 
       <div>
@@ -229,6 +292,13 @@ export function RecipePage() {
           url={window.location.href}
           title={recipe.title}
           onClose={() => setSharing(false)}
+        />
+      )}
+
+      {buyNowIngredients && (
+        <BuyNowSheet
+          ingredients={buyNowIngredients}
+          onClose={() => setBuyNowIngredients(null)}
         />
       )}
     </article>
