@@ -18,7 +18,7 @@
     {
       "label": "Backend",
       "type": "shell",
-      "command": "cd backend && echo '' && echo '=== Backend ===' && echo '1. source ../.venv/Scripts/activate' && echo '2. python manage.py runserver 0.0.0.0:8000' && echo '' && bash",
+      "command": "cd backend && echo '' && echo '=== Backend ===' && echo '1. source ../.venv/Scripts/activate' && echo '2. (If changes were made) python manage.py migrate' && echo '3. python manage.py runserver 0.0.0.0:8000' && echo '' && bash",
       "runOptions": { "runOn": "folderOpen" },
       "presentation": { "panel": "dedicated", "reveal": "always", "showReuseMessage": false }
     },
