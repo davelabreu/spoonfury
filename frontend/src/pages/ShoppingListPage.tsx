@@ -261,7 +261,7 @@ export function ShoppingListPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-8">
+    <div className="max-w-2xl mx-auto space-y-6 pb-8 min-h-[calc(100vh-5rem)] flex flex-col">
       {/* Header */}
       <div>
         <div className="flex items-center justify-between gap-4">
@@ -299,6 +299,7 @@ export function ShoppingListPage() {
         </div>
       )}
 
+      <div className="flex-1 space-y-6">
       {data.total_items === 0 ? (
         <div className="text-center py-16">
           <p className="text-4xl mb-4">🛒</p>
@@ -386,6 +387,7 @@ export function ShoppingListPage() {
           )}
         </>
       )}
+      </div>
 
       {/* Clear list */}
       {data.total_items > 0 && (
