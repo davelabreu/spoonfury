@@ -157,38 +157,36 @@ export function ShoppingListPage() {
     const onTouchMove = (e: React.TouchEvent) => {
       if (!swiping.current || !rowRef.current) return;
       const dx = e.touches[0].clientX - startX.current;
-      // Only allow left swipe
       currentX.current = Math.min(0, dx);
       rowRef.current.style.transform = `translateX(${currentX.current}px)`;
       rowRef.current.style.transition = "none";
+      // Show red tint proportional to swipe distance
+      const progress = Math.min(1, Math.abs(currentX.current) / 80);
+      rowRef.current.style.backgroundColor = `rgba(239, 68, 68, ${progress * 0.15})`;
     };
 
     const onTouchEnd = () => {
       if (!swiping.current || !rowRef.current) return;
       swiping.current = false;
-      rowRef.current.style.transition = "transform 0.2s ease-out";
+      rowRef.current.style.transition = "transform 0.2s ease-out, background-color 0.2s ease-out";
       if (currentX.current < -80) {
-        // Swipe far enough — delete
         rowRef.current.style.transform = "translateX(-100%)";
+        rowRef.current.style.backgroundColor = "rgba(239, 68, 68, 0.3)";
         setTimeout(() => deleteItem(item), 200);
       } else {
         rowRef.current.style.transform = "translateX(0)";
+        rowRef.current.style.backgroundColor = "";
       }
     };
 
     return (
-      <div className="relative overflow-hidden">
-        {/* Red delete background revealed on swipe */}
-        <div className="absolute inset-y-0 right-0 w-24 bg-red-500 flex items-center justify-center">
-          <Trash2 className="w-4 h-4 text-white" />
-        </div>
-        <div
-          ref={rowRef}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-          className={`relative flex items-center gap-3 py-2 bg-background ${item.is_checked ? "opacity-50" : ""}`}
-        >
+      <div
+        ref={rowRef}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        className={`flex items-center gap-3 py-2 ${item.is_checked ? "opacity-50" : ""}`}
+      >
           <input
             type="checkbox"
             checked={item.is_checked}
@@ -209,7 +207,6 @@ export function ShoppingListPage() {
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
-        </div>
       </div>
     );
   }
