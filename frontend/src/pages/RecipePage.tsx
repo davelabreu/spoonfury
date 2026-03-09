@@ -90,6 +90,7 @@ export function RecipePage() {
         token
       );
       setInList(res.already_in_list);
+      window.dispatchEvent(new Event("shopping-list-updated"));
     } catch {
       setListMsg("Failed to add to list.");
       setTimeout(() => setListMsg(""), 2500);

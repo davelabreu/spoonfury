@@ -147,12 +147,18 @@ function UsernameBadge({ username, className }: { username: string; className?: 
 
 function useShoppingCount(token: string | null | undefined, locationKey: string) {
   const [count, setCount] = useState(0);
+  const [bump, setBump] = useState(0);
+  useEffect(() => {
+    const onUpdate = () => setBump(b => b + 1);
+    window.addEventListener("shopping-list-updated", onUpdate);
+    return () => window.removeEventListener("shopping-list-updated", onUpdate);
+  }, []);
   useEffect(() => {
     if (!token) { setCount(0); return; }
     api.get("/shopping-list/", token)
       .then((d: any) => setCount(d.total_items ?? 0))
       .catch(() => {});
-  }, [token, locationKey]);
+  }, [token, locationKey, bump]);
   return count;
 }
 
