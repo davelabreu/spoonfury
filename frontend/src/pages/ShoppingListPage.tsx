@@ -35,6 +35,23 @@ function itemToIngredient(item: ShoppingItem): Ingredient {
   return { quantity: item.quantity, unit: item.unit, name: item.name, note: item.note };
 }
 
+function titleCase(s: string): string {
+  return s.replace(/\b\w/g, c => c.toUpperCase());
+}
+
+const ingredientEmoji: Record<string, string> = {
+  egg: "🥚", eggs: "🥚", salt: "🧂", pepper: "🌶️", butter: "🧈",
+  milk: "🥛", cheese: "🧀", garlic: "🧄", onion: "🧅", tomato: "🍅",
+  lemon: "🍋", chicken: "🍗", beef: "🥩", rice: "🍚", bread: "🍞",
+  pasta: "🍝", olive: "🫒", carrot: "🥕", potato: "🥔", corn: "🌽",
+  mushroom: "🍄", mushrooms: "🍄", avocado: "🥑", honey: "🍯",
+  chocolate: "🍫", sugar: "🍬", water: "💧", oil: "🫒", flour: "🌾",
+  shrimp: "🦐", fish: "🐟", salmon: "🐟", bacon: "🥓", apple: "🍎",
+  banana: "🍌", strawberry: "🍓", blueberry: "🫐", peach: "🍑",
+  peanut: "🥜", coconut: "🥥", broccoli: "🥦", cucumber: "🥒",
+  "coca cola": "🥤", soda: "🥤", wine: "🍷", beer: "🍺", coffee: "☕", tea: "🍵",
+};
+
 export function ShoppingListPage() {
   const { token } = useAuth();
   const [data, setData] = useState<ShoppingListData | null>(null);
@@ -203,34 +220,38 @@ export function ShoppingListPage() {
       }
     };
 
+    const nameLower = item.name.toLowerCase();
+    const emoji = ingredientEmoji[nameLower] || Object.entries(ingredientEmoji).find(([k]) => nameLower.includes(k))?.[1] || "";
+
     return (
       <div
         ref={rowRef}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        className={`flex items-center gap-3 py-2 ${item.is_checked ? "opacity-50" : ""}`}
+        className={`flex items-center gap-3 py-2.5 px-1 ${item.is_checked ? "opacity-50" : ""}`}
       >
           <input
             type="checkbox"
             checked={item.is_checked}
             onChange={() => toggleItem(item)}
-            className="w-4 h-4 rounded accent-indigo-500 cursor-pointer shrink-0"
+            className="w-4 h-4 rounded accent-indigo-500 cursor-pointer shrink-0 mt-px"
             aria-label={`Mark ${item.name} as picked up`}
           />
-          <span className={`flex-1 text-sm ${item.is_checked ? "line-through text-muted-foreground" : ""}`}>
+          <span className={`flex-1 text-sm leading-5 ${item.is_checked ? "line-through text-muted-foreground" : ""}`}>
+            {emoji && <span className="mr-1">{emoji}</span>}
             {item.quantity && <span className="font-medium">{
               multiplier > 1 && !isNaN(Number(item.quantity))
                 ? String(Number(item.quantity) * multiplier)
                 : item.quantity
             }{item.unit && ` ${item.unit}`} </span>}
-            {item.name}
+            {titleCase(item.name)}
             {item.note && <span className="text-muted-foreground ml-1">({item.note})</span>}
           </span>
           <button
             type="button"
             onClick={() => deleteItem(item)}
-            className="p-1 rounded text-muted-foreground hover:text-destructive transition-colors"
+            className="trash-shake p-1.5 rounded text-muted-foreground transition-colors"
             aria-label={`Remove ${item.name}`}
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -314,22 +335,22 @@ export function ShoppingListPage() {
             <div className="space-y-6">
               {data.items_by_recipe.map(group => (
                   <div key={group.recipe_slug} className="space-y-1">
-                    {/* Recipe header with Amazon-style quantity widget */}
-                    <div className="flex items-center justify-between gap-3 mb-2">
+                    {/* Recipe header with quantity widget */}
+                    <div className="flex items-center justify-between gap-3 mb-2 bg-muted/60 rounded-lg px-3 py-2">
                       <Link
                         to={`/recipes/${group.recipe_slug}`}
-                        className="font-semibold text-sm hover:underline underline-offset-4 flex-1"
+                        className="font-bold text-sm hover:underline underline-offset-4 flex-1"
                       >
                         {group.recipe_title}
                       </Link>
-                      <div className="flex items-center border border-amber-300 rounded-lg overflow-hidden shrink-0">
+                      <div className="flex items-center border-2 border-amber-400 rounded-lg overflow-hidden shrink-0 shadow-sm">
                         <button
                           type="button"
                           onClick={() => group.multiplier > 1
                             ? updateMultiplier(group.recipe_slug, group.multiplier - 1)
                             : removeRecipe(group.recipe_slug)
                           }
-                          className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 transition-colors border-r border-amber-300"
+                          className="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 transition-colors border-r-2 border-amber-400"
                           aria-label={group.multiplier > 1
                             ? `Decrease ${group.recipe_title} to ${group.multiplier - 1}`
                             : `Remove ${group.recipe_title} from shopping list`
@@ -340,13 +361,13 @@ export function ShoppingListPage() {
                             : <Trash2 className="w-3.5 h-3.5" />
                           }
                         </button>
-                        <span className="px-3 py-1.5 text-sm font-semibold text-amber-900 bg-white min-w-[2rem] text-center">
+                        <span className="px-3 py-1.5 text-sm font-bold text-amber-900 bg-white min-w-[2rem] text-center">
                           {group.multiplier}
                         </span>
                         <button
                           type="button"
                           onClick={() => updateMultiplier(group.recipe_slug, group.multiplier + 1)}
-                          className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 transition-colors border-l border-amber-300"
+                          className="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 transition-colors border-l-2 border-amber-400"
                           aria-label={`Increase ${group.recipe_title} to ${group.multiplier + 1}`}
                         >
                           <Plus className="w-3.5 h-3.5" />
@@ -376,7 +397,7 @@ export function ShoppingListPage() {
             size="sm"
             className="text-muted-foreground hover:text-destructive"
           >
-            {clearing ? "Clearing…" : "Clear entire list"}
+            {clearing ? "Tossing…" : "🗑️ Start fresh"}
           </Button>
         </div>
       )}
