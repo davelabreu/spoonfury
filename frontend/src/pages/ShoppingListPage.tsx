@@ -4,7 +4,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { BuyNowSheet } from "@/components/BuyNowSheet";
+import { buildInstacartUrl } from "@/lib/instacart";
 import { Trash2, Plus, Minus } from "lucide-react";
 import type { Ingredient } from "@/types";
 
@@ -40,7 +40,6 @@ export function ShoppingListPage() {
   const [data, setData] = useState<ShoppingListData | null>(null);
   const [error, setError] = useState("");
   const [view, setView] = useState<"recipe" | "all">("recipe");
-  const [buyNowIngredients, setBuyNowIngredients] = useState<Ingredient[] | null>(null);
   const [clearing, setClearing] = useState(false);
 
   const load = useCallback(async () => {
@@ -254,15 +253,29 @@ export function ShoppingListPage() {
         </div>
       </div>
 
-      {/* Hero checkout button */}
+      {/* Checkout buttons */}
       {uncheckedAll.length > 0 && (
-        <Button
-          onClick={() => setBuyNowIngredients(uncheckedAll)}
-          className="w-full bg-green-600 hover:bg-green-700 text-white text-base py-6 gap-2 rounded-xl shadow-md"
-          size="lg"
-        >
-          🛒 Buy it ALL NOW! — {uncheckedAll.length} item{uncheckedAll.length !== 1 ? "s" : ""}
-        </Button>
+        <div className="space-y-1.5">
+          <div className="flex gap-2">
+            <a
+              href={buildInstacartUrl(uncheckedAll, "pickup")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold text-sm transition-colors"
+            >
+              🚗 Pickup · {uncheckedAll.length} item{uncheckedAll.length !== 1 ? "s" : ""}
+            </a>
+            <a
+              href={buildInstacartUrl(uncheckedAll, "delivery")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-green-600 text-green-700 hover:bg-green-50 font-semibold text-sm transition-colors"
+            >
+              🏠 Delivery
+            </a>
+          </div>
+          <p className="text-xs text-center text-muted-foreground">via Instacart</p>
+        </div>
       )}
 
       {data.total_items === 0 ? (
@@ -299,15 +312,7 @@ export function ShoppingListPage() {
 
           {view === "recipe" ? (
             <div className="space-y-6">
-              {data.items_by_recipe.map(group => {
-                const unchecked = group.items.filter(i => !i.is_checked).map(i => {
-                  const ing = itemToIngredient(i);
-                  if (group.multiplier > 1 && ing.quantity && !isNaN(Number(ing.quantity))) {
-                    return { ...ing, quantity: String(Number(ing.quantity) * group.multiplier) };
-                  }
-                  return ing;
-                });
-                return (
+              {data.items_by_recipe.map(group => (
                   <div key={group.recipe_slug} className="space-y-1">
                     {/* Recipe header with Amazon-style quantity widget */}
                     <div className="flex items-center justify-between gap-3 mb-2">
@@ -351,8 +356,7 @@ export function ShoppingListPage() {
                     {group.items.map(item => <ItemRow key={item.id} item={item} multiplier={group.multiplier} />)}
                     <Separator className="mt-4" />
                   </div>
-                );
-              })}
+              ))}
             </div>
           ) : (
             <div className="space-y-1">
@@ -377,12 +381,6 @@ export function ShoppingListPage() {
         </div>
       )}
 
-      {buyNowIngredients && (
-        <BuyNowSheet
-          ingredients={buyNowIngredients}
-          onClose={() => setBuyNowIngredients(null)}
-        />
-      )}
     </div>
   );
 }
