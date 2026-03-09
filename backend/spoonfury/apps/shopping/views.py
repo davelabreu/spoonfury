@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from spoonfury.apps.recipes.models import Recipe
-from .models import ShoppingList, ShoppingListItem
+from .models import ShoppingList, ShoppingListItem, RecipeMultiplier
 from .serializers import ShoppingListSerializer, ShoppingListItemSerializer
 
 
@@ -12,7 +12,7 @@ class ShoppingListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        shopping_list, _ = ShoppingList.objects.prefetch_related("items").get_or_create(owner=request.user)
+        shopping_list, _ = ShoppingList.objects.prefetch_related("items", "multipliers").get_or_create(owner=request.user)
         return Response(ShoppingListSerializer(shopping_list).data)
 
 
@@ -79,8 +79,29 @@ class ShoppingListRemoveRecipeView(APIView):
             return Response({"error": "recipe_slug is required"}, status=status.HTTP_400_BAD_REQUEST)
         shopping_list, _ = ShoppingList.objects.get_or_create(owner=request.user)
         deleted, _ = shopping_list.items.filter(recipe_slug=recipe_slug).delete()
+        RecipeMultiplier.objects.filter(shopping_list=shopping_list, recipe_slug=recipe_slug).delete()
         shopping_list.save(update_fields=["updated_at"])
         return Response({"removed": deleted})
+
+
+class RecipeMultiplierView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        recipe_slug = request.data.get("recipe_slug", "")
+        multiplier = request.data.get("multiplier", 1)
+        if not recipe_slug:
+            return Response({"error": "recipe_slug is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not isinstance(multiplier, int) or multiplier < 1:
+            return Response({"error": "multiplier must be a positive integer"}, status=status.HTTP_400_BAD_REQUEST)
+        shopping_list, _ = ShoppingList.objects.get_or_create(owner=request.user)
+        obj, _ = RecipeMultiplier.objects.update_or_create(
+            shopping_list=shopping_list,
+            recipe_slug=recipe_slug,
+            defaults={"multiplier": multiplier},
+        )
+        shopping_list.save(update_fields=["updated_at"])
+        return Response({"recipe_slug": recipe_slug, "multiplier": obj.multiplier})
 
 
 class ShoppingListClearView(APIView):
@@ -89,6 +110,7 @@ class ShoppingListClearView(APIView):
     def post(self, request):
         shopping_list, _ = ShoppingList.objects.get_or_create(owner=request.user)
         shopping_list.items.all().delete()
+        shopping_list.multipliers.all().delete()
         shopping_list.save(update_fields=["updated_at"])
         return Response(status=status.HTTP_204_NO_CONTENT)
 

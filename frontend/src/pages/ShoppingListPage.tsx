@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { BuyNowSheet } from "@/components/BuyNowSheet";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Minus } from "lucide-react";
 import type { Ingredient } from "@/types";
 
 interface ShoppingItem {
@@ -22,6 +22,7 @@ interface ShoppingItem {
 interface RecipeGroup {
   recipe_slug: string;
   recipe_title: string;
+  multiplier: number;
   items: ShoppingItem[];
 }
 
@@ -105,6 +106,22 @@ export function ShoppingListPage() {
     }
   };
 
+  const updateMultiplier = async (recipeSlug: string, newMultiplier: number) => {
+    if (!token || newMultiplier < 1) return;
+    // Optimistic update
+    setData(prev => prev ? {
+      ...prev,
+      items_by_recipe: prev.items_by_recipe.map(g =>
+        g.recipe_slug === recipeSlug ? { ...g, multiplier: newMultiplier } : g
+      ),
+    } : prev);
+    try {
+      await api.patch("/shopping-list/multiplier/", { recipe_slug: recipeSlug, multiplier: newMultiplier }, token);
+    } catch {
+      load();
+    }
+  };
+
   const clearList = async () => {
     if (!token) return;
     setClearing(true);
@@ -142,7 +159,7 @@ export function ShoppingListPage() {
   const allItems = data.items_by_recipe.flatMap(g => g.items);
   const uncheckedAll = allItems.filter(i => !i.is_checked).map(itemToIngredient);
 
-  function ItemRow({ item }: { item: ShoppingItem }) {
+  function ItemRow({ item, multiplier = 1 }: { item: ShoppingItem; multiplier?: number }) {
     const rowRef = useRef<HTMLDivElement>(null);
     const startX = useRef(0);
     const currentX = useRef(0);
@@ -195,7 +212,11 @@ export function ShoppingListPage() {
             aria-label={`Mark ${item.name} as picked up`}
           />
           <span className={`flex-1 text-sm ${item.is_checked ? "line-through text-muted-foreground" : ""}`}>
-            {item.quantity && <span className="font-medium">{item.quantity}{item.unit && ` ${item.unit}`} </span>}
+            {item.quantity && <span className="font-medium">{
+              multiplier > 1 && !isNaN(Number(item.quantity))
+                ? String(Number(item.quantity) * multiplier)
+                : item.quantity
+            }{item.unit && ` ${item.unit}`} </span>}
             {item.name}
             {item.note && <span className="text-muted-foreground ml-1">({item.note})</span>}
           </span>
@@ -260,7 +281,13 @@ export function ShoppingListPage() {
           {view === "recipe" ? (
             <div className="space-y-6">
               {data.items_by_recipe.map(group => {
-                const unchecked = group.items.filter(i => !i.is_checked).map(itemToIngredient);
+                const unchecked = group.items.filter(i => !i.is_checked).map(i => {
+                  const ing = itemToIngredient(i);
+                  if (group.multiplier > 1 && ing.quantity && !isNaN(Number(ing.quantity))) {
+                    return { ...ing, quantity: String(Number(ing.quantity) * group.multiplier) };
+                  }
+                  return ing;
+                });
                 return (
                   <div key={group.recipe_slug} className="space-y-1">
                     {/* Recipe header with Amazon-style quantity widget */}
@@ -274,27 +301,35 @@ export function ShoppingListPage() {
                       <div className="flex items-center border border-amber-300 rounded-lg overflow-hidden shrink-0">
                         <button
                           type="button"
-                          onClick={() => removeRecipe(group.recipe_slug)}
+                          onClick={() => group.multiplier > 1
+                            ? updateMultiplier(group.recipe_slug, group.multiplier - 1)
+                            : removeRecipe(group.recipe_slug)
+                          }
                           className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 transition-colors border-r border-amber-300"
-                          aria-label={`Remove ${group.recipe_title} from shopping list`}
+                          aria-label={group.multiplier > 1
+                            ? `Decrease ${group.recipe_title} to ${group.multiplier - 1}`
+                            : `Remove ${group.recipe_title} from shopping list`
+                          }
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          {group.multiplier > 1
+                            ? <Minus className="w-3.5 h-3.5" />
+                            : <Trash2 className="w-3.5 h-3.5" />
+                          }
                         </button>
                         <span className="px-3 py-1.5 text-sm font-semibold text-amber-900 bg-white min-w-[2rem] text-center">
-                          1
+                          {group.multiplier}
                         </span>
                         <button
                           type="button"
-                          disabled
-                          className="px-2.5 py-1.5 bg-amber-50 text-amber-300 border-l border-amber-300 cursor-not-allowed"
-                          aria-label="Increase quantity (coming soon)"
-                          title="Ingredient scaling coming soon"
+                          onClick={() => updateMultiplier(group.recipe_slug, group.multiplier + 1)}
+                          className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 transition-colors border-l border-amber-300"
+                          aria-label={`Increase ${group.recipe_title} to ${group.multiplier + 1}`}
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
-                    {group.items.map(item => <ItemRow key={item.id} item={item} />)}
+                    {group.items.map(item => <ItemRow key={item.id} item={item} multiplier={group.multiplier} />)}
                     {unchecked.length > 0 && (
                       <Button
                         variant="outline"

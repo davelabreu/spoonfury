@@ -219,3 +219,59 @@ def test_remove_recipe_deletes_all_items_for_recipe(auth_client, recipe, ingredi
 
     list_response = auth_client.get(reverse("shopping-list"))
     assert list_response.data["total_items"] == 0
+
+
+@pytest.mark.django_db
+def test_multiplier_set_and_read(auth_client, recipe, ingredients):
+    """PATCH multiplier updates it, GET list returns it per recipe group."""
+    auth_client.post(reverse("shopping-list-add"), {
+        "recipe_slug": recipe.slug,
+        "recipe_title": recipe.title,
+        "ingredients": ingredients,
+    }, format="json")
+
+    # Default multiplier is 1
+    r = auth_client.get(reverse("shopping-list"))
+    assert r.data["items_by_recipe"][0]["multiplier"] == 1
+
+    # Set to 3
+    r2 = auth_client.patch(
+        reverse("shopping-list-multiplier"),
+        {"recipe_slug": recipe.slug, "multiplier": 3},
+        format="json",
+    )
+    assert r2.status_code == 200
+    assert r2.data["multiplier"] == 3
+
+    # Verify in list response
+    r3 = auth_client.get(reverse("shopping-list"))
+    assert r3.data["items_by_recipe"][0]["multiplier"] == 3
+
+
+@pytest.mark.django_db
+def test_remove_recipe_also_removes_multiplier(auth_client, recipe, ingredients):
+    """Removing a recipe also cleans up its multiplier."""
+    auth_client.post(reverse("shopping-list-add"), {
+        "recipe_slug": recipe.slug,
+        "recipe_title": recipe.title,
+        "ingredients": ingredients,
+    }, format="json")
+    auth_client.patch(
+        reverse("shopping-list-multiplier"),
+        {"recipe_slug": recipe.slug, "multiplier": 2},
+        format="json",
+    )
+    auth_client.post(
+        reverse("shopping-list-remove-recipe"),
+        {"recipe_slug": recipe.slug},
+        format="json",
+    )
+
+    # Re-add — multiplier should be back to default 1
+    auth_client.post(reverse("shopping-list-add"), {
+        "recipe_slug": recipe.slug,
+        "recipe_title": recipe.title,
+        "ingredients": ingredients,
+    }, format="json")
+    r = auth_client.get(reverse("shopping-list"))
+    assert r.data["items_by_recipe"][0]["multiplier"] == 1
