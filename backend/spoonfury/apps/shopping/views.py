@@ -58,6 +58,18 @@ class ShoppingListAddView(APIView):
         return Response({"added": added, "already_in_list": in_list}, status=status.HTTP_201_CREATED)
 
 
+class ShoppingListStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        recipe_slug = request.query_params.get("recipe_slug", "")
+        if not recipe_slug:
+            return Response({"error": "recipe_slug is required"}, status=status.HTTP_400_BAD_REQUEST)
+        shopping_list, _ = ShoppingList.objects.get_or_create(owner=request.user)
+        in_list = shopping_list.items.filter(recipe_slug=recipe_slug).exists()
+        return Response({"in_list": in_list})
+
+
 class ShoppingListClearView(APIView):
     permission_classes = [IsAuthenticated]
 

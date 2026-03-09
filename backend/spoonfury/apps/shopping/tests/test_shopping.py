@@ -174,3 +174,27 @@ def test_add_returns_already_in_list_flag(auth_client, recipe, ingredients):
     r2 = auth_client.post(url, payload, format="json")
     assert r2.data["added"] == 0
     assert r2.data["already_in_list"] is True
+
+
+@pytest.mark.django_db
+def test_status_returns_false_when_empty(auth_client, recipe):
+    """Status endpoint returns in_list=false when recipe has no items."""
+    url = reverse("shopping-list-status")
+    response = auth_client.get(f"{url}?recipe_slug={recipe.slug}")
+    assert response.status_code == 200
+    assert response.data["in_list"] is False
+
+
+@pytest.mark.django_db
+def test_status_returns_true_when_items_exist(auth_client, recipe, ingredients):
+    """Status endpoint returns in_list=true when recipe has items."""
+    auth_client.post(reverse("shopping-list-add"), {
+        "recipe_slug": recipe.slug,
+        "recipe_title": recipe.title,
+        "ingredients": ingredients,
+    }, format="json")
+
+    url = reverse("shopping-list-status")
+    response = auth_client.get(f"{url}?recipe_slug={recipe.slug}")
+    assert response.status_code == 200
+    assert response.data["in_list"] is True
