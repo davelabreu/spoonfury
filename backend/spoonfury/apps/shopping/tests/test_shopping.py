@@ -198,3 +198,24 @@ def test_status_returns_true_when_items_exist(auth_client, recipe, ingredients):
     response = auth_client.get(f"{url}?recipe_slug={recipe.slug}")
     assert response.status_code == 200
     assert response.data["in_list"] is True
+
+
+@pytest.mark.django_db
+def test_remove_recipe_deletes_all_items_for_recipe(auth_client, recipe, ingredients):
+    """POST to remove-recipe/ deletes all items for a specific recipe."""
+    auth_client.post(reverse("shopping-list-add"), {
+        "recipe_slug": recipe.slug,
+        "recipe_title": recipe.title,
+        "ingredients": ingredients,
+    }, format="json")
+
+    response = auth_client.post(
+        reverse("shopping-list-remove-recipe"),
+        {"recipe_slug": recipe.slug},
+        format="json",
+    )
+    assert response.status_code == 200
+    assert response.data["removed"] == 2
+
+    list_response = auth_client.get(reverse("shopping-list"))
+    assert list_response.data["total_items"] == 0

@@ -70,6 +70,19 @@ class ShoppingListStatusView(APIView):
         return Response({"in_list": in_list})
 
 
+class ShoppingListRemoveRecipeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        recipe_slug = request.data.get("recipe_slug", "")
+        if not recipe_slug:
+            return Response({"error": "recipe_slug is required"}, status=status.HTTP_400_BAD_REQUEST)
+        shopping_list, _ = ShoppingList.objects.get_or_create(owner=request.user)
+        deleted, _ = shopping_list.items.filter(recipe_slug=recipe_slug).delete()
+        shopping_list.save(update_fields=["updated_at"])
+        return Response({"removed": deleted})
+
+
 class ShoppingListClearView(APIView):
     permission_classes = [IsAuthenticated]
 
