@@ -157,7 +157,15 @@ export function ShoppingListPage() {
   if (!data) return <p className="text-muted-foreground">Loading…</p>;
 
   const allItems = data.items_by_recipe.flatMap(g => g.items);
-  const uncheckedAll = allItems.filter(i => !i.is_checked).map(itemToIngredient);
+  const uncheckedAll = data.items_by_recipe.flatMap(g =>
+    g.items.filter(i => !i.is_checked).map(i => {
+      const ing = itemToIngredient(i);
+      if (g.multiplier > 1 && ing.quantity && !isNaN(Number(ing.quantity))) {
+        return { ...ing, quantity: String(Number(ing.quantity) * g.multiplier) };
+      }
+      return ing;
+    })
+  );
 
   function ItemRow({ item, multiplier = 1 }: { item: ShoppingItem; multiplier?: number }) {
     const rowRef = useRef<HTMLDivElement>(null);
@@ -233,7 +241,7 @@ export function ShoppingListPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-24">
+    <div className="max-w-2xl mx-auto space-y-6 pb-8">
       {/* Header */}
       <div>
         <div className="flex items-center justify-between gap-4">
@@ -245,6 +253,17 @@ export function ShoppingListPage() {
           )}
         </div>
       </div>
+
+      {/* Hero checkout button */}
+      {uncheckedAll.length > 0 && (
+        <Button
+          onClick={() => setBuyNowIngredients(uncheckedAll)}
+          className="w-full bg-green-600 hover:bg-green-700 text-white text-base py-6 gap-2 rounded-xl shadow-md"
+          size="lg"
+        >
+          🛒 Buy it ALL NOW! — {uncheckedAll.length} item{uncheckedAll.length !== 1 ? "s" : ""}
+        </Button>
+      )}
 
       {data.total_items === 0 ? (
         <div className="text-center py-16">
@@ -330,16 +349,6 @@ export function ShoppingListPage() {
                       </div>
                     </div>
                     {group.items.map(item => <ItemRow key={item.id} item={item} multiplier={group.multiplier} />)}
-                    {unchecked.length > 0 && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setBuyNowIngredients(unchecked)}
-                        className="w-full mt-2 text-xs border-green-200 text-green-700 hover:bg-green-50"
-                      >
-                        🛒 Buy it NOW!
-                      </Button>
-                    )}
                     <Separator className="mt-4" />
                   </div>
                 );
@@ -353,9 +362,9 @@ export function ShoppingListPage() {
         </>
       )}
 
-      {/* Sticky footer */}
+      {/* Clear list */}
       {data.total_items > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t px-4 py-3 flex items-center gap-3 justify-between">
+        <div className="flex justify-center pt-4">
           <Button
             onClick={clearList}
             disabled={clearing}
@@ -363,16 +372,8 @@ export function ShoppingListPage() {
             size="sm"
             className="text-muted-foreground hover:text-destructive"
           >
-            {clearing ? "Clearing…" : "Clear list"}
+            {clearing ? "Clearing…" : "Clear entire list"}
           </Button>
-          {uncheckedAll.length > 0 && (
-            <Button
-              onClick={() => setBuyNowIngredients(uncheckedAll)}
-              className="bg-green-600 hover:bg-green-700 text-white gap-2"
-            >
-              🛒 Buy it ALL NOW!
-            </Button>
-          )}
         </div>
       )}
 
