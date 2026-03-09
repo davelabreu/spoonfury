@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { BuyNowSheet } from "@/components/BuyNowSheet";
-import { Trash2, X } from "lucide-react";
+import { Trash2, Plus } from "lucide-react";
 import type { Ingredient } from "@/types";
 
 interface ShoppingItem {
@@ -263,35 +263,48 @@ export function ShoppingListPage() {
                 const unchecked = group.items.filter(i => !i.is_checked).map(itemToIngredient);
                 return (
                   <div key={group.recipe_slug} className="space-y-1">
+                    {/* Recipe header with Amazon-style quantity widget */}
                     <div className="flex items-center justify-between gap-3 mb-2">
                       <Link
                         to={`/recipes/${group.recipe_slug}`}
-                        className="font-semibold text-sm hover:underline underline-offset-4"
+                        className="font-semibold text-sm hover:underline underline-offset-4 flex-1"
                       >
                         {group.recipe_title}
                       </Link>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center border border-amber-300 rounded-lg overflow-hidden shrink-0">
                         <button
                           type="button"
                           onClick={() => removeRecipe(group.recipe_slug)}
-                          className="p-1 rounded text-muted-foreground hover:text-destructive transition-colors"
-                          aria-label={`Remove all items from ${group.recipe_title}`}
+                          className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 transition-colors border-r border-amber-300"
+                          aria-label={`Remove ${group.recipe_title} from shopping list`}
                         >
-                          <X className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
-                        {unchecked.length > 0 && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setBuyNowIngredients(unchecked)}
-                            className="text-xs border-green-200 text-green-700 hover:bg-green-50"
-                          >
-                            🛒 Buy it NOW!
-                          </Button>
-                        )}
+                        <span className="px-3 py-1.5 text-sm font-semibold text-amber-900 bg-white min-w-[2rem] text-center">
+                          1
+                        </span>
+                        <button
+                          type="button"
+                          disabled
+                          className="px-2.5 py-1.5 bg-amber-50 text-amber-300 border-l border-amber-300 cursor-not-allowed"
+                          aria-label="Increase quantity (coming soon)"
+                          title="Ingredient scaling coming soon"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
                     {group.items.map(item => <ItemRow key={item.id} item={item} />)}
+                    {unchecked.length > 0 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setBuyNowIngredients(unchecked)}
+                        className="w-full mt-2 text-xs border-green-200 text-green-700 hover:bg-green-50"
+                      >
+                        🛒 Buy it NOW!
+                      </Button>
+                    )}
                     <Separator className="mt-4" />
                   </div>
                 );
