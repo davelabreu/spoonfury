@@ -54,7 +54,8 @@ class ShoppingListAddView(APIView):
             existing_names.add(name)
             added += 1
 
-        return Response({"added": added}, status=status.HTTP_201_CREATED)
+        in_list = shopping_list.items.filter(recipe_slug=recipe_slug).exists()
+        return Response({"added": added, "already_in_list": in_list}, status=status.HTTP_201_CREATED)
 
 
 class ShoppingListClearView(APIView):

@@ -157,3 +157,20 @@ def test_cannot_modify_another_users_item(auth_client, recipe, ingredients):
 
     assert other_client.patch(url, {"is_checked": True}, format="json").status_code == 404
     assert other_client.delete(url).status_code == 404
+
+
+@pytest.mark.django_db
+def test_add_returns_already_in_list_flag(auth_client, recipe, ingredients):
+    """Add response includes already_in_list boolean."""
+    url = reverse("shopping-list-add")
+    payload = {"recipe_slug": recipe.slug, "recipe_title": recipe.title, "ingredients": ingredients}
+
+    # First add — items added, now in list
+    r1 = auth_client.post(url, payload, format="json")
+    assert r1.data["added"] == 2
+    assert r1.data["already_in_list"] is True
+
+    # Second add — nothing new, but still in list
+    r2 = auth_client.post(url, payload, format="json")
+    assert r2.data["added"] == 0
+    assert r2.data["already_in_list"] is True
