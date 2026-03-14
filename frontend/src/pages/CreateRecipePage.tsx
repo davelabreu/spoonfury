@@ -4,6 +4,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { IngredientEmojiPicker } from "@/components/IngredientEmojiPicker";
 
 const CATEGORIES = ["soup","pasta","bake","salad","grill","breakfast","dessert","drink","snack","other"];
 
@@ -14,7 +15,7 @@ export function CreateRecipePage() {
     title: "", description: "", serves: "",
     instructions: "", notes: "", category: "other",
   });
-  const [ingredients, setIngredients] = useState([{ quantity: "", unit: "", name: "", note: "" }]);
+  const [ingredients, setIngredients] = useState([{ quantity: "", unit: "", name: "", note: "", emoji: "" }]);
   const [error, setError] = useState("");
 
   if (!token) return <p>Please <a href="/login" className="underline">sign in</a> to create recipes.</p>;
@@ -58,7 +59,12 @@ export function CreateRecipePage() {
           <div>
             <h3 className="text-sm font-semibold mb-2">Ingredients</h3>
             {ingredients.map((ing, i) => (
-              <div key={i} className="flex gap-2 mb-2">
+              <div key={i} className="flex gap-2 mb-2 items-center">
+                <IngredientEmojiPicker
+                  value={ing.emoji}
+                  ingredientName={ing.name}
+                  onChange={v => updateIng(i, "emoji", v)}
+                />
                 <input className="border rounded px-2 py-1 text-xs w-14" placeholder="Qty"
                   value={ing.quantity} onChange={e => updateIng(i, "quantity", e.target.value)} />
                 <input className="border rounded px-2 py-1 text-xs w-14" placeholder="Unit"
@@ -74,7 +80,7 @@ export function CreateRecipePage() {
               </div>
             ))}
             <Button type="button" variant="outline" size="sm"
-              onClick={() => setIngredients(p => [...p, { quantity: "", unit: "", name: "", note: "" }])}>
+              onClick={() => setIngredients(p => [...p, { quantity: "", unit: "", name: "", note: "", emoji: "" }])}>
               + Add ingredient
             </Button>
           </div>

@@ -3,4 +3,5 @@ export interface Ingredient {
   unit: string;
   name: string;
   note: string;
+  emoji?: string;
 }

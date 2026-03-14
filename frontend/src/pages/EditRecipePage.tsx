@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft } from "lucide-react";
 import type { Ingredient } from "@/types";
+import { IngredientEmojiPicker } from "@/components/IngredientEmojiPicker";
 
 export function EditRecipePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -47,7 +48,7 @@ export function EditRecipePage() {
   };
 
   const addIngredient = () => {
-    setIngredients(prev => [...prev, { quantity: "", unit: "", name: "", note: "" }]);
+    setIngredients(prev => [...prev, { quantity: "", unit: "", name: "", note: "", emoji: "" }]);
   };
 
   const removeIngredient = (i: number) => {
@@ -117,6 +118,11 @@ export function EditRecipePage() {
         <h3 className="text-sm font-semibold mb-2">Ingredients</h3>
         {ingredients.map((ing, i) => (
           <div key={i} className="flex gap-2 mb-2 items-center">
+            <IngredientEmojiPicker
+              value={ing.emoji}
+              ingredientName={ing.name}
+              onChange={v => updateIngredient(i, "emoji", v)}
+            />
             <input className="border rounded px-2 py-1 text-xs w-14" value={ing.quantity}
               onChange={e => updateIngredient(i, "quantity", e.target.value)} placeholder="Qty" />
             <input className="border rounded px-2 py-1 text-xs w-14" value={ing.unit}

@@ -93,3 +93,21 @@ export function getIngredientEmoji(name: string): string {
   }
   return "🛒";
 }
+
+// Flat deduplicated list for the emoji picker UI
+export const PICKER_EMOJIS = [
+  // Vegetables
+  "🥕","🌽","🥦","🧅","🧄","🥔","🍅","🍆","🥑","🥬","🥒","🫑","🍄","🫛","🫘","🎃",
+  // Fruit
+  "🍋","🍎","🍊","🍇","🍓","🍌","🍉","🍑","🫐","🥝","🥭","🍍","🍒","🥥","🍐",
+  // Meat & seafood
+  "🍗","🥩","🥓","🌭","🐟","🦐","🦀","🦞","🦑",
+  // Dairy & eggs
+  "🥚","🧀","🧈","🥛",
+  // Bread & grains
+  "🍞","🥐","🥖","🍝","🍚","🌾",
+  // Herbs, spices & condiments
+  "🌿","🧂","🌶️","🫚","🫙","🫒","🍯","🍬","🍫","🍷","🍲",
+  // Nuts
+  "🥜","🌰",
+];
