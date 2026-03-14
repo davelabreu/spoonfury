@@ -205,7 +205,7 @@ const FOOD_EMOJIS = [
 
 function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
   const [hovered, setHovered] = useState<"pickup" | "delivery" | "cart" | null>(null);
-  const [flyEmojis, setFlyEmojis] = useState<Array<{ id: number; emoji: string; dx: number; delay: number }>>([]);
+  const [flyEmojis, setFlyEmojis] = useState<Array<{ id: number; emoji: string; dx: number; delay: number; duration: number }>>([]);
   const [badgeKey, setBadgeKey] = useState(0);
   const prevCount = useRef(count);
   const capsuleControls = useAnimationControls();
@@ -221,9 +221,10 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
         emoji: FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)],
         dx: (i - (burstCount - 1) / 2) * 22,
         delay: i * 0.07,
+        duration: 0.8 + Math.random() * 0.9, // 0.8s–1.7s, each emoji drifts at its own pace
       }));
       setFlyEmojis(burst);
-      setTimeout(() => setFlyEmojis([]), 950);
+      setTimeout(() => setFlyEmojis([]), 2000);
     };
     window.addEventListener(SHOPPING_LIST_UPDATED, onUpdate);
     return () => window.removeEventListener(SHOPPING_LIST_UPDATED, onUpdate);
@@ -302,13 +303,13 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
 
       {/* Food emoji burst on item added */}
       <AnimatePresence>
-        {flyEmojis.map(({ id, emoji, dx, delay }) => (
+        {flyEmojis.map(({ id, emoji, dx, delay, duration }) => (
           <motion.span
             key={id}
             initial={{ opacity: 1, y: 4, x: 0, scale: 0.5 }}
             animate={{ opacity: 0, y: -52, x: dx, scale: 2.0 }}
             exit={{}}
-            transition={{ duration: 0.75, ease: "easeOut", delay }}
+            transition={{ duration, ease: "easeOut", delay }}
             style={{ position: "absolute", right: 14, top: 0, pointerEvents: "none", fontSize: 15, zIndex: 10 }}
           >
             {emoji}
