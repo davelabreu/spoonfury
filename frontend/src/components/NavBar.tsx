@@ -237,12 +237,14 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
         </Link>
       </div>
       {/* Badge on outer wrapper — avoids overflow:hidden clipping from inner div */}
-      <span
-        style={{ position: "absolute", top: 0, right: 0 }}
-        className="min-w-[16px] h-[16px] flex items-center justify-center rounded-full bg-green-500 text-white text-[9px] font-black border-[1.5px] border-[#f0fdf4] px-0.5"
-      >
-        {count > 99 ? "99+" : count}
-      </span>
+      {count > 0 && (
+        <span
+          style={{ position: "absolute", top: 0, right: 0 }}
+          className="min-w-[16px] h-[16px] flex items-center justify-center rounded-full bg-green-500 text-white text-[9px] font-black border-[1.5px] border-[#f0fdf4] px-0.5"
+        >
+          {count > 99 ? "99+" : count}
+        </span>
+      )}
     </div>
   );
 }
@@ -343,7 +345,7 @@ function MinimalNav({
 
             {/* Auth + theme toggle */}
             <div className="flex items-center gap-3 shrink-0">
-              {username && cartCount > 0 && <CartCapsule count={cartCount} items={cartItems} />}
+              {username && <CartCapsule count={cartCount} items={cartItems} />}
               {username ? (
                 <>
                   <UsernameBadge username={username} />
