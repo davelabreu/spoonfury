@@ -37,7 +37,15 @@
       "Bash(/g/Projects/dev/1.work/Spoonfury/_fix_indent2.js:*)",
       "Bash(git check-ignore:*)",
       "Bash(G:/Projects/dev/1.work/Spoonfury/.venv/Scripts/python:*)",
-      "mcp__playwright__playwright_get"
+      "mcp__playwright__playwright_get",
+      "Bash(docker:*)",
+      "mcp__playwright__playwright_get_visible_text",
+      "Bash(git:*)",
+      "mcp__playwright__playwright_resize",
+      "Bash(bash \"C:/Users/davel/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.2/skills/brainstorming/scripts/start-server.sh\" --project-dir \"G:/Projects/dev/1.work/Spoonfury\")",
+      "Bash(curl:*)",
+      "Bash(bash \"C:/Users/davel/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.2/skills/brainstorming/scripts/start-server.sh\" --project-dir \"G:/Projects/dev/1.work/Spoonfury\" --foreground)",
+      "Bash(cd:*)"
     ]
   }
 }
