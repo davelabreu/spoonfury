@@ -38,9 +38,9 @@ const EMOJI_MAP: Array<[RegExp, string]> = [
 
   // Meat & seafood
   [/chicken|poultry|hen|turkey/i,      "🍗"],
-  [/beef|steak|mince|ground meat|veal/i, "🥩"],
-  [/pork|ham|prosciutto|pancetta/i,    "🥩"],
-  [/lamb|mutton/i,                     "🥩"],
+  [/beef|steak|ribeye|rib.?eye|sirloin|tenderloin|filet|fillet|brisket|flank|chuck|mince|ground meat|veal|roast\b/i, "🥩"],
+  [/pork|ham|prosciutto|pancetta|pulled/i, "🥩"],
+  [/lamb|mutton|rack of/i,            "🥩"],
   [/bacon|lardons/i,                   "🥓"],
   [/sausage|salami|chorizo|pepperoni/i,"🌭"],
   [/salmon|tuna|cod|halibut|fish|tilapia|bass|trout/i, "🐟"],

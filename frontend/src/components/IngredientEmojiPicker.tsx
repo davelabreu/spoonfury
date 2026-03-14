@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { getIngredientEmoji, PICKER_EMOJIS } from "@/lib/ingredientEmoji";
 
 interface Props {
@@ -11,6 +12,18 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  // Track auto-emoji changes → spring pop
+  const autoEmoji = getIngredientEmoji(ingredientName);
+  const prevAutoRef = useRef(autoEmoji);
+  const [popKey, setPopKey] = useState(0);
+
+  useEffect(() => {
+    if (!value && autoEmoji !== prevAutoRef.current && autoEmoji !== "🛒") {
+      setPopKey(k => k + 1);
+    }
+    prevAutoRef.current = autoEmoji;
+  }, [autoEmoji, value]);
+
   useEffect(() => {
     if (!open) return;
     function handleClick(e: MouseEvent) {
@@ -20,8 +33,7 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
-  const displayed = value || getIngredientEmoji(ingredientName);
-  const autoEmoji = getIngredientEmoji(ingredientName);
+  const displayed = value || autoEmoji;
 
   return (
     <div ref={ref} className="relative shrink-0">
@@ -29,9 +41,16 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
         type="button"
         onClick={() => setOpen(o => !o)}
         title="Change emoji"
-        className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 text-base transition-colors"
+        className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 text-base transition-colors overflow-hidden"
       >
-        {displayed}
+        <motion.span
+          key={popKey}
+          initial={popKey > 0 ? { scale: 0.2, rotate: -20 } : false}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 500, damping: 12 }}
+        >
+          {displayed}
+        </motion.span>
       </button>
 
       {open && (
