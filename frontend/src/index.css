@@ -48,3 +48,8 @@ body {
   animation: shake 0.4s ease-in-out;
   color: hsl(0 84.2% 60.2%);
 }
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
