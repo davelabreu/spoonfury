@@ -261,7 +261,7 @@ export function ShoppingListPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-8 min-h-[calc(100vh-5rem)] flex flex-col">
+    <div className="min-h-full max-w-2xl mx-auto space-y-4 flex flex-col">
       {/* Header */}
       <div>
         <div className="flex items-center justify-between gap-4">
@@ -282,9 +282,9 @@ export function ShoppingListPage() {
               href={buildInstacartUrl(uncheckedAll, "pickup")}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold text-sm transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold text-sm transition-colors whitespace-nowrap"
             >
-              🚗 Pickup · {uncheckedAll.length} item{uncheckedAll.length !== 1 ? "s" : ""}
+              🚗 Pickup · {uncheckedAll.length}
             </a>
             <a
               href={buildInstacartUrl(uncheckedAll, "delivery")}
@@ -391,7 +391,7 @@ export function ShoppingListPage() {
 
       {/* Clear list */}
       {data.total_items > 0 && (
-        <div className="flex justify-center pt-4">
+        <div className="flex justify-center py-2 mt-auto">
           <Button
             onClick={clearList}
             disabled={clearing}

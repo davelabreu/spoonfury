@@ -78,7 +78,7 @@ export function EditRecipePage() {
   if (error) return <p className="text-destructive">{error}</p>;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4">
+    <div className="max-w-4xl mx-auto space-y-4">
       {/* Navigation */}
       <div className="flex items-center -ml-2 mb-2">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground">

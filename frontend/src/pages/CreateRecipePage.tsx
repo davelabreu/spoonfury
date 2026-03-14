@@ -37,7 +37,7 @@ export function CreateRecipePage() {
     setIngredients(prev => prev.map((ing, idx) => idx === i ? { ...ing, [f]: v } : ing));
 
   return (
-    <Card className="max-w-2xl mx-auto">
+    <Card className="max-w-4xl mx-auto">
       <CardHeader><CardTitle>New Recipe</CardTitle></CardHeader>
       <CardContent>
         <form onSubmit={submit} className="space-y-4">

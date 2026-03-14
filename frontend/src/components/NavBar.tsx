@@ -212,6 +212,11 @@ function MinimalNav({
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [mobileOpen]);
 
+  useEffect(() => {
+    document.body.style.overflowY = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflowY = ""; };
+  }, [mobileOpen]);
+
   return (
     <nav ref={navRef} className="sticky top-0 z-50 bg-background border-b border-border">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-1">
@@ -222,7 +227,7 @@ function MinimalNav({
         </Link>
 
         {isMobile ? (
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2">
             {username && <UsernameBadge username={username} />}
             <button
               type="button"
@@ -393,6 +398,11 @@ export function NavBar() {
     if (!isMobile && mobileOpen) setMobileOpen(false);
   }, [isMobile, mobileOpen]);
 
+  useEffect(() => {
+    document.body.style.overflowY = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflowY = ""; };
+  }, [mobileOpen]);
+
   function handleSignOut() {
     logout();
     navigate("/");
@@ -506,7 +516,7 @@ export function NavBar() {
         </Link>
 
         {isMobile ? (
-          <div className="ml-auto flex items-center gap-3 mb-2.5 z-30">
+          <div className="ml-auto flex items-center gap-2 mb-2.5 z-30">
             {username && <CartButton count={cartCount} onClick={() => setMobileOpen(false)} />}
             {username && <UsernameBadge username={username} />}
             <button
