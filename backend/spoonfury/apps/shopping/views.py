@@ -63,7 +63,7 @@ class ShoppingListStatusView(APIView):
 
     def get(self, request):
         recipe_slug = request.query_params.get("recipe_slug", "")
-        if not recipe_slug:
+        if not recipe_slug or len(recipe_slug) > 255:
             return Response({"error": "recipe_slug is required"}, status=status.HTTP_400_BAD_REQUEST)
         shopping_list, _ = ShoppingList.objects.get_or_create(owner=request.user)
         in_list = shopping_list.items.filter(recipe_slug=recipe_slug).exists()

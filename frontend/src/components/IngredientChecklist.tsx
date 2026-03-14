@@ -79,9 +79,8 @@ export function IngredientChecklist({ ingredients, inList, onAddToList, onBuyNow
       )}
 
       {inList && (
-        <Alert className="border-green-600 text-green-600 bg-green-50 animate-in fade-in slide-in-from-bottom-1">
-          <span className="text-base leading-none translate-y-0.5">🛍️❤️</span>
-          <AlertTitle className="text-green-700">In your shopping list</AlertTitle>
+        <Alert className="border-green-600 bg-green-50 animate-in fade-in slide-in-from-bottom-1">
+          <AlertTitle className="text-green-700">🛍️❤️ In your shopping list</AlertTitle>
         </Alert>
       )}
     </div>
