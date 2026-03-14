@@ -191,6 +191,10 @@ function CartButton({ count, onClick }: { count: number; onClick?: () => void })
 }
 
 function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
+  const [hovered, setHovered] = useState<"pickup" | "delivery" | "cart" | null>(null);
+
+  const segmentBase = { padding: "0 13px", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" as const, lineHeight: "32px", textDecoration: "none", transition: "background 0.15s ease, color 0.15s ease" };
+
   return (
     <div
       style={{
@@ -198,9 +202,10 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
         backgroundImage: "linear-gradient(270deg, #86efac, #93c5fd, #c4b5fd, #fda4af, #86efac)",
         backgroundSize: "300% 300%",
         animation: "shimmer 8s ease infinite",
-        boxShadow: "0 2px 8px rgba(147,197,253,0.3)",
+        boxShadow: hovered ? "0 4px 14px rgba(147,197,253,0.5)" : "0 2px 8px rgba(147,197,253,0.3)",
         padding: 2,
         borderRadius: 9999,
+        transition: "box-shadow 0.15s ease",
       }}
     >
       <div style={{ borderRadius: 9999, overflow: "hidden", background: "#fff", display: "flex", alignItems: "center" }}>
@@ -208,7 +213,9 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
           href={buildInstacartUrl(items, "pickup")}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ padding: "0 13px", color: "#374151", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap", lineHeight: "32px", textDecoration: "none" }}
+          onMouseEnter={() => setHovered("pickup")}
+          onMouseLeave={() => setHovered(null)}
+          style={{ ...segmentBase, background: hovered === "pickup" ? "#f0fdf4" : "#fff", color: hovered === "pickup" ? "#15803d" : "#374151" }}
         >
           🚗 Pickup
         </a>
@@ -217,22 +224,27 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
           href={buildInstacartUrl(items, "delivery")}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ padding: "0 13px", color: "#374151", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap", lineHeight: "32px", textDecoration: "none" }}
+          onMouseEnter={() => setHovered("delivery")}
+          onMouseLeave={() => setHovered(null)}
+          style={{ ...segmentBase, background: hovered === "delivery" ? "#eff6ff" : "#fff", color: hovered === "delivery" ? "#1d4ed8" : "#374151" }}
         >
           🏠 Delivery
         </a>
         <Link
           to="/shopping-list"
+          onMouseEnter={() => setHovered("cart")}
+          onMouseLeave={() => setHovered(null)}
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             padding: "0 13px",
-            background: "#f0fdf4",
+            background: hovered === "cart" ? "#bbf7d0" : "#f0fdf4",
             color: "#15803d",
             borderLeft: "1px solid rgba(0,0,0,0.06)",
             borderRadius: "0 9999px 9999px 0",
             lineHeight: "32px",
+            transition: "background 0.15s ease",
           }}
         >
           <ShoppingCart className="w-[22px] h-[22px]" />
