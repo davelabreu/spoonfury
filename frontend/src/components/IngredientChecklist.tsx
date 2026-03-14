@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertTitle } from "@/components/ui/alert";
 import type { Ingredient } from "@/types";
 
 interface Props {
@@ -50,33 +52,37 @@ export function IngredientChecklist({ ingredients, inList, onAddToList, onBuyNow
       {(onAddToList || onBuyNow) && (
         <div className="flex gap-2 pt-1">
           {onAddToList && (
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               disabled={needed.length === 0 || inList}
               onClick={() => onAddToList(needed)}
-              className="flex-1 text-sm border border-indigo-200 rounded-md px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800"
             >
               + Add {needed.length} to Shopping List
-            </button>
+            </Button>
           )}
           {onBuyNow && (
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               disabled={needed.length === 0}
               onClick={() => onBuyNow(needed)}
-              className="flex-1 text-sm border border-amber-200 rounded-md px-3 py-2 bg-amber-50 text-amber-800 hover:bg-amber-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold transition-colors"
+              className="flex-1 border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 hover:text-amber-900 font-semibold"
             >
               🛒 Buy it NOW!
-            </button>
+            </Button>
           )}
         </div>
       )}
 
       {inList && (
-        <div className="flex items-center gap-2 w-full px-3 py-2 bg-green-50 border border-green-200 rounded-md text-green-700 text-sm font-medium animate-in fade-in slide-in-from-bottom-1">
-          <span className="text-base">🛍️❤️</span>
-          In your shopping list
-        </div>
+        <Alert className="border-green-600 text-green-600 bg-green-50 animate-in fade-in slide-in-from-bottom-1">
+          <span className="text-base leading-none translate-y-0.5">🛍️❤️</span>
+          <AlertTitle className="text-green-700">In your shopping list</AlertTitle>
+        </Alert>
       )}
     </div>
   );
