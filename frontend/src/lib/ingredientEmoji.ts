@@ -121,24 +121,15 @@ export function getIngredientEmoji(name: string): string {
   return "🛒";
 }
 
-// Flat deduplicated list for the emoji picker UI
-export const PICKER_EMOJIS = [
-  // Vegetables
-  "🥕","🌽","🥦","🧅","🧄","🥔","🍅","🍆","🥑","🥬","🥒","🫑","🍄","🫛","🫘","🎃",
-  // Fruit
-  "🍋","🍎","🍊","🍇","🍓","🍌","🍉","🍑","🫐","🥝","🥭","🍍","🍒","🥥","🍐",
-  // Meat & seafood
-  "🍗","🥩","🥓","🌭","🐟","🦐","🦀","🦞","🦑",
-  // Dairy & eggs
-  "🥚","🧀","🧈","🥛",
-  // Bread & grains
-  "🍞","🥐","🥖","🍝","🍚","🌾","🥨","🧇",
-  // Herbs, spices & condiments
-  "🌿","🧂","🌶️","🫚","🫙","🫒","🍯","🍬","🍫","🍷","🍲",
-  // Beverages
-  "🥤","🧃","🍺","☕","🍵","💧","🍸","🥃",
-  // Prepared & sweets
-  "🍕","🌮","🌯","🥪","🥧","🎂","🍪","🍩","🍦","🍭","🍿",
-  // Nuts
-  "🥜","🌰",
+// Categorized emoji palette for the picker UI
+export const PICKER_CATEGORIES = [
+  { label: "🥬 Vegetables",         color: "bg-green-50",   emojis: ["🥕","🌽","🥦","🧅","🧄","🥔","🍅","🍆","🥑","🥬","🥒","🫑","🍄","🫛","🫘","🎃"] },
+  { label: "🍎 Fruit",              color: "bg-red-50",     emojis: ["🍋","🍎","🍊","🍇","🍓","🍌","🍉","🍑","🫐","🥝","🥭","🍍","🍒","🥥","🍐"] },
+  { label: "🥩 Meat & Seafood",     color: "bg-rose-50",    emojis: ["🍗","🥩","🥓","🌭","🐟","🦐","🦀","🦞","🦑"] },
+  { label: "🥚 Dairy & Eggs",       color: "bg-amber-50",   emojis: ["🥚","🧀","🧈","🥛"] },
+  { label: "🍞 Bread & Grains",     color: "bg-yellow-50",  emojis: ["🍞","🥐","🥖","🍝","🍚","🌾","🥨","🧇"] },
+  { label: "🌿 Herbs & Spices",     color: "bg-emerald-50", emojis: ["🌿","🧂","🌶️","🫚","🫙","🫒","🍯","🍬","🍫","🍷","🍲"] },
+  { label: "🥤 Beverages",          color: "bg-sky-50",     emojis: ["🥤","🧃","🍺","☕","🍵","💧","🍸","🥃"] },
+  { label: "🍕 Prepared & Sweets",  color: "bg-purple-50",  emojis: ["🍕","🌮","🌯","🥪","🥧","🎂","🍪","🍩","🍦","🍭","🍿"] },
+  { label: "🥜 Nuts & Seeds",       color: "bg-orange-50",  emojis: ["🥜","🌰"] },
 ];

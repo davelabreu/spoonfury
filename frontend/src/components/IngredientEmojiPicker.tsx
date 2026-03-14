@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { getIngredientEmoji, PICKER_EMOJIS } from "@/lib/ingredientEmoji";
+import { motion, AnimatePresence } from "framer-motion";
+import { getIngredientEmoji, PICKER_CATEGORIES } from "@/lib/ingredientEmoji";
 
 interface Props {
   value: string | undefined;
@@ -35,6 +35,12 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
 
   const displayed = value || autoEmoji;
 
+  const pick = (emoji: string) => {
+    onChange(emoji);
+    setPopKey(k => k + 1);
+    setOpen(false);
+  };
+
   return (
     <div ref={ref} className="relative shrink-0">
       <button
@@ -53,30 +59,56 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
         </motion.span>
       </button>
 
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-2.5 w-72">
-          {/* Reset to auto */}
-          <button
-            type="button"
-            onClick={() => { onChange(""); setPopKey(k => k + 1); setOpen(false); }}
-            className="w-full text-xs text-center text-indigo-400 hover:text-indigo-600 py-1 mb-2 border-b border-gray-100 transition-colors"
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92, y: -8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -4 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-200 rounded-2xl shadow-2xl p-4 w-[460px]"
           >
-            ↺ auto ({autoEmoji})
-          </button>
-          <div className="grid grid-cols-9 gap-1 max-h-60 overflow-y-auto">
-            {PICKER_EMOJIS.map(emoji => (
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-bold text-gray-700">Pick an ingredient</span>
               <button
-                key={emoji}
                 type="button"
-                onClick={() => { onChange(emoji); setPopKey(k => k + 1); setOpen(false); }}
-                className={`text-xl p-1 rounded hover:bg-indigo-50 hover:scale-125 transition-all leading-none ${value === emoji ? "bg-indigo-100 ring-1 ring-indigo-300 scale-110" : ""}`}
+                onClick={() => { onChange(""); setPopKey(k => k + 1); setOpen(false); }}
+                className="text-xs text-indigo-400 hover:text-indigo-600 transition-colors px-2 py-0.5 rounded-full hover:bg-indigo-50"
               >
-                {emoji}
+                ↺ auto ({autoEmoji})
               </button>
-            ))}
-          </div>
-        </div>
-      )}
+            </div>
+
+            {/* Categories */}
+            <div className="space-y-2.5">
+              {PICKER_CATEGORIES.map(cat => (
+                <div key={cat.label}>
+                  <div className={`rounded-xl px-3 py-2 ${cat.color}`}>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">{cat.label}</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {cat.emojis.map(emoji => (
+                        <button
+                          key={emoji}
+                          type="button"
+                          onClick={() => pick(emoji)}
+                          className={`text-2xl w-10 h-10 flex items-center justify-center rounded-lg
+                            hover:scale-[1.35] hover:shadow-md hover:-translate-y-0.5
+                            active:scale-110
+                            transition-all duration-150
+                            ${value === emoji ? "bg-white/90 ring-2 ring-indigo-400 shadow-sm scale-110" : "hover:bg-white/70"}`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
