@@ -1,6 +1,6 @@
 from collections import defaultdict
 from rest_framework import serializers
-from .models import ShoppingList, ShoppingListItem
+from .models import ShoppingList, ShoppingListItem, RecipeMultiplier
 
 
 class ShoppingListItemSerializer(serializers.ModelSerializer):
@@ -33,10 +33,16 @@ class ShoppingListSerializer(serializers.ModelSerializer):
         for item in obj.items.all():
             groups[item.recipe_slug].append(item)
 
+        multipliers = {
+            m.recipe_slug: m.multiplier
+            for m in RecipeMultiplier.objects.filter(shopping_list=obj)
+        }
+
         return [
             {
                 "recipe_slug": slug,
                 "recipe_title": items[0].recipe_title,
+                "multiplier": multipliers.get(slug, 1),
                 "items": ShoppingListItemSerializer(items, many=True).data,
             }
             for slug, items in groups.items()

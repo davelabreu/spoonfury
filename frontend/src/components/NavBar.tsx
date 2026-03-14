@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Utensils, ShoppingCart } from "lucide-react";
@@ -6,11 +6,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useNavTheme } from "@/hooks/useNavTheme";
 import { api } from "@/lib/api";
+import { buildInstacartUrl } from "@/lib/instacart";
+import type { Ingredient } from "@/types";
 
 const STICKERS = [
   { label: "Stir the Pot", to: "/", color: "bg-[#FF6B6B]", icon: Utensils, isSpecial: true },
   { label: "My Books", to: "/books", color: "bg-[#4ECDC4]", authRequired: true },
-  { label: "Shopping List", to: "/shopping-list", color: "bg-[#95D5B2]", icon: ShoppingCart, authRequired: true },
   { label: "+ Recipe", to: "/recipes/new", color: "bg-[#FFE66D]", authRequired: true },
 ];
 
@@ -147,20 +148,28 @@ function UsernameBadge({ username, className }: { username: string; className?: 
 
 export const SHOPPING_LIST_UPDATED = "shopping-list-updated";
 
-function useShoppingCount(token: string | null | undefined, locationKey: string) {
+function useShoppingData(token: string | null | undefined, locationKey: string) {
   const [count, setCount] = useState(0);
-  const refresh = useCallback(() => {
-    if (!token) { setCount(0); return; }
-    api.get("/shopping-list/", token)
-      .then((d: any) => setCount(d.total_items ?? 0))
-      .catch(() => {});
-  }, [token]);
-  useEffect(() => { refresh(); }, [refresh, locationKey]);
+  const [items, setItems] = useState<Ingredient[]>([]);
+  const [bump, setBump] = useState(0);
   useEffect(() => {
-    window.addEventListener(SHOPPING_LIST_UPDATED, refresh);
-    return () => window.removeEventListener(SHOPPING_LIST_UPDATED, refresh);
-  }, [refresh]);
-  return count;
+    const onUpdate = () => setBump(b => b + 1);
+    window.addEventListener(SHOPPING_LIST_UPDATED, onUpdate);
+    return () => window.removeEventListener(SHOPPING_LIST_UPDATED, onUpdate);
+  }, []);
+  useEffect(() => {
+    if (!token) { setCount(0); setItems([]); return; }
+    api.get("/shopping-list/", token)
+      .then((d: any) => {
+        setCount(d.total_items ?? 0);
+        const unchecked: Ingredient[] = (d.items_by_recipe ?? [])
+          .flatMap((g: any) => g.items.filter((i: any) => !i.is_checked))
+          .map((i: any) => ({ quantity: i.quantity, unit: i.unit, name: i.name, note: i.note }));
+        setItems(unchecked);
+      })
+      .catch(() => {});
+  }, [token, locationKey, bump]);
+  return { count, items };
 }
 
 function CartButton({ count, onClick }: { count: number; onClick?: () => void }) {
@@ -181,18 +190,81 @@ function CartButton({ count, onClick }: { count: number; onClick?: () => void })
   );
 }
 
+function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
+  return (
+    <div
+      style={{
+        position: "relative",
+        backgroundImage: "linear-gradient(270deg, #86efac, #93c5fd, #c4b5fd, #fda4af, #86efac)",
+        backgroundSize: "300% 300%",
+        animation: "shimmer 8s ease infinite",
+        boxShadow: "0 2px 8px rgba(147,197,253,0.3)",
+        padding: 2,
+        borderRadius: 9999,
+      }}
+    >
+      <div style={{ borderRadius: 9999, overflow: "hidden", background: "#fff", display: "flex", alignItems: "center" }}>
+        <a
+          href={buildInstacartUrl(items, "pickup")}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ padding: "0 13px", color: "#374151", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap", lineHeight: "32px", textDecoration: "none" }}
+        >
+          🚗 Pickup
+        </a>
+        <div style={{ width: 1, height: 20, backgroundColor: "#e5e7eb", flexShrink: 0 }} />
+        <a
+          href={buildInstacartUrl(items, "delivery")}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ padding: "0 13px", color: "#374151", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap", lineHeight: "32px", textDecoration: "none" }}
+        >
+          🏠 Delivery
+        </a>
+        <Link
+          to="/shopping-list"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 13px",
+            background: "#f0fdf4",
+            color: "#15803d",
+            borderLeft: "1px solid rgba(0,0,0,0.06)",
+            borderRadius: "0 9999px 9999px 0",
+            lineHeight: "32px",
+          }}
+        >
+          <ShoppingCart className="w-[22px] h-[22px]" />
+        </Link>
+      </div>
+      {/* Badge on outer wrapper — avoids overflow:hidden clipping from inner div */}
+      {count > 0 && (
+        <span
+          style={{ position: "absolute", top: 0, right: 0 }}
+          className="min-w-[16px] h-[16px] flex items-center justify-center rounded-full bg-green-500 text-white text-[9px] font-black border-[1.5px] border-[#f0fdf4] px-0.5"
+        >
+          {count > 99 ? "99+" : count}
+        </span>
+      )}
+    </div>
+  );
+}
+
 type StickerDef = typeof STICKERS[number];
 
 function MinimalNav({
   visibleStickers,
   username,
   cartCount,
+  cartItems,
   onSignOut,
   onSwitchTheme,
 }: {
   visibleStickers: StickerDef[];
   username: string | null | undefined;
   cartCount: number;
+  cartItems: Ingredient[];
   onSignOut: () => void;
   onSwitchTheme: () => void;
 }) {
@@ -213,6 +285,11 @@ function MinimalNav({
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [mobileOpen]);
 
+  useEffect(() => {
+    document.body.style.overflowY = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflowY = ""; };
+  }, [mobileOpen]);
+
   return (
     <nav ref={navRef} className="sticky top-0 z-50 bg-background border-b border-border">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-1">
@@ -223,7 +300,7 @@ function MinimalNav({
         </Link>
 
         {isMobile ? (
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2">
             {username && <UsernameBadge username={username} />}
             <button
               type="button"
@@ -270,7 +347,7 @@ function MinimalNav({
 
             {/* Auth + theme toggle */}
             <div className="flex items-center gap-3 shrink-0">
-              {username && <CartButton count={cartCount} />}
+              {username && <CartCapsule count={cartCount} items={cartItems} />}
               {username ? (
                 <>
                   <UsernameBadge username={username} />
@@ -328,6 +405,17 @@ function MinimalNav({
                   {sticker.label}
                 </Link>
               ))}
+              {username && (
+                <Link
+                  to="/shopping-list"
+                  onClick={() => setMobileOpen(false)}
+                  className={`px-4 py-3 text-base font-semibold rounded-lg transition-colors ${
+                    location.pathname === "/shopping-list" ? "bg-muted" : "hover:bg-muted/50"
+                  }`}
+                >
+                  Shopping List
+                </Link>
+              )}
               <div className="h-px bg-border my-2" />
               {username ? (
                 <>
@@ -374,7 +462,7 @@ export function NavBar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoHovered, setLogoHovered] = useState(false);
   const { theme, setTheme } = useNavTheme();
-  const cartCount = useShoppingCount(token, location.key);
+  const { count: cartCount, items: cartItems } = useShoppingData(token, location.key);
 
   const navRef = useRef<HTMLElement>(null);
 
@@ -394,6 +482,11 @@ export function NavBar() {
     if (!isMobile && mobileOpen) setMobileOpen(false);
   }, [isMobile, mobileOpen]);
 
+  useEffect(() => {
+    document.body.style.overflowY = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflowY = ""; };
+  }, [mobileOpen]);
+
   function handleSignOut() {
     logout();
     navigate("/");
@@ -408,6 +501,7 @@ export function NavBar() {
         visibleStickers={visibleStickers}
         username={username}
         cartCount={cartCount}
+        cartItems={cartItems}
         onSignOut={handleSignOut}
         onSwitchTheme={() => setTheme("sticker")}
       />
@@ -507,7 +601,7 @@ export function NavBar() {
         </Link>
 
         {isMobile ? (
-          <div className="ml-auto flex items-center gap-3 mb-2.5 z-30">
+          <div className="ml-auto flex items-center gap-2 mb-2.5 z-30">
             {username && <CartButton count={cartCount} onClick={() => setMobileOpen(false)} />}
             {username && <UsernameBadge username={username} />}
             <button
@@ -534,9 +628,9 @@ export function NavBar() {
 
             {/* Column 3: Identity / auth actions */}
             <div className="flex-shrink-0 flex items-end gap-2 h-full z-30">
-              {username && (
+              {username && cartCount > 0 && (
                 <div className="mb-3.5">
-                  <CartButton count={cartCount} />
+                  <CartCapsule count={cartCount} items={cartItems} />
                 </div>
               )}
               {username ? (
@@ -605,7 +699,18 @@ export function NavBar() {
                   onClick={() => setMobileOpen(false)}
                 />
               ))}
-              
+              {username && (
+                <NavSticker
+                  label="Shopping List"
+                  to="/shopping-list"
+                  color="bg-[#95D5B2]"
+                  icon={ShoppingCart}
+                  variant="button"
+                  isActive={location.pathname === "/shopping-list"}
+                  onClick={() => setMobileOpen(false)}
+                />
+              )}
+
               <div className="h-[2.5px] bg-black/10 my-2" />
 
               {username ? (

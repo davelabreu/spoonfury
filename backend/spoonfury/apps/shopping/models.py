@@ -44,3 +44,18 @@ class ShoppingListItem(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.recipe_title})"
+
+
+class RecipeMultiplier(models.Model):
+    """Tracks how many servings of a recipe the user wants to buy."""
+    shopping_list = models.ForeignKey(
+        ShoppingList, on_delete=models.CASCADE, related_name="multipliers"
+    )
+    recipe_slug = models.SlugField(max_length=120)
+    multiplier = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        unique_together = ("shopping_list", "recipe_slug")
+
+    def __str__(self):
+        return f"{self.recipe_slug} x{self.multiplier}"

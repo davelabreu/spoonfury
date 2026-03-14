@@ -1,11 +1,11 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { BuyNowSheet } from "@/components/BuyNowSheet";
-import { Trash2 } from "lucide-react";
+import { buildInstacartUrl } from "@/lib/instacart";
+import { Trash2, Plus, Minus } from "lucide-react";
 import type { Ingredient } from "@/types";
 
 interface ShoppingItem {
@@ -22,6 +22,7 @@ interface ShoppingItem {
 interface RecipeGroup {
   recipe_slug: string;
   recipe_title: string;
+  multiplier: number;
   items: ShoppingItem[];
 }
 
@@ -34,12 +35,28 @@ function itemToIngredient(item: ShoppingItem): Ingredient {
   return { quantity: item.quantity, unit: item.unit, name: item.name, note: item.note };
 }
 
+function titleCase(s: string): string {
+  return s.replace(/\b\w/g, c => c.toUpperCase());
+}
+
+const ingredientEmoji: Record<string, string> = {
+  egg: "🥚", eggs: "🥚", salt: "🧂", pepper: "🌶️", butter: "🧈",
+  milk: "🥛", cheese: "🧀", garlic: "🧄", onion: "🧅", tomato: "🍅",
+  lemon: "🍋", chicken: "🍗", beef: "🥩", rice: "🍚", bread: "🍞",
+  pasta: "🍝", olive: "🫒", carrot: "🥕", potato: "🥔", corn: "🌽",
+  mushroom: "🍄", mushrooms: "🍄", avocado: "🥑", honey: "🍯",
+  chocolate: "🍫", sugar: "🍬", water: "💧", oil: "🫒", flour: "🌾",
+  shrimp: "🦐", fish: "🐟", salmon: "🐟", bacon: "🥓", apple: "🍎",
+  banana: "🍌", strawberry: "🍓", blueberry: "🫐", peach: "🍑",
+  peanut: "🥜", coconut: "🥥", broccoli: "🥦", cucumber: "🥒",
+  "coca cola": "🥤", soda: "🥤", wine: "🍷", beer: "🍺", coffee: "☕", tea: "🍵",
+};
+
 export function ShoppingListPage() {
   const { token } = useAuth();
   const [data, setData] = useState<ShoppingListData | null>(null);
   const [error, setError] = useState("");
   const [view, setView] = useState<"recipe" | "all">("recipe");
-  const [buyNowIngredients, setBuyNowIngredients] = useState<Ingredient[] | null>(null);
   const [clearing, setClearing] = useState(false);
 
   const load = useCallback(async () => {
@@ -82,6 +99,40 @@ export function ShoppingListPage() {
     } : prev);
     try {
       await api.delete(`/shopping-list/items/${item.id}/`, token);
+      window.dispatchEvent(new Event("shopping-list-updated"));
+    } catch {
+      load();
+    }
+  };
+
+  const removeRecipe = async (recipeSlug: string) => {
+    if (!token) return;
+    const group = data?.items_by_recipe.find(g => g.recipe_slug === recipeSlug);
+    const count = group?.items.length ?? 0;
+    setData(prev => prev ? {
+      ...prev,
+      total_items: prev.total_items - count,
+      items_by_recipe: prev.items_by_recipe.filter(g => g.recipe_slug !== recipeSlug),
+    } : prev);
+    try {
+      await api.post("/shopping-list/remove-recipe/", { recipe_slug: recipeSlug }, token);
+      window.dispatchEvent(new Event("shopping-list-updated"));
+    } catch {
+      load();
+    }
+  };
+
+  const updateMultiplier = async (recipeSlug: string, newMultiplier: number) => {
+    if (!token || newMultiplier < 1) return;
+    // Optimistic update
+    setData(prev => prev ? {
+      ...prev,
+      items_by_recipe: prev.items_by_recipe.map(g =>
+        g.recipe_slug === recipeSlug ? { ...g, multiplier: newMultiplier } : g
+      ),
+    } : prev);
+    try {
+      await api.patch("/shopping-list/multiplier/", { recipe_slug: recipeSlug, multiplier: newMultiplier }, token);
     } catch {
       load();
     }
@@ -93,6 +144,7 @@ export function ShoppingListPage() {
     try {
       await api.post("/shopping-list/clear/", {}, token);
       setData(prev => prev ? { ...prev, total_items: 0, items_by_recipe: [] } : prev);
+      window.dispatchEvent(new Event("shopping-list-updated"));
     } catch {
       setError("Failed to clear list.");
     } finally {
@@ -121,37 +173,95 @@ export function ShoppingListPage() {
   if (!data) return <p className="text-muted-foreground">Loading…</p>;
 
   const allItems = data.items_by_recipe.flatMap(g => g.items);
-  const uncheckedAll = allItems.filter(i => !i.is_checked).map(itemToIngredient);
+  const uncheckedAll = data.items_by_recipe.flatMap(g =>
+    g.items.filter(i => !i.is_checked).map(i => {
+      const ing = itemToIngredient(i);
+      if (g.multiplier > 1 && ing.quantity && !isNaN(Number(ing.quantity))) {
+        return { ...ing, quantity: String(Number(ing.quantity) * g.multiplier) };
+      }
+      return ing;
+    })
+  );
 
-  function ItemRow({ item }: { item: ShoppingItem }) {
+  function ItemRow({ item, multiplier = 1 }: { item: ShoppingItem; multiplier?: number }) {
+    const rowRef = useRef<HTMLDivElement>(null);
+    const startX = useRef(0);
+    const currentX = useRef(0);
+    const swiping = useRef(false);
+
+    const onTouchStart = (e: React.TouchEvent) => {
+      startX.current = e.touches[0].clientX;
+      currentX.current = 0;
+      swiping.current = true;
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => {
+      if (!swiping.current || !rowRef.current) return;
+      const dx = e.touches[0].clientX - startX.current;
+      currentX.current = Math.min(0, dx);
+      rowRef.current.style.transform = `translateX(${currentX.current}px)`;
+      rowRef.current.style.transition = "none";
+      // Show red tint proportional to swipe distance
+      const progress = Math.min(1, Math.abs(currentX.current) / 80);
+      rowRef.current.style.backgroundColor = `rgba(239, 68, 68, ${progress * 0.15})`;
+    };
+
+    const onTouchEnd = () => {
+      if (!swiping.current || !rowRef.current) return;
+      swiping.current = false;
+      rowRef.current.style.transition = "transform 0.2s ease-out, background-color 0.2s ease-out";
+      if (currentX.current < -80) {
+        rowRef.current.style.transform = "translateX(-100%)";
+        rowRef.current.style.backgroundColor = "rgba(239, 68, 68, 0.3)";
+        setTimeout(() => deleteItem(item), 200);
+      } else {
+        rowRef.current.style.transform = "translateX(0)";
+        rowRef.current.style.backgroundColor = "";
+      }
+    };
+
+    const nameLower = item.name.toLowerCase();
+    const emoji = ingredientEmoji[nameLower] || Object.entries(ingredientEmoji).find(([k]) => nameLower.includes(k))?.[1] || "";
+
     return (
-      <div className={`flex items-center gap-3 py-2 group ${item.is_checked ? "opacity-50" : ""}`}>
-        <input
-          type="checkbox"
-          checked={item.is_checked}
-          onChange={() => toggleItem(item)}
-          className="w-4 h-4 rounded accent-indigo-500 cursor-pointer shrink-0"
-          aria-label={`Mark ${item.name} as picked up`}
-        />
-        <span className={`flex-1 text-sm ${item.is_checked ? "line-through text-muted-foreground" : ""}`}>
-          {item.quantity && <span className="font-medium">{item.quantity}{item.unit && ` ${item.unit}`} </span>}
-          {item.name}
-          {item.note && <span className="text-muted-foreground ml-1">({item.note})</span>}
-        </span>
-        <button
-          type="button"
-          onClick={() => deleteItem(item)}
-          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-muted-foreground hover:text-destructive"
-          aria-label={`Remove ${item.name}`}
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
+      <div
+        ref={rowRef}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        className={`flex items-center gap-3 py-2.5 px-1 ${item.is_checked ? "opacity-50" : ""}`}
+      >
+          <input
+            type="checkbox"
+            checked={item.is_checked}
+            onChange={() => toggleItem(item)}
+            className="w-4 h-4 rounded accent-indigo-500 cursor-pointer shrink-0 mt-px"
+            aria-label={`Mark ${item.name} as picked up`}
+          />
+          <span className={`flex-1 text-sm leading-5 ${item.is_checked ? "line-through text-muted-foreground" : ""}`}>
+            {emoji && <span className="mr-1">{emoji}</span>}
+            {item.quantity && <span className="font-medium">{
+              multiplier > 1 && !isNaN(Number(item.quantity))
+                ? String(Number(item.quantity) * multiplier)
+                : item.quantity
+            }{item.unit && ` ${item.unit}`} </span>}
+            {titleCase(item.name)}
+            {item.note && <span className="text-muted-foreground ml-1">({item.note})</span>}
+          </span>
+          <button
+            type="button"
+            onClick={() => deleteItem(item)}
+            className="trash-shake p-1.5 rounded text-muted-foreground transition-colors"
+            aria-label={`Remove ${item.name}`}
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-24">
+    <div className="min-h-full max-w-2xl mx-auto space-y-4 flex flex-col">
       {/* Header */}
       <div>
         <div className="flex items-center justify-between gap-4">
@@ -164,6 +274,32 @@ export function ShoppingListPage() {
         </div>
       </div>
 
+      {/* Checkout buttons */}
+      {uncheckedAll.length > 0 && (
+        <div className="space-y-1.5">
+          <div className="flex gap-2">
+            <a
+              href={buildInstacartUrl(uncheckedAll, "pickup")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold text-sm transition-colors whitespace-nowrap"
+            >
+              🚗 Pickup · {uncheckedAll.length}
+            </a>
+            <a
+              href={buildInstacartUrl(uncheckedAll, "delivery")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-green-600 text-green-700 hover:bg-green-50 font-semibold text-sm transition-colors"
+            >
+              🏠 Delivery
+            </a>
+          </div>
+          <p className="text-xs text-center text-muted-foreground">via Instacart</p>
+        </div>
+      )}
+
+      <div className="flex-1 space-y-6">
       {data.total_items === 0 ? (
         <div className="text-center py-16">
           <p className="text-4xl mb-4">🛒</p>
@@ -198,33 +334,51 @@ export function ShoppingListPage() {
 
           {view === "recipe" ? (
             <div className="space-y-6">
-              {data.items_by_recipe.map(group => {
-                const unchecked = group.items.filter(i => !i.is_checked).map(itemToIngredient);
-                return (
+              {data.items_by_recipe.map(group => (
                   <div key={group.recipe_slug} className="space-y-1">
-                    <div className="flex items-center justify-between gap-3 mb-2">
+                    {/* Recipe header with quantity widget */}
+                    <div className="flex items-center justify-between gap-3 mb-2 bg-muted/60 rounded-lg px-3 py-2">
                       <Link
                         to={`/recipes/${group.recipe_slug}`}
-                        className="font-semibold text-sm hover:underline underline-offset-4"
+                        className="font-bold text-sm hover:underline underline-offset-4 flex-1"
                       >
                         {group.recipe_title}
                       </Link>
-                      {unchecked.length > 0 && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setBuyNowIngredients(unchecked)}
-                          className="shrink-0 text-xs border-green-200 text-green-700 hover:bg-green-50"
+                      <div className="flex items-center border-2 border-amber-400 rounded-lg overflow-hidden shrink-0 shadow-sm">
+                        <button
+                          type="button"
+                          onClick={() => group.multiplier > 1
+                            ? updateMultiplier(group.recipe_slug, group.multiplier - 1)
+                            : removeRecipe(group.recipe_slug)
+                          }
+                          className="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 transition-colors border-r-2 border-amber-400"
+                          aria-label={group.multiplier > 1
+                            ? `Decrease ${group.recipe_title} to ${group.multiplier - 1}`
+                            : `Remove ${group.recipe_title} from shopping list`
+                          }
                         >
-                          🛒 Buy it NOW!
-                        </Button>
-                      )}
+                          {group.multiplier > 1
+                            ? <Minus className="w-3.5 h-3.5" />
+                            : <Trash2 className="w-3.5 h-3.5" />
+                          }
+                        </button>
+                        <span className="px-3 py-1.5 text-sm font-bold text-amber-900 bg-white min-w-[2rem] text-center">
+                          {group.multiplier}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateMultiplier(group.recipe_slug, group.multiplier + 1)}
+                          className="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 transition-colors border-l-2 border-amber-400"
+                          aria-label={`Increase ${group.recipe_title} to ${group.multiplier + 1}`}
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
-                    {group.items.map(item => <ItemRow key={item.id} item={item} />)}
+                    {group.items.map(item => <ItemRow key={item.id} item={item} multiplier={group.multiplier} />)}
                     <Separator className="mt-4" />
                   </div>
-                );
-              })}
+              ))}
             </div>
           ) : (
             <div className="space-y-1">
@@ -233,10 +387,11 @@ export function ShoppingListPage() {
           )}
         </>
       )}
+      </div>
 
-      {/* Sticky footer */}
+      {/* Clear list */}
       {data.total_items > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t px-4 py-3 flex items-center gap-3 justify-between">
+        <div className="flex justify-center py-2 mt-auto">
           <Button
             onClick={clearList}
             disabled={clearing}
@@ -244,25 +399,11 @@ export function ShoppingListPage() {
             size="sm"
             className="text-muted-foreground hover:text-destructive"
           >
-            {clearing ? "Clearing…" : "Clear list"}
+            {clearing ? "Tossing…" : "🗑️ Start fresh"}
           </Button>
-          {uncheckedAll.length > 0 && (
-            <Button
-              onClick={() => setBuyNowIngredients(uncheckedAll)}
-              className="bg-green-600 hover:bg-green-700 text-white gap-2"
-            >
-              🛒 Buy it ALL NOW!
-            </Button>
-          )}
         </div>
       )}
 
-      {buyNowIngredients && (
-        <BuyNowSheet
-          ingredients={buyNowIngredients}
-          onClose={() => setBuyNowIngredients(null)}
-        />
-      )}
     </div>
   );
 }

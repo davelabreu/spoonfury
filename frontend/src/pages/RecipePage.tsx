@@ -34,6 +34,7 @@ export function RecipePage() {
   const cookNow = useWakeLock();
   const [buyNowIngredients, setBuyNowIngredients] = useState<Ingredient[] | null>(null);
   const [listMsg, setListMsg] = useState("");
+  const [inList, setInList] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -45,6 +46,13 @@ export function RecipePage() {
       api.get("/books/", token).then((data: any) => setBooks(data.results ?? data));
     }
   }, [token]);
+
+  useEffect(() => {
+    if (!token || !recipe) return;
+    api.get(`/shopping-list/status/?recipe_slug=${recipe.slug}`, token)
+      .then((data: any) => setInList(data.in_list))
+      .catch(() => {});
+  }, [token, recipe]);
 
   const isOwner = recipe && username && recipe.author_username === username;
 
@@ -82,9 +90,8 @@ export function RecipePage() {
         { recipe_slug: recipe.slug, recipe_title: recipe.title, ingredients: needed },
         token
       );
-      setListMsg(`Added ${res.added} item${res.added !== 1 ? "s" : ""} to your list`);
-      setTimeout(() => setListMsg(""), 2500);
-      window.dispatchEvent(new CustomEvent(SHOPPING_LIST_UPDATED));
+      setInList(res.already_in_list);
+      window.dispatchEvent(new Event(SHOPPING_LIST_UPDATED));
     } catch {
       setListMsg("Failed to add to list.");
       setTimeout(() => setListMsg(""), 2500);
@@ -249,6 +256,7 @@ export function RecipePage() {
       <Separator />
       <IngredientChecklist
         ingredients={recipe.ingredients}
+        inList={inList}
         onAddToList={token ? addToList : undefined}
         onBuyNow={setBuyNowIngredients}
       />

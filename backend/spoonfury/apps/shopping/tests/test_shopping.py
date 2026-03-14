@@ -157,3 +157,121 @@ def test_cannot_modify_another_users_item(auth_client, recipe, ingredients):
 
     assert other_client.patch(url, {"is_checked": True}, format="json").status_code == 404
     assert other_client.delete(url).status_code == 404
+
+
+@pytest.mark.django_db
+def test_add_returns_already_in_list_flag(auth_client, recipe, ingredients):
+    """Add response includes already_in_list boolean."""
+    url = reverse("shopping-list-add")
+    payload = {"recipe_slug": recipe.slug, "recipe_title": recipe.title, "ingredients": ingredients}
+
+    # First add — items added, now in list
+    r1 = auth_client.post(url, payload, format="json")
+    assert r1.data["added"] == 2
+    assert r1.data["already_in_list"] is True
+
+    # Second add — nothing new, but still in list
+    r2 = auth_client.post(url, payload, format="json")
+    assert r2.data["added"] == 0
+    assert r2.data["already_in_list"] is True
+
+
+@pytest.mark.django_db
+def test_status_returns_false_when_empty(auth_client, recipe):
+    """Status endpoint returns in_list=false when recipe has no items."""
+    url = reverse("shopping-list-status")
+    response = auth_client.get(f"{url}?recipe_slug={recipe.slug}")
+    assert response.status_code == 200
+    assert response.data["in_list"] is False
+
+
+@pytest.mark.django_db
+def test_status_returns_true_when_items_exist(auth_client, recipe, ingredients):
+    """Status endpoint returns in_list=true when recipe has items."""
+    auth_client.post(reverse("shopping-list-add"), {
+        "recipe_slug": recipe.slug,
+        "recipe_title": recipe.title,
+        "ingredients": ingredients,
+    }, format="json")
+
+    url = reverse("shopping-list-status")
+    response = auth_client.get(f"{url}?recipe_slug={recipe.slug}")
+    assert response.status_code == 200
+    assert response.data["in_list"] is True
+
+
+@pytest.mark.django_db
+def test_remove_recipe_deletes_all_items_for_recipe(auth_client, recipe, ingredients):
+    """POST to remove-recipe/ deletes all items for a specific recipe."""
+    auth_client.post(reverse("shopping-list-add"), {
+        "recipe_slug": recipe.slug,
+        "recipe_title": recipe.title,
+        "ingredients": ingredients,
+    }, format="json")
+
+    response = auth_client.post(
+        reverse("shopping-list-remove-recipe"),
+        {"recipe_slug": recipe.slug},
+        format="json",
+    )
+    assert response.status_code == 200
+    assert response.data["removed"] == 2
+
+    list_response = auth_client.get(reverse("shopping-list"))
+    assert list_response.data["total_items"] == 0
+
+
+@pytest.mark.django_db
+def test_multiplier_set_and_read(auth_client, recipe, ingredients):
+    """PATCH multiplier updates it, GET list returns it per recipe group."""
+    auth_client.post(reverse("shopping-list-add"), {
+        "recipe_slug": recipe.slug,
+        "recipe_title": recipe.title,
+        "ingredients": ingredients,
+    }, format="json")
+
+    # Default multiplier is 1
+    r = auth_client.get(reverse("shopping-list"))
+    assert r.data["items_by_recipe"][0]["multiplier"] == 1
+
+    # Set to 3
+    r2 = auth_client.patch(
+        reverse("shopping-list-multiplier"),
+        {"recipe_slug": recipe.slug, "multiplier": 3},
+        format="json",
+    )
+    assert r2.status_code == 200
+    assert r2.data["multiplier"] == 3
+
+    # Verify in list response
+    r3 = auth_client.get(reverse("shopping-list"))
+    assert r3.data["items_by_recipe"][0]["multiplier"] == 3
+
+
+@pytest.mark.django_db
+def test_remove_recipe_also_removes_multiplier(auth_client, recipe, ingredients):
+    """Removing a recipe also cleans up its multiplier."""
+    auth_client.post(reverse("shopping-list-add"), {
+        "recipe_slug": recipe.slug,
+        "recipe_title": recipe.title,
+        "ingredients": ingredients,
+    }, format="json")
+    auth_client.patch(
+        reverse("shopping-list-multiplier"),
+        {"recipe_slug": recipe.slug, "multiplier": 2},
+        format="json",
+    )
+    auth_client.post(
+        reverse("shopping-list-remove-recipe"),
+        {"recipe_slug": recipe.slug},
+        format="json",
+    )
+
+    # Re-add — multiplier should be back to default 1
+    auth_client.post(reverse("shopping-list-add"), {
+        "recipe_slug": recipe.slug,
+        "recipe_title": recipe.title,
+        "ingredients": ingredients,
+    }, format="json")
+    r = auth_client.get(reverse("shopping-list"))
+    assert r.data["items_by_recipe"][0]["multiplier"] == 1
