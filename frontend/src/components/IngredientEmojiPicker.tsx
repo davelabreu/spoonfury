@@ -54,22 +54,22 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-2 w-52">
+        <div className="absolute top-full left-0 mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-2.5 w-72">
           {/* Reset to auto */}
           <button
             type="button"
             onClick={() => { onChange(""); setPopKey(k => k + 1); setOpen(false); }}
-            className="w-full text-[10px] text-center text-indigo-400 hover:text-indigo-600 py-0.5 mb-1.5 border-b border-gray-100 transition-colors"
+            className="w-full text-xs text-center text-indigo-400 hover:text-indigo-600 py-1 mb-2 border-b border-gray-100 transition-colors"
           >
             ↺ auto ({autoEmoji})
           </button>
-          <div className="grid grid-cols-8 gap-0.5 max-h-44 overflow-y-auto">
+          <div className="grid grid-cols-9 gap-1 max-h-60 overflow-y-auto">
             {PICKER_EMOJIS.map(emoji => (
               <button
                 key={emoji}
                 type="button"
                 onClick={() => { onChange(emoji); setPopKey(k => k + 1); setOpen(false); }}
-                className={`text-base p-0.5 rounded hover:bg-indigo-50 transition-colors leading-none ${value === emoji ? "bg-indigo-100 ring-1 ring-indigo-300" : ""}`}
+                className={`text-xl p-1 rounded hover:bg-indigo-50 hover:scale-125 transition-all leading-none ${value === emoji ? "bg-indigo-100 ring-1 ring-indigo-300 scale-110" : ""}`}
               >
                 {emoji}
               </button>

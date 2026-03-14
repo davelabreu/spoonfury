@@ -82,6 +82,33 @@ const EMOJI_MAP: Array<[RegExp, string]> = [
   [/wine/i,                            "🍷"],
   [/broth|stock/i,                     "🍲"],
 
+  // Beverages
+  [/soda|pop|cola|sprite|fanta|coke/i,  "🥤"],
+  [/juice/i,                            "🧃"],
+  [/beer|ale|lager|ipa/i,              "🍺"],
+  [/coffee|espresso/i,                  "☕"],
+  [/tea\b/i,                            "🍵"],
+  [/water/i,                            "💧"],
+  [/smoothie|shake/i,                   "🥤"],
+  [/cocktail|margarita|martini/i,       "🍸"],
+  [/whiskey|bourbon|rum|vodka|gin|tequila/i, "🥃"],
+
+  // Prepared / misc
+  [/pizza/i,                            "🍕"],
+  [/taco|tortilla/i,                    "🌮"],
+  [/burrito|wrap/i,                     "🌯"],
+  [/sandwich|sub\b/i,                   "🥪"],
+  [/pretzel/i,                          "🥨"],
+  [/pancake|waffle/i,                   "🧇"],
+  [/pie/i,                              "🥧"],
+  [/cake/i,                             "🎂"],
+  [/cookie|biscuit/i,                   "🍪"],
+  [/donut|doughnut/i,                   "🍩"],
+  [/ice cream|gelato/i,                 "🍦"],
+  [/candy/i,                            "🍭"],
+  [/popcorn/i,                          "🍿"],
+  [/tofu|tempeh/i,                      "🧈"],
+
   // Nuts & seeds
   [/almond|walnut|pecan|cashew|pistachio|hazelnut|nut/i, "🥜"],
   [/sesame|sunflower seed|pumpkin seed|seed/i, "🌰"],
@@ -105,9 +132,13 @@ export const PICKER_EMOJIS = [
   // Dairy & eggs
   "🥚","🧀","🧈","🥛",
   // Bread & grains
-  "🍞","🥐","🥖","🍝","🍚","🌾",
+  "🍞","🥐","🥖","🍝","🍚","🌾","🥨","🧇",
   // Herbs, spices & condiments
   "🌿","🧂","🌶️","🫚","🫙","🫒","🍯","🍬","🍫","🍷","🍲",
+  // Beverages
+  "🥤","🧃","🍺","☕","🍵","💧","🍸","🥃",
+  // Prepared & sweets
+  "🍕","🌮","🌯","🥪","🥧","🎂","🍪","🍩","🍦","🍭","🍿",
   // Nuts
   "🥜","🌰",
 ];
