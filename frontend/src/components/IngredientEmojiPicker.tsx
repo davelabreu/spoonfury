@@ -58,7 +58,7 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
           {/* Reset to auto */}
           <button
             type="button"
-            onClick={() => { onChange(""); setOpen(false); }}
+            onClick={() => { onChange(""); setPopKey(k => k + 1); setOpen(false); }}
             className="w-full text-[10px] text-center text-indigo-400 hover:text-indigo-600 py-0.5 mb-1.5 border-b border-gray-100 transition-colors"
           >
             ↺ auto ({autoEmoji})
@@ -68,7 +68,7 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
               <button
                 key={emoji}
                 type="button"
-                onClick={() => { onChange(emoji); setOpen(false); }}
+                onClick={() => { onChange(emoji); setPopKey(k => k + 1); setOpen(false); }}
                 className={`text-base p-0.5 rounded hover:bg-indigo-50 transition-colors leading-none ${value === emoji ? "bg-indigo-100 ring-1 ring-indigo-300" : ""}`}
               >
                 {emoji}
