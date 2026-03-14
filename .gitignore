@@ -17,9 +17,13 @@ frontend/dist/
 # Env
 .env
 .gemini/
+.superpowers/
 
 # Docker
 *.log
 
 # Worktrees
 .worktrees/
+
+# Example templates
+docs/example_templates/
