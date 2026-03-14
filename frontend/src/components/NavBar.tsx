@@ -194,18 +194,25 @@ const FOOD_EMOJIS = ["🥕", "🧅", "🍋", "🥦", "🧄", "🫙", "🥩", "�
 
 function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
   const [hovered, setHovered] = useState<"pickup" | "delivery" | "cart" | null>(null);
-  const [flyEmoji, setFlyEmoji] = useState<string | null>(null);
+  const [flyEmojis, setFlyEmojis] = useState<Array<{ id: number; emoji: string; dx: number; delay: number }>>([]);
   const [badgeKey, setBadgeKey] = useState(0);
   const prevCount = useRef(count);
   const capsuleControls = useAnimationControls();
   const cartIconControls = useAnimationControls();
 
-  // Capsule wiggle + flying emoji when item is added
+  // Capsule wiggle + emoji burst when item is added
   useEffect(() => {
     const onUpdate = () => {
       capsuleControls.start({ x: [0, -5, 5, -3, 3, -1, 1, 0], transition: { duration: 0.4, ease: "easeInOut" } });
-      setFlyEmoji(FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)]);
-      setTimeout(() => setFlyEmoji(null), 750);
+      const burstCount = 2 + Math.floor(Math.random() * 2); // 2 or 3
+      const burst = Array.from({ length: burstCount }, (_, i) => ({
+        id: Date.now() + i,
+        emoji: FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)],
+        dx: (i - (burstCount - 1) / 2) * 22,
+        delay: i * 0.07,
+      }));
+      setFlyEmojis(burst);
+      setTimeout(() => setFlyEmojis([]), 950);
     };
     window.addEventListener(SHOPPING_LIST_UPDATED, onUpdate);
     return () => window.removeEventListener(SHOPPING_LIST_UPDATED, onUpdate);
@@ -282,20 +289,20 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
         </Link>
       </div>
 
-      {/* Food emoji flies out on item added */}
+      {/* Food emoji burst on item added */}
       <AnimatePresence>
-        {flyEmoji && (
+        {flyEmojis.map(({ id, emoji, dx, delay }) => (
           <motion.span
-            key={flyEmoji + Date.now()}
-            initial={{ opacity: 1, y: 4, x: -2, scale: 0.7 }}
-            animate={{ opacity: 0, y: -36, scale: 1.4 }}
+            key={id}
+            initial={{ opacity: 1, y: 4, x: 0, scale: 0.5 }}
+            animate={{ opacity: 0, y: -52, x: dx, scale: 2.0 }}
             exit={{}}
-            transition={{ duration: 0.65, ease: "easeOut" }}
-            style={{ position: "absolute", right: 8, top: 0, pointerEvents: "none", fontSize: 14, zIndex: 10 }}
+            transition={{ duration: 0.75, ease: "easeOut", delay }}
+            style={{ position: "absolute", right: 14, top: 0, pointerEvents: "none", fontSize: 15, zIndex: 10 }}
           >
-            {flyEmoji}
+            {emoji}
           </motion.span>
-        )}
+        ))}
       </AnimatePresence>
 
       {/* Badge with spring pop on count change */}
