@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
 import { Menu, X, Utensils, ShoppingCart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -190,13 +190,45 @@ function CartButton({ count, onClick }: { count: number; onClick?: () => void })
   );
 }
 
+const FOOD_EMOJIS = ["🥕", "🧅", "🍋", "🥦", "🧄", "🫙", "🥩", "🧀", "🍅", "🌽"];
+
 function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
   const [hovered, setHovered] = useState<"pickup" | "delivery" | "cart" | null>(null);
+  const [flyEmoji, setFlyEmoji] = useState<string | null>(null);
+  const [badgeKey, setBadgeKey] = useState(0);
+  const prevCount = useRef(count);
+  const capsuleControls = useAnimationControls();
+  const cartIconControls = useAnimationControls();
+
+  // Capsule wiggle + flying emoji when item is added
+  useEffect(() => {
+    const onUpdate = () => {
+      capsuleControls.start({ x: [0, -5, 5, -3, 3, -1, 1, 0], transition: { duration: 0.4, ease: "easeInOut" } });
+      setFlyEmoji(FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)]);
+      setTimeout(() => setFlyEmoji(null), 750);
+    };
+    window.addEventListener(SHOPPING_LIST_UPDATED, onUpdate);
+    return () => window.removeEventListener(SHOPPING_LIST_UPDATED, onUpdate);
+  }, [capsuleControls]);
+
+  // Badge spring pop on count increase
+  useEffect(() => {
+    if (count > prevCount.current) setBadgeKey(k => k + 1);
+    prevCount.current = count;
+  }, [count]);
+
+  // Cart icon rocks on hover
+  useEffect(() => {
+    if (hovered === "cart") {
+      cartIconControls.start({ rotate: [-7, 7, -5, 5, -2, 2, 0], transition: { duration: 0.5, ease: "easeInOut" } });
+    }
+  }, [hovered, cartIconControls]);
 
   const segmentBase = { padding: "0 13px", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" as const, lineHeight: "32px", textDecoration: "none", transition: "background 0.15s ease, color 0.15s ease" };
 
   return (
-    <div
+    <motion.div
+      animate={capsuleControls}
       style={{
         position: "relative",
         backgroundImage: "linear-gradient(270deg, #86efac, #93c5fd, #c4b5fd, #fda4af, #86efac)",
@@ -235,9 +267,7 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
           onMouseEnter={() => setHovered("cart")}
           onMouseLeave={() => setHovered(null)}
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            display: "flex", alignItems: "center", justifyContent: "center",
             padding: "0 13px",
             background: hovered === "cart" ? "#f0fdf4" : "#fff",
             color: "#15803d",
@@ -246,19 +276,42 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
             transition: "background 0.15s ease",
           }}
         >
-          <ShoppingCart className="w-[22px] h-[22px]" />
+          <motion.div animate={cartIconControls}>
+            <ShoppingCart className="w-[22px] h-[22px]" />
+          </motion.div>
         </Link>
       </div>
-      {/* Badge on outer wrapper — avoids overflow:hidden clipping from inner div */}
+
+      {/* Food emoji flies out on item added */}
+      <AnimatePresence>
+        {flyEmoji && (
+          <motion.span
+            key={flyEmoji + Date.now()}
+            initial={{ opacity: 1, y: 4, x: -2, scale: 0.7 }}
+            animate={{ opacity: 0, y: -36, scale: 1.4 }}
+            exit={{}}
+            transition={{ duration: 0.65, ease: "easeOut" }}
+            style={{ position: "absolute", right: 8, top: 0, pointerEvents: "none", fontSize: 14, zIndex: 10 }}
+          >
+            {flyEmoji}
+          </motion.span>
+        )}
+      </AnimatePresence>
+
+      {/* Badge with spring pop on count change */}
       {count > 0 && (
-        <span
+        <motion.span
+          key={badgeKey}
+          initial={{ scale: 0 }}
+          animate={{ scale: [0, 1.5, 1] }}
+          transition={{ type: "spring", stiffness: 420, damping: 11 }}
           style={{ position: "absolute", top: 0, right: 0 }}
-          className="min-w-[16px] h-[16px] flex items-center justify-center rounded-full bg-green-500 text-white text-[9px] font-black border-[1.5px] border-[#f0fdf4] px-0.5"
+          className="min-w-[16px] h-[16px] flex items-center justify-center rounded-full bg-green-500 text-white text-[9px] font-black border-[1.5px] border-white px-0.5"
         >
           {count > 99 ? "99+" : count}
-        </span>
+        </motion.span>
       )}
-    </div>
+    </motion.div>
   );
 }
 
