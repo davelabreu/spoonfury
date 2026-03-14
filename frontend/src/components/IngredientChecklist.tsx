@@ -3,6 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import type { Ingredient } from "@/types";
+import { getIngredientEmoji } from "@/lib/ingredientEmoji";
 
 interface Props {
   ingredients: Ingredient[];
@@ -40,10 +41,11 @@ export function IngredientChecklist({ ingredients, inList, onAddToList, onBuyNow
             />
             <label
               htmlFor={`ing-${i}`}
-              className={`text-sm cursor-pointer select-none ${haveAlready.has(i) ? "line-through text-muted-foreground" : ""}`}
+              className={`text-sm cursor-pointer select-none flex items-baseline gap-1.5 ${haveAlready.has(i) ? "line-through text-muted-foreground" : ""}`}
             >
-              <span className="font-medium">{ing.quantity} {ing.unit}</span> {ing.name}
-              {ing.note && <span className="text-muted-foreground"> — {ing.note}</span>}
+              <span className="text-base leading-none">{getIngredientEmoji(ing.name)}</span>
+              <span><span className="font-medium">{ing.quantity} {ing.unit}</span> {ing.name}
+              {ing.note && <span className="text-muted-foreground"> — {ing.note}</span>}</span>
             </label>
           </li>
         ))}
