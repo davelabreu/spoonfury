@@ -66,10 +66,10 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -4 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-200 rounded-2xl shadow-2xl p-4 w-[460px]"
+            className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-200 rounded-2xl shadow-2xl p-3 w-[min(460px,90vw)]"
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-bold text-gray-700">Pick an ingredient</span>
               <button
                 type="button"
@@ -80,28 +80,26 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
               </button>
             </div>
 
-            {/* Categories */}
-            <div className="space-y-2.5">
+            {/* Categories — 2-col on desktop, 1-col on mobile */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {PICKER_CATEGORIES.map(cat => (
-                <div key={cat.label}>
-                  <div className={`rounded-xl px-3 py-2 ${cat.color}`}>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">{cat.label}</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {cat.emojis.map(emoji => (
-                        <button
-                          key={emoji}
-                          type="button"
-                          onClick={() => pick(emoji)}
-                          className={`text-2xl w-10 h-10 flex items-center justify-center rounded-lg
-                            hover:scale-[1.35] hover:shadow-md hover:-translate-y-0.5
-                            active:scale-110
-                            transition-all duration-150
-                            ${value === emoji ? "bg-white/90 ring-2 ring-indigo-400 shadow-sm scale-110" : "hover:bg-white/70"}`}
-                        >
-                          {emoji}
-                        </button>
-                      ))}
-                    </div>
+                <div key={cat.label} className={`rounded-lg px-2.5 py-1.5 ${cat.color}`}>
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500">{cat.label}</span>
+                  <div className="flex flex-wrap gap-0.5 mt-0.5">
+                    {cat.emojis.map(emoji => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => pick(emoji)}
+                        className={`text-xl w-8 h-8 flex items-center justify-center rounded-md
+                          hover:scale-[1.35] hover:shadow-md hover:-translate-y-0.5
+                          active:scale-110
+                          transition-all duration-150
+                          ${value === emoji ? "bg-white/90 ring-2 ring-indigo-400 shadow-sm scale-110" : "hover:bg-white/70"}`}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
                   </div>
                 </div>
               ))}
