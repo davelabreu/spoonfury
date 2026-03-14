@@ -190,7 +190,18 @@ function CartButton({ count, onClick }: { count: number; onClick?: () => void })
   );
 }
 
-const FOOD_EMOJIS = ["🥕", "🧅", "🍋", "🥦", "🧄", "🫙", "🥩", "🧀", "🍅", "🌽"];
+const FOOD_EMOJIS = [
+  // Vegetables
+  "🥕", "🌽", "🥦", "🧅", "🧄", "🥔", "🍅", "🍆", "🥑", "🥬", "🥒",
+  // Fruit
+  "🍋", "🍎", "🍊", "🍇", "🍓", "🍌", "🍉", "🍑", "🫐", "🥝",
+  // Meat & protein
+  "🥩", "🍗", "🥚", "🧀", "🥓",
+  // Bread & grains
+  "🍞", "🥐", "🥖",
+  // Dairy & other
+  "🧈", "🥛",
+];
 
 function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
   const [hovered, setHovered] = useState<"pickup" | "delivery" | "cart" | null>(null);
