@@ -215,7 +215,7 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
           rel="noopener noreferrer"
           onMouseEnter={() => setHovered("pickup")}
           onMouseLeave={() => setHovered(null)}
-          style={{ ...segmentBase, background: hovered === "pickup" ? "#f0fdf4" : "#fff", color: hovered === "pickup" ? "#15803d" : "#374151" }}
+          style={{ ...segmentBase, background: hovered === "pickup" ? "#fde8ea" : "#fff", color: hovered === "pickup" ? "#9f1239" : "#374151" }}
         >
           🚗 Pickup
         </a>
@@ -226,7 +226,7 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
           rel="noopener noreferrer"
           onMouseEnter={() => setHovered("delivery")}
           onMouseLeave={() => setHovered(null)}
-          style={{ ...segmentBase, background: hovered === "delivery" ? "#eff6ff" : "#fff", color: hovered === "delivery" ? "#1d4ed8" : "#374151" }}
+          style={{ ...segmentBase, background: hovered === "delivery" ? "#ede9fe" : "#fff", color: hovered === "delivery" ? "#5b21b6" : "#374151" }}
         >
           🏠 Delivery
         </a>
@@ -239,11 +239,10 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
             alignItems: "center",
             justifyContent: "center",
             padding: "0 13px",
-            background: hovered === "cart" ? "#bbf7d0" : "#f0fdf4",
+            background: hovered === "cart" ? "#f0fdf4" : "#fff",
             color: "#15803d",
             borderLeft: "1px solid rgba(0,0,0,0.06)",
-            borderRadius: "0 9999px 9999px 0",
-            lineHeight: "32px",
+            alignSelf: "stretch",
             transition: "background 0.15s ease",
           }}
         >
