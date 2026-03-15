@@ -41,6 +41,7 @@ export function RecipePage() {
 
   useEffect(() => {
     if (!slug) return;
+    setHeroImgError(false); // Reset broken-image state when navigating to a new recipe
     api.get(`/recipes/${slug}/`).then(setRecipe).catch(() => setError("Recipe not found."));
   }, [slug]);
 
@@ -137,13 +138,18 @@ export function RecipePage() {
           />
         ) : (
           /* Category placeholder — emoji on gradient background */
-          <div
-            className={`w-full h-full bg-gradient-to-br ${getCategoryFallback(recipe.category).gradient} flex items-center justify-center`}
-          >
-            <span className="text-6xl sm:text-7xl drop-shadow-md">
-              {getCategoryFallback(recipe.category).emoji}
-            </span>
-          </div>
+          (() => {
+            const heroFallback = getCategoryFallback(recipe.category);
+            return (
+              <div
+                className={`w-full h-full bg-gradient-to-br ${heroFallback.gradient} flex items-center justify-center`}
+              >
+                <span className="text-6xl sm:text-7xl drop-shadow-md">
+                  {heroFallback.emoji}
+                </span>
+              </div>
+            );
+          })()
         )}
 
         {/* Owner prompt: "Add a photo" overlay — only shown on the placeholder */}
