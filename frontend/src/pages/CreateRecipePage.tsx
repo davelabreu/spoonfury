@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IngredientEmojiPicker } from "@/components/IngredientEmojiPicker";
+import { ImageUploadField } from "@/components/ImageUploadField";
 
 const CATEGORIES = ["soup","pasta","bake","salad","grill","breakfast","dessert","drink","snack","other"];
 
@@ -23,10 +24,9 @@ export function CreateRecipePage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const data = await api.post("/recipes/", { 
-        ...form, 
-        ingredients: ingredients.filter(i => i.name.trim() !== "") 
-      }, token);
+      const payload: Record<string, unknown> = { ...form, ingredients: ingredients.filter(i => i.name.trim() !== "") };
+      if (!payload.image_url) delete payload.image_url;
+      const data = await api.post("/recipes/", payload, token);
       navigate(`/recipes/${data.slug}`);
     } catch (err: unknown) {
       const e = err as { data?: unknown };
@@ -55,8 +55,11 @@ export function CreateRecipePage() {
               {CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
             </select>
           </div>
-          <input className="w-full border rounded px-3 py-2 text-sm" placeholder="Photo URL (optional — paste any image link)"
-            value={form.image_url} onChange={e => setForm(f => ({ ...f, image_url: e.target.value }))} />
+          <ImageUploadField
+            value={form.image_url}
+            onChange={url => setForm(f => ({ ...f, image_url: url }))}
+            token={token}
+          />
 
           <div>
             <h3 className="text-sm font-semibold mb-2">Ingredients</h3>

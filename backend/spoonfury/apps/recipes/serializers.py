@@ -15,6 +15,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         source="parent_recipe.author.username", read_only=True
     )
 
+    image_url = serializers.URLField(allow_blank=True, required=False, default="")
+
     class Meta:
         model = Recipe
         fields = [

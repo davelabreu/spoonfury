@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronLeft } from "lucide-react";
 import type { Ingredient } from "@/types";
 import { IngredientEmojiPicker } from "@/components/IngredientEmojiPicker";
+import { ImageUploadField } from "@/components/ImageUploadField";
 
 export function EditRecipePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -61,15 +62,14 @@ export function EditRecipePage() {
     if (!token || !slug) return;
     setError("");
     try {
-      await api.patch(`/recipes/${slug}/`, {
-        title,
-        description,
-        serves,
+      const payload: Record<string, unknown> = {
+        title, description, serves,
         ingredients: ingredients.filter(i => i.name.trim() !== ""),
-        instructions,
-        notes,
-        image_url: imageUrl,
-      }, token);
+        instructions, notes,
+      };
+      if (imageUrl) payload.image_url = imageUrl;
+      else payload.image_url = "";
+      await api.patch(`/recipes/${slug}/`, payload, token);
       navigate(`/recipes/${slug}`);
     } catch (err: unknown) {
       const e = err as { data?: { detail?: string } };
@@ -116,11 +116,10 @@ export function EditRecipePage() {
         onChange={e => setServes(e.target.value)}
         placeholder="Serves"
       />
-      <input
-        className="w-full border rounded px-3 py-2 text-sm"
+      <ImageUploadField
         value={imageUrl}
-        onChange={e => setImageUrl(e.target.value)}
-        placeholder="Photo URL (optional — paste any image link)"
+        onChange={setImageUrl}
+        token={token!}
       />
 
       <div>
