@@ -216,7 +216,7 @@ export function ShoppingListPage() {
     const info = getIngredientInfo(item.name);
 
     const itemContent = (
-      <span className={`flex-1 text-sm leading-5 ${item.is_checked ? "line-through text-muted-foreground" : ""}`}>
+      <span className={`text-sm leading-5 ${item.is_checked ? "line-through text-muted-foreground" : ""}`}>
         {emoji && <span className="mr-1">{emoji}</span>}
         {item.quantity && <span className="font-medium">{
           multiplier > 1 && !isNaN(Number(item.quantity))
@@ -244,9 +244,10 @@ export function ShoppingListPage() {
             aria-label={`Mark ${item.name} as picked up`}
           />
           {info ? (
+            <div className="flex-1">
             <Tooltip>
               <TooltipTrigger asChild>
-                <div tabIndex={0} className="flex-1 cursor-default outline-none">{itemContent}</div>
+                <div tabIndex={0} className="cursor-default outline-none inline-flex">{itemContent}</div>
               </TooltipTrigger>
               <TooltipContent
                 side="right"
@@ -276,7 +277,8 @@ export function ShoppingListPage() {
                 </div>
               </TooltipContent>
             </Tooltip>
-          ) : itemContent}
+            </div>
+          ) : <div className="flex-1">{itemContent}</div>}
           <button
             type="button"
             onClick={() => deleteItem(item)}
