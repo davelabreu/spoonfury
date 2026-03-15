@@ -54,6 +54,9 @@ export function ShoppingListPage() {
   const [error, setError] = useState("");
   const [view, setView] = useState<"recipe" | "all">("recipe");
   const [clearing, setClearing] = useState(false);
+  // Tracks recipe slugs whose thumbnail URLs returned errors (404, broken, etc.)
+  // so we can fall back to category emoji instead of showing a broken image.
+  const [brokenThumbs, setBrokenThumbs] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -281,7 +284,7 @@ export function ShoppingListPage() {
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        className="flex items-center gap-3 py-2 px-1"
+        className="flex items-center gap-3 py-1 px-1"
       >
         <input
           type="checkbox"
@@ -290,7 +293,7 @@ export function ShoppingListPage() {
           className="w-4 h-4 rounded accent-indigo-500 cursor-pointer shrink-0"
           aria-label={`Mark ${item.name} as picked up`}
         />
-        <div className={`w-10 h-10 flex items-center justify-center text-2xl shrink-0 rounded-2xl select-none transition-colors ${item.is_checked ? "bg-muted/30" : "bg-muted/50"}`}>
+        <div className={`w-8 h-8 flex items-center justify-center text-lg shrink-0 rounded-xl select-none transition-colors ${item.is_checked ? "bg-muted/30" : "bg-muted/50"}`}>
           {emoji || "🛒"}
         </div>
         <WithTooltip>{label}</WithTooltip>
@@ -407,20 +410,26 @@ export function ShoppingListPage() {
                         to={`/recipes/${group.recipe_slug}`}
                         className="flex items-center gap-2 bg-muted rounded-full pr-3 hover:bg-muted/80 transition-colors"
                       >
-                        {/* Small circular thumbnail — image or category fallback */}
-                        {group.recipe_image_url ? (
+                        {/* Small circular thumbnail — image or category fallback.
+                            If image_url exists and hasn't errored, show the photo.
+                            Otherwise fall back to category emoji on gradient. */}
+                        {group.recipe_image_url && !brokenThumbs.has(group.recipe_slug) ? (
                           <img
                             src={group.recipe_image_url}
                             alt=""
                             className="w-7 h-7 rounded-full object-cover shrink-0"
+                            onError={() => setBrokenThumbs(prev => new Set(prev).add(group.recipe_slug))}
                           />
-                        ) : (
-                          <span
-                            className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-sm bg-gradient-to-br ${getCategoryFallback(group.recipe_category).gradient}`}
-                          >
-                            {getCategoryFallback(group.recipe_category).emoji}
-                          </span>
-                        )}
+                        ) : (() => {
+                          const fb = getCategoryFallback(group.recipe_category ?? "other");
+                          return (
+                            <span
+                              className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-sm bg-gradient-to-br ${fb.gradient}`}
+                            >
+                              {fb.emoji}
+                            </span>
+                          );
+                        })()}
                         <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground py-1.5">
                           {group.recipe_title}
                         </span>
