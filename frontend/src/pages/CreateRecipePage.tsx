@@ -67,8 +67,34 @@ export function CreateRecipePage() {
                 />
                 <input className="border rounded px-2 py-1 text-xs w-14" placeholder="Qty"
                   value={ing.quantity} onChange={e => updateIng(i, "quantity", e.target.value)} />
-                <input className="border rounded px-2 py-1 text-xs w-14" placeholder="Unit"
-                  value={ing.unit} onChange={e => updateIng(i, "unit", e.target.value)} />
+                <select className="border rounded px-2 py-1 text-xs w-20 bg-white" value={ing.unit}
+                  onChange={e => updateIng(i, "unit", e.target.value)}>
+                  <option value="">— unit</option>
+                  <optgroup label="Volume">
+                    <option>tsp</option>
+                    <option>tbsp</option>
+                    <option>cup</option>
+                    <option>fl oz</option>
+                    <option>ml</option>
+                    <option>L</option>
+                  </optgroup>
+                  <optgroup label="Weight">
+                    <option>g</option>
+                    <option>kg</option>
+                    <option>oz</option>
+                    <option>lb</option>
+                  </optgroup>
+                  <optgroup label="Cooking">
+                    <option>pinch</option>
+                    <option>clove</option>
+                    <option>slice</option>
+                    <option>sprig</option>
+                    <option>bunch</option>
+                    <option>head</option>
+                    <option>can</option>
+                    <option>pkg</option>
+                  </optgroup>
+                </select>
                 <input className="border rounded px-2 py-1 text-xs flex-1" placeholder="Name"
                   value={ing.name} onChange={e => updateIng(i, "name", e.target.value)} />
                 <input className="border rounded px-2 py-1 text-xs w-24" placeholder="Note"

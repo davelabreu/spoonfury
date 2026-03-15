@@ -14,7 +14,7 @@ This is the canonical project context for Spoonfury. All AI agents should read t
 
 Spoonfury — a recipe-first social platform. Core mechanic: fork a recipe, make it yours, build curated digital recipe books.
 
-**Status**: Prototype v0.4.1 — CartCapsule nav pill, persistent in-list badge, Shopping List feedback polish, and all v0.4 features (Shopping List, Buy it NOW! / Instacart, Cook Now / Wake Lock, NavBar theme toggle) and all v0.3 features (Stir the Pot, Sharing, fork-to-book loop, ownership security).
+**Status**: Prototype v0.4.2 — Ingredient emoji system (auto-guess, picker, tooltips with health info), CartCapsule nav pill, persistent in-list badge, Shopping List feedback polish, and all v0.4 features (Shopping List, Buy it NOW! / Instacart, Cook Now / Wake Lock, NavBar theme toggle) and all v0.3 features (Stir the Pot, Sharing, fork-to-book loop, ownership security).
 
 **Active worktrees**:
 - `.worktrees/test-kitchen` — test kitchen / recipe privacy feature
@@ -64,6 +64,7 @@ npm run dev
 - **Logo**: Spoon emoji features a "Pro" fire effect using an SVG gooey filter (`#goo`) and screen blend mode on hover.
 - **Modal Pattern**: `ForkModal` and `ShareModal` use `backdrop-blur-[2px]`, `bg-black/30` overlay, solid `bg-white` card.
 - **Sharing**: QR code generation and direct WhatsApp links for social sharing.
+- **Ingredient Emojis**: Auto-guessed via regex in `ingredientEmoji.ts`, overridable per-ingredient with `IngredientEmojiPicker` (create/edit pages). Picker is a categorized 2-col grid with color-coded food categories, spring pop animation on selection. Emojis stored in `Ingredient.emoji` field (optional, falls back to auto-guess). Hover tooltips on recipe page show description, health/nutrition info, and cooking tips via `ingredientInfo.ts`.
 - **Shopping List UI**: `IngredientChecklist` shows a shadcn `Button` "+ Add to Shopping List" and "Buy it NOW!". A shadcn `Alert` green badge ("🛍️❤️ In your shopping list") appears when the recipe's ingredients are already in the cart — checked via `GET /shopping-list/status/` on page load. Add button disables while badge is showing.
 - **CartCapsule**: Replaces the Shopping List nav tab on desktop. A shimmer gradient pill (`🚗 Pickup | 🏠 Delivery | 🛒`) always visible when logged in. Badge shows item count when cart is non-empty. Shopping List accessible via mobile drawer in both nav themes. `useShoppingData` hook returns `{ count, items }` (flattened unchecked ingredients for Instacart URLs). Exports `SHOPPING_LIST_UPDATED` event constant.
 - **Cook Now**: Wake Lock API (`useWakeLock` hook) keeps screen awake while cooking. Gracefully falls back when Wake Lock is unsupported.
@@ -78,7 +79,10 @@ npm run dev
 | `backend/spoonfury/apps/books/views.py` | Book management, add/remove recipe actions |
 | `backend/spoonfury/apps/shopping/views.py` | Shopping list add, clear, status endpoints |
 | `frontend/src/pages/RecipePage.tsx` | Main recipe UI — action bar, checklist, modals |
-| `frontend/src/components/IngredientChecklist.tsx` | Shopping list add + Buy Now buttons + in-list badge |
+| `frontend/src/components/IngredientChecklist.tsx` | Shopping list add + Buy Now buttons + in-list badge + emoji tooltips |
+| `frontend/src/components/IngredientEmojiPicker.tsx` | Categorized emoji picker for create/edit recipe pages |
+| `frontend/src/lib/ingredientEmoji.ts` | Auto-emoji matching (regex → emoji) + picker categories |
+| `frontend/src/lib/ingredientInfo.ts` | Ingredient tooltips — description, nutrition, cooking tips |
 | `frontend/src/components/NavBar.tsx` | NavBar, CartCapsule, useShoppingData, SHOPPING_LIST_UPDATED |
 | `frontend/src/lib/api.ts` | Typed API utility (all HTTP calls go through here) |
 | `frontend/src/index.css` | Global styles, Tailwind plugins |

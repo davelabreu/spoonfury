@@ -51,22 +51,24 @@ function IngredientRow({ ing, index, checked, onToggle }: {
         <TooltipContent
           side="right"
           sideOffset={14}
-          className="max-w-64 p-0 text-pretty bg-neutral-100 text-neutral-950 border border-neutral-300 shadow-lg rounded-xl overflow-hidden [&>svg]:bg-neutral-100 [&>svg]:fill-neutral-100 [&>svg]:size-4 [&>svg]:translate-y-[calc(-50%_-_1px)]"
+          className="max-w-sm p-0 text-pretty bg-neutral-100 text-neutral-950 border border-neutral-300 shadow-lg rounded-xl overflow-hidden [&>svg]:bg-neutral-100 [&>svg]:fill-neutral-100 [&>svg]:size-4 [&>svg]:translate-y-[calc(-50%_-_1px)]"
         >
           <div className="flex">
             <div className="w-1 shrink-0 bg-indigo-400 rounded-l-xl" />
             <div className="px-3 py-2.5 space-y-1.5">
-              <p className="text-sm font-semibold">{emoji} {ing.name}</p>
-              <p className="text-xs text-neutral-500 leading-snug">{info.description}</p>
+              <div>
+                <p className="text-sm font-semibold">{emoji} {ing.name}</p>
+                <p className="text-[10px] text-neutral-500 leading-tight mt-0.5">{info.description}</p>
+              </div>
               {info.nutrition && (
                 <p className="text-xs leading-snug">
-                  <span className="font-semibold text-green-700">🌱 </span>
+                  <span className="font-semibold text-green-700">🌱 Health: </span>
                   <span className="text-neutral-700">{info.nutrition}</span>
                 </p>
               )}
               {info.tip && (
                 <p className="text-xs leading-snug">
-                  <span className="font-semibold text-amber-600">✦ </span>
+                  <span className="font-semibold text-amber-600">✦ Tip: </span>
                   <span className="text-neutral-700">{info.tip}</span>
                 </p>
               )}

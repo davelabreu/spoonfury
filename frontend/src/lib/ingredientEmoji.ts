@@ -1,9 +1,9 @@
 const EMOJI_MAP: Array<[RegExp, string]> = [
-  // Vegetables
+  // Vegetables & Aromatics
   [/carrot/i,                          "🥕"],
   [/corn|maize/i,                      "🌽"],
   [/broccoli/i,                        "🥦"],
-  [/\bonion/i,                         "🧅"],
+  [/\bonion|shallot/i,                 "🧅"],
   [/garlic/i,                          "🧄"],
   [/potato|yam|sweet potato/i,         "🥔"],
   [/tomato/i,                          "🍅"],
@@ -18,6 +18,7 @@ const EMOJI_MAP: Array<[RegExp, string]> = [
   [/pea\b|green bean|snap pea/i,       "🫛"],
   [/bean|lentil|chickpea|legume/i,     "🫘"],
   [/pumpkin|squash|butternut/i,        "🎃"],
+  [/ginger/i,                          "🫚"],
 
   // Fruit
   [/lemon|lime/i,                      "🍋"],
@@ -36,11 +37,11 @@ const EMOJI_MAP: Array<[RegExp, string]> = [
   [/coconut/i,                         "🥥"],
   [/pear/i,                            "🍐"],
 
-  // Meat & seafood
+  // Proteins
   [/chicken|poultry|hen|turkey/i,      "🍗"],
   [/beef|steak|ribeye|rib.?eye|sirloin|tenderloin|filet|fillet|brisket|flank|chuck|mince|ground meat|veal|roast\b/i, "🥩"],
   [/pork|ham|prosciutto|pancetta|pulled/i, "🥩"],
-  [/lamb|mutton|rack of/i,            "🥩"],
+  [/lamb|mutton|rack of/i,             "🥩"],
   [/bacon|lardons/i,                   "🥓"],
   [/sausage|salami|chorizo|pepperoni/i,"🌭"],
   [/salmon|tuna|cod|halibut|fish|tilapia|bass|trout/i, "🐟"],
@@ -48,44 +49,44 @@ const EMOJI_MAP: Array<[RegExp, string]> = [
   [/crab/i,                            "🦀"],
   [/lobster/i,                         "🦞"],
   [/squid|calamari|octopus/i,          "🦑"],
-
-  // Dairy & eggs
   [/egg/i,                             "🥚"],
+  [/tofu|tempeh/i,                     "🧊"],
+
+  // Dairy
   [/cheese|parmesan|mozzarella|cheddar|brie|gouda|feta/i, "🧀"],
   [/butter/i,                          "🧈"],
   [/milk|cream|yogurt|yoghurt/i,       "🥛"],
 
-  // Bread & grains
-  [/bread|loaf/i,                      "🍞"],
-  [/croissant/i,                       "🥐"],
-  [/baguette/i,                        "🥖"],
-  [/pasta|spaghetti|fettuccine|penne|noodle|linguine/i, "🍝"],
-  [/rice/i,                            "🍚"],
-  [/flour|wheat/i,                     "🌾"],
-  [/oat/i,                             "🌾"],
-
-  // Herbs & spices
-  [/basil|parsley|cilantro|coriander|dill|mint|thyme|rosemary|oregano|herb/i, "🌿"],
+  // Pantry & Grains
+  [/flour|wheat|baking powder|baking soda/i, "🌾"],
+  [/sugar|maple syrup/i,               "🍬"],
+  [/honey/i,                           "🍯"],
   [/salt/i,                            "🧂"],
   [/pepper\b/i,                        "🌶️"],
-  [/ginger/i,                          "🫚"],
-  [/cinnamon|nutmeg|cumin|turmeric|paprika|spice/i, "🫙"],
-
-  // Condiments & liquids
-  [/olive oil|oil/i,                   "🫒"],
-  [/vinegar/i,                         "🍶"],
+  [/olive oil|oil|vegetable oil/i,     "🫒"],
+  [/vinegar|balsamic/i,                "🍶"],
   [/soy sauce|sauce/i,                 "🥢"],
-  [/honey/i,                           "🍯"],
-  [/sugar/i,                           "🍬"],
+  [/broth|stock/i,                     "🍲"],
   [/chocolate|cocoa/i,                 "🍫"],
   [/vanilla/i,                         "🌿"],
   [/wine/i,                            "🍷"],
-  [/broth|stock/i,                     "🍲"],
+  [/rice|quinoa/i,                     "🍚"],
+  [/pasta|spaghetti|fettuccine|penne|noodle|linguine/i, "🍝"],
+  [/bread|loaf|toast/i,                "🍞"],
+  [/baguette/i,                        "🥖"],
+  [/croissant/i,                       "🥐"],
+  [/oat/i,                             "🌾"],
+  [/cinnamon|nutmeg|cumin|turmeric|paprika|spice/i, "🫙"],
+  [/basil|parsley|cilantro|coriander|dill|mint|thyme|rosemary|oregano|herb/i, "🌿"],
+
+  // Nuts & seeds
+  [/almond|walnut|pecan|cashew|pistachio|hazelnut|peanut|nut/i, "🥜"],
+  [/sesame|sunflower seed|pumpkin seed|seed/i, "🌰"],
 
   // Beverages
   [/soda|pop|cola|sprite|fanta|coke/i,  "🥤"],
   [/juice/i,                            "🧃"],
-  [/beer|ale|lager|ipa/i,              "🍺"],
+  [/beer|ale|lager|ipa/i,               "🍺"],
   [/coffee|espresso/i,                  "☕"],
   [/tea\b/i,                            "🍵"],
   [/water/i,                            "💧"],
@@ -107,11 +108,6 @@ const EMOJI_MAP: Array<[RegExp, string]> = [
   [/ice cream|gelato/i,                 "🍦"],
   [/candy/i,                            "🍭"],
   [/popcorn/i,                          "🍿"],
-  [/tofu|tempeh/i,                      "🧈"],
-
-  // Nuts & seeds
-  [/almond|walnut|pecan|cashew|pistachio|hazelnut|nut/i, "🥜"],
-  [/sesame|sunflower seed|pumpkin seed|seed/i, "🌰"],
 ];
 
 export function getIngredientEmoji(name: string): string {
@@ -125,15 +121,15 @@ export function getIngredientEmoji(name: string): string {
 // Ordered by cooking logic: proteins → produce → pantry → fun stuff
 // Within each category: most common first
 export const PICKER_CATEGORIES = [
-  { label: "🍗 Meat & Poultry",          color: "bg-rose-50",    emojis: ["🍗","🥩","🍖","🥓","🌭","🦃"] },
-  { label: "🐟 Seafood",                 color: "bg-cyan-50",    emojis: ["🐟","🦐","🍤","🍣","🦀","🦞","🦑","🦪","🐙","🍥"] },
-  { label: "🥚 Dairy & Eggs",            color: "bg-amber-50",   emojis: ["🥚","🧀","🧈","🥛","🍳"] },
-  { label: "🧅 Vegetables",              color: "bg-green-50",   emojis: ["🧅","🧄","🍅","🥔","🥕","🌽","🥦","🥬","🥒","🫑","🍆","🥑","🍄","🫛","🫘","🎃","🥗","🌱"] },
-  { label: "🍋 Fruit",                   color: "bg-red-50",     emojis: ["🍋","🍎","🍏","🍊","🍌","🍓","🫐","🍇","🍑","🥝","🥭","🍍","🍉","🍒","🍐","🍈","🥥"] },
-  { label: "🍞 Bread & Grains",          color: "bg-yellow-50",  emojis: ["🍞","🥖","🍝","🍜","🍚","🌾","🥐","🫓","🥨","🧇","🥞","🥣"] },
-  { label: "🧂 Herbs, Spices & Sauces",  color: "bg-emerald-50", emojis: ["🧂","🌿","🌶️","🫚","🫙","🫒","🍯","🥫","🍲","🍶","🫕","🥢"] },
-  { label: "🥜 Nuts, Seeds & Legumes",   color: "bg-orange-50",  emojis: ["🥜","🌰","🫘","🫛","🥥","🍠","🧆","🌻"] },
-  { label: "🍕 Prepared Foods",          color: "bg-purple-50",  emojis: ["🍕","🌮","🌯","🥪","🥟","🍱","🫔","🍛","🍜","🍣"] },
+  { label: "🍗 Proteins",               color: "bg-rose-50",    emojis: ["🍗","🥩","🍖","🥓","🌭","🦃","🥚","🧊"] },
+  { label: "🐟 Seafood",                color: "bg-cyan-50",    emojis: ["🐟","🦐","🍤","🍣","🦀","🦞","🦑","🦪","🐙","🍥"] },
+  { label: "🧀 Dairy",                  color: "bg-amber-50",   emojis: ["🧀","🧈","🥛","🍳"] },
+  { label: "🧅 Vegetables",             color: "bg-green-50",   emojis: ["🧅","🧄","🍅","🥔","🥕","🌽","🥦","🥬","🥒","🫑","🍆","🥑","🍄","🫛","🫘","🎃","🥗","🌱"] },
+  { label: "🍋 Fruit",                  color: "bg-red-50",     emojis: ["🍋","🍎","🍏","🍊","🍌","🍓","🫐","🍇","🍑","🥝","🥭","🍍","🍉","🍒","🍐","🍈","🥥"] },
+  { label: "🍞 Pantry & Baking",        color: "bg-yellow-50",  emojis: ["🍞","🥖","🌾","🍝","🍚","🧂","🌶️","🫚","🫙","🫒","🍯","🍬","🍫","🍷","🍲","🥐","🫓","🥨"] },
+  { label: "🌿 Herbs & Aromatics",      color: "bg-emerald-50", emojis: ["🌿","🧄","🧅","🫚","🌶️","🫙","🥢","🍶","🫕"] },
+  { label: "🥜 Nuts, Seeds & Legumes",  color: "bg-orange-50",  emojis: ["🥜","🌰","🫘","🫛","🥥","🍠","🧆","🌻"] },
+  { label: "🍕 Prepared Foods",         color: "bg-purple-50",  emojis: ["🍕","🌮","🌯","🥪","🥟","🍱","🫔","🍛","🍜","🍣"] },
   { label: "🍰 Sweets & Baking",        color: "bg-pink-50",    emojis: ["🍫","🍬","🥧","🎂","🧁","🍪","🍩","🍦","🍭","🍿","🍮"] },
-  { label: "☕ Beverages",               color: "bg-sky-50",     emojis: ["💧","☕","🍵","🥛","🧃","🥤","🍺","🍻","🍷","🍸","🥃","🍹","🍾","🥂","🧋","🫖","🧉"] },
+  { label: "☕ Beverages",              color: "bg-sky-50",     emojis: ["💧","☕","🍵","🥛","🧃","🥤","🍺","🍻","🍷","🍸","🥃","🍹","🍾","🥂","🧋","🫖","🧉"] },
 ];

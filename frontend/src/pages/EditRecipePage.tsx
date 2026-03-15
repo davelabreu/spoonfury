@@ -125,8 +125,34 @@ export function EditRecipePage() {
             />
             <input className="border rounded px-2 py-1 text-xs w-14" value={ing.quantity}
               onChange={e => updateIngredient(i, "quantity", e.target.value)} placeholder="Qty" />
-            <input className="border rounded px-2 py-1 text-xs w-14" value={ing.unit}
-              onChange={e => updateIngredient(i, "unit", e.target.value)} placeholder="Unit" />
+            <select className="border rounded px-2 py-1 text-xs w-20 bg-white" value={ing.unit}
+              onChange={e => updateIngredient(i, "unit", e.target.value)}>
+              <option value="">— unit</option>
+              <optgroup label="Volume">
+                <option>tsp</option>
+                <option>tbsp</option>
+                <option>cup</option>
+                <option>fl oz</option>
+                <option>ml</option>
+                <option>L</option>
+              </optgroup>
+              <optgroup label="Weight">
+                <option>g</option>
+                <option>kg</option>
+                <option>oz</option>
+                <option>lb</option>
+              </optgroup>
+              <optgroup label="Cooking">
+                <option>pinch</option>
+                <option>clove</option>
+                <option>slice</option>
+                <option>sprig</option>
+                <option>bunch</option>
+                <option>head</option>
+                <option>can</option>
+                <option>pkg</option>
+              </optgroup>
+            </select>
             <input className="border rounded px-2 py-1 text-xs flex-1" value={ing.name}
               onChange={e => updateIngredient(i, "name", e.target.value)} placeholder="Name" />
             <input className="border rounded px-2 py-1 text-xs w-24" value={ing.note}
