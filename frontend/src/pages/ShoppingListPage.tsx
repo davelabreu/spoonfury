@@ -355,7 +355,7 @@ export function ShoppingListPage() {
               href={buildInstacartUrl(uncheckedAll, "pickup")}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 relative overflow-hidden flex items-center justify-center gap-2 py-3.5 rounded-xl bg-green-600 text-white font-semibold text-sm whitespace-nowrap before:absolute before:inset-0 before:rounded-[inherit] before:bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:transition-[background-position_0s_ease] before:duration-1000 hover:before:bg-[position:-100%_0,0_0]"
+              className="flex-1 relative overflow-hidden flex items-center justify-center gap-2 py-3.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm whitespace-nowrap before:absolute before:inset-0 before:rounded-[inherit] before:bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:transition-[background-position_0s_ease] before:duration-1000 hover:before:bg-[position:-100%_0,0_0]"
             >
               🚗 Pickup · {uncheckedAll.length}
             </a>
@@ -363,7 +363,7 @@ export function ShoppingListPage() {
               href={buildInstacartUrl(uncheckedAll, "delivery")}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-green-700 via-green-500/80 to-green-700 [background-size:200%_auto] text-white font-semibold text-sm hover:[background-position:99%_center] transition-[background-position] duration-500"
+              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500/80 to-amber-600 [background-size:200%_auto] text-white font-semibold text-sm hover:[background-position:99%_center] transition-[background-position] duration-500"
             >
               🏠 Delivery
             </a>
