@@ -175,7 +175,7 @@ export function ShoppingListPage() {
     );
   }
 
-  // ── ItemRow (Aisle style: 4xl emoji bubble, vertical text stack) ──────────
+  // ── ItemRow ───────────────────────────────────────────────────────────────
   function ItemRow({ item, multiplier = 1 }: { item: ShoppingItem; multiplier?: number }) {
     const rowRef = useRef<HTMLDivElement>(null);
     const startX = useRef(0);
@@ -262,9 +262,10 @@ export function ShoppingListPage() {
       );
     }
 
+    // Emoji tile stays full-opacity; only the text dims when checked
     const label = (
-      <div className={`flex flex-col min-w-0 ${item.is_checked ? "opacity-70" : ""}`}>
-        <span className={`text-sm font-medium leading-tight ${item.is_checked ? "line-through text-muted-foreground" : ""}`}>
+      <div className="flex flex-col min-w-0">
+        <span className={`text-sm font-medium leading-tight ${item.is_checked ? "line-through text-muted-foreground opacity-60" : ""}`}>
           {qty && <span>{qty}{item.unit ? ` ${item.unit}` : ""} </span>}{titleCase(item.name)}
         </span>
         {item.note && <span className="text-xs text-muted-foreground mt-0.5">{item.note}</span>}
@@ -272,8 +273,13 @@ export function ShoppingListPage() {
     );
 
     return (
-      <div ref={rowRef} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
-        className={`flex items-center gap-3 py-2 px-1 ${item.is_checked ? "opacity-50" : ""}`}>
+      <div
+        ref={rowRef}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        className="flex items-center gap-3 py-2 px-1"
+      >
         <input
           type="checkbox"
           checked={item.is_checked}
@@ -281,7 +287,7 @@ export function ShoppingListPage() {
           className="w-4 h-4 rounded accent-indigo-500 cursor-pointer shrink-0"
           aria-label={`Mark ${item.name} as picked up`}
         />
-        <div className="w-14 h-14 flex items-center justify-center text-4xl shrink-0 bg-muted/50 rounded-2xl select-none">
+        <div className={`w-10 h-10 flex items-center justify-center text-2xl shrink-0 rounded-2xl select-none transition-colors ${item.is_checked ? "bg-muted/30" : "bg-muted/50"}`}>
           {emoji || "🛒"}
         </div>
         <WithTooltip>{label}</WithTooltip>
@@ -328,6 +334,7 @@ export function ShoppingListPage() {
   );
 
   const isEmpty = data.total_items === 0;
+  const groups = data.items_by_recipe;
 
   return (
     <div className="max-w-2xl mx-auto w-full min-h-full space-y-4 flex flex-col">
@@ -340,15 +347,24 @@ export function ShoppingListPage() {
         )}
       </div>
 
+      {/* ── Instacart checkout buttons ── */}
       {!isEmpty && uncheckedAll.length > 0 && (
         <div className="space-y-1.5">
           <div className="flex gap-2">
-            <a href={buildInstacartUrl(uncheckedAll, "pickup")} target="_blank" rel="noopener noreferrer"
-              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold text-sm transition-colors whitespace-nowrap">
+            <a
+              href={buildInstacartUrl(uncheckedAll, "pickup")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 relative overflow-hidden flex items-center justify-center gap-2 py-3.5 rounded-xl bg-green-600 text-white font-semibold text-sm whitespace-nowrap before:absolute before:inset-0 before:rounded-[inherit] before:bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:transition-[background-position_0s_ease] before:duration-1000 hover:before:bg-[position:-100%_0,0_0]"
+            >
               🚗 Pickup · {uncheckedAll.length}
             </a>
-            <a href={buildInstacartUrl(uncheckedAll, "delivery")} target="_blank" rel="noopener noreferrer"
-              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-green-600 text-green-700 hover:bg-green-50 font-semibold text-sm transition-colors">
+            <a
+              href={buildInstacartUrl(uncheckedAll, "delivery")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-green-700 via-green-500/80 to-green-700 [background-size:200%_auto] text-white font-semibold text-sm hover:[background-position:99%_center] transition-[background-position] duration-500"
+            >
               🏠 Delivery
             </a>
           </div>
@@ -378,11 +394,13 @@ export function ShoppingListPage() {
 
             {view === "recipe" ? (
               <div className="space-y-6">
-                {data.items_by_recipe.map(group => (
+                {groups.map((group, idx) => (
                   <div key={group.recipe_slug} className="space-y-1">
                     <div className="flex items-center justify-between gap-3 mb-3">
-                      <Link to={`/recipes/${group.recipe_slug}`}
-                        className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground bg-muted px-3 py-1.5 rounded-full hover:bg-muted/80 transition-colors">
+                      <Link
+                        to={`/recipes/${group.recipe_slug}`}
+                        className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground bg-muted px-3 py-1.5 rounded-full hover:bg-muted/80 transition-colors"
+                      >
                         {group.recipe_title}
                       </Link>
                       <MultiplierWidget group={group} />
@@ -390,7 +408,7 @@ export function ShoppingListPage() {
                     <div className="space-y-1">
                       {group.items.map(item => <ItemRow key={item.id} item={item} multiplier={group.multiplier} />)}
                     </div>
-                    <Separator className="mt-4" />
+                    {idx < groups.length - 1 && <Separator className="mt-4" />}
                   </div>
                 ))}
               </div>
