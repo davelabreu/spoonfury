@@ -20,6 +20,6 @@ Gemini CLI uses different tool names than Claude Code. See `references/codex-too
 
 Claude Code uses a `Skill` tool to invoke workflow skills (brainstorming, TDD, debugging, etc.). In Gemini CLI, skills activate via the `activate_skill` tool. The skill content and workflows are the same — only the invocation mechanism differs.
 
-### shadcn/studio MCP
+### MCP Server Usage
 
-Same instructions as in `CLAUDE.md`. The `components.json` is at `frontend/components.json`.
+This project uses several MCP servers (shadcn, context7, postgresPRO) to enhance AI development. See the **MCP Server Usage** section in `CLAUDE.md` for full details on their roles and workflows.

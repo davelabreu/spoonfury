@@ -122,19 +122,24 @@ cd .worktrees/<branch>/backend
 ../../.venv/Scripts/python manage.py runserver
 ```
 
-## shadcn/studio MCP Instructions
+## MCP Server Usage
 
-When using the shadcn/studio MCP Server (`/cui`, `/rui`, `/iui`, `/ftc` commands), follow all instructions precisely:
+This project leverages Model Context Protocol (MCP) servers to enhance AI-assisted development. These servers bridge the AI with real-time documentation, specialized UI tools, and database internals.
 
-- Follow each step of the workflow immediately after completing the previous one
-- Complete the ENTIRE workflow without stopping for user confirmation
-- Never bypass steps or make additional tool calls not required by the workflow
-- **`/cui` (create-ui)**: COLLECT all blocks first, THEN install — never install prematurely; always customize content after installation
-- **`/rui` (refine-ui)**: Update existing components per user requirements
-- **`/iui` (inspiration-ui)**: Use inspiration tools as outlined (Pro)
-- **`/ftc` (figma-to-code)**: Convert Figma designs to code using the figma-to-code workflow
+- **shadcn/studio MCP**: Used for AI-powered UI generation and customization.
+  - **Why**: Allows using commands like `/cui` (create-ui), `/rui` (refine-ui), and `/ftc` (figma-to-code) to rapidly build and iterate on shadcn/ui components using premium registries.
+  - **Config**: Registry auth is configured in `frontend/components.json` using environment variables.
+- **context7 (Upstash)**: Provides real-time, version-specific documentation for libraries.
+  - **Why**: Eliminates "knowledge cutoff" hallucinations by fetching live docs for modern frameworks (Next.js, Tailwind 4, etc.).
+- **postgresPRO (Crystal DBA)**: Advanced PostgreSQL management and tuning.
+  - **Why**: Enables the AI to analyze query plans, suggest index optimizations, and perform database health checks directly within the session.
 
-The `components.json` for this project is at `frontend/components.json`. The `@ss-components`, `@ss-themes`, and `@ss-blocks` registries are already configured pointing to `shadcnstudio.com`.
+### shadcn/studio Workflow
+
+When using the shadcn/studio MCP Server, follow these guidelines:
+- **`/cui` (create-ui)**: COLLECT all blocks first, THEN install — never install prematurely; always customize content after installation.
+- **`/rui` (refine-ui)**: Update existing components per user requirements.
+- **`/ftc` (figma-to-code)**: Convert Figma designs to code using the figma-to-code workflow.
 
 ## Design Docs
 
