@@ -252,29 +252,28 @@ export function ShoppingListPage() {
       </div>
     ) : null;
 
-    function WithTooltip({ children }: { children: React.ReactNode }) {
-      if (!info) return <div className="flex-1">{children}</div>;
-      return (
-        <div className="flex-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div tabIndex={0} className="cursor-default outline-none inline-flex">{children}</div>
-            </TooltipTrigger>
-            <TooltipContent side="right" sideOffset={14} className={TOOLTIP_CONTENT_CLASS}>
-              {tooltipInner}
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      );
-    }
+    // Emoji tile + text label — both wrapped in a single tooltip trigger
+    // so hovering over either shows the ingredient info popup.
+    const emojiTile = (
+      <div className={`w-8 h-8 flex items-center justify-center text-xl shrink-0 rounded-xl select-none transition-colors ${item.is_checked ? "bg-muted/30" : "bg-muted/50"}`}>
+        {emoji || "🛒"}
+      </div>
+    );
 
-    // Emoji tile stays full-opacity; only the text dims when checked
     const label = (
       <div className="flex flex-col min-w-0">
         <span className={`text-sm font-medium leading-tight ${item.is_checked ? "line-through text-muted-foreground opacity-60" : ""}`}>
           {qty && <span>{qty}{item.unit ? ` ${item.unit}` : ""} </span>}{titleCase(item.name)}
         </span>
         {item.note && <span className="text-xs text-muted-foreground mt-0.5">{item.note}</span>}
+      </div>
+    );
+
+    // Combines emoji tile + label into a single tooltip-triggerable unit
+    const emojiAndLabel = (
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        {emojiTile}
+        {label}
       </div>
     );
 
@@ -293,10 +292,16 @@ export function ShoppingListPage() {
           className="w-4 h-4 rounded accent-indigo-500 cursor-pointer shrink-0"
           aria-label={`Mark ${item.name} as picked up`}
         />
-        <div className={`w-8 h-8 flex items-center justify-center text-lg shrink-0 rounded-xl select-none transition-colors ${item.is_checked ? "bg-muted/30" : "bg-muted/50"}`}>
-          {emoji || "🛒"}
-        </div>
-        <WithTooltip>{label}</WithTooltip>
+        {info ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div tabIndex={0} className="cursor-default outline-none flex-1 min-w-0">{emojiAndLabel}</div>
+            </TooltipTrigger>
+            <TooltipContent side="right" sideOffset={14} className={TOOLTIP_CONTENT_CLASS}>
+              {tooltipInner}
+            </TooltipContent>
+          </Tooltip>
+        ) : emojiAndLabel}
         <button
           type="button"
           onClick={() => deleteItem(item)}
