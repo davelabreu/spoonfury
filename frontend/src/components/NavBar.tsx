@@ -1,12 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
-import { Menu, X, Utensils, ShoppingCart } from "lucide-react";
+import { Menu, X, Utensils, ShoppingCart, BookOpen, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useNavTheme } from "@/hooks/useNavTheme";
 import { api } from "@/lib/api";
 import { buildInstacartUrl } from "@/lib/instacart";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { Ingredient } from "@/types";
 
 const STICKERS = [
@@ -131,18 +138,46 @@ function NavSticker({ label, to, color, icon: Icon, isSpecial, isActive, onClick
   );
 }
 
-function UsernameBadge({ username, className }: { username: string; className?: string }) {
-  return (
+/** UsernameBadge — the purple pill in the nav bar.
+ *  When `onSignOut` is provided, wraps itself in a DropdownMenu with
+ *  "My Books" and "Sign out" options. Otherwise renders as a plain badge. */
+function UsernameBadge({ username, className, onSignOut }: { username: string; className?: string; onSignOut?: () => void }) {
+  const navigate = useNavigate();
+
+  const badge = (
     <div
       className={`
-        inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-black 
-        bg-[#E9D8FD] text-[10px] font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] 
+        inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-black
+        bg-[#E9D8FD] text-[10px] font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+        ${onSignOut ? "cursor-pointer hover:bg-[#D6BCFA] transition-colors" : ""}
         ${className || ""}
       `}
     >
       <span className="text-sm leading-none">👨‍🍳</span>
       <span className="leading-none">@{username}</span>
     </div>
+  );
+
+  // If no sign-out handler, just render the badge (e.g. in mobile drawer)
+  if (!onSignOut) return badge;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        {badge}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-44">
+        <DropdownMenuItem onClick={() => navigate("/books")} className="gap-2 cursor-pointer">
+          <BookOpen className="w-4 h-4" />
+          My Books
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={onSignOut} className="gap-2 cursor-pointer text-red-500 focus:text-red-500">
+          <LogOut className="w-4 h-4" />
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -432,16 +467,7 @@ function MinimalNav({
             <div className="flex items-center gap-3 shrink-0">
               {username && <CartCapsule count={cartCount} items={cartItems} />}
               {username ? (
-                <>
-                  <UsernameBadge username={username} />
-                  <button
-                    type="button"
-                    onClick={onSignOut}
-                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Sign out
-                  </button>
-                </>
+                <UsernameBadge username={username} onSignOut={onSignOut} />
               ) : (
                 <>
                   <Link to="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -506,7 +532,7 @@ function MinimalNav({
                   <button
                     type="button"
                     onClick={() => { onSignOut(); setMobileOpen(false); }}
-                    className="px-4 py-3 text-base font-semibold rounded-lg text-left hover:bg-muted/50 transition-colors"
+                    className="px-4 py-3 text-base font-semibold rounded-lg text-left text-red-500 hover:bg-muted/50 transition-colors"
                   >
                     Sign out
                   </button>
@@ -719,13 +745,8 @@ export function NavBar() {
               {username ? (
                 <div className="flex items-end gap-3 h-full">
                   <div className="mb-3.5">
-                    <UsernameBadge username={username} />
+                    <UsernameBadge username={username} onSignOut={handleSignOut} />
                   </div>
-                  <NavSticker
-                    label="Sign out"
-                    color="bg-white"
-                    onClick={handleSignOut}
-                  />
                 </div>
               ) : (
                 <div className="flex items-end gap-3 h-full">

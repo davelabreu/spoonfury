@@ -58,6 +58,22 @@ Replace the flat `category` field with three filtering dimensions:
 
 Current `category` (pasta, salad, etc.) may become a sub-category or "cuisine type."
 
+## User Menu & Account Hub
+
+The username badge (top-right) should be the entry point for a user dropdown menu.
+Currently sign-out is buried. Long-term this becomes the account hub.
+
+**MVP (done):** Dropdown with "My Books" link and "Sign out".
+
+**Future items for the menu:**
+- Account management (display name, avatar, password, linked OAuth accounts)
+- My Forked Recipes (filtered view where `parent_recipe_slug` is non-null)
+- Test Kitchen (private drafts — depends on test-kitchen feature branch)
+- Comments / Activity (social features — needs its own brainstorm)
+- Settings (nav theme, preferences)
+
+**Implementation:** Shadcn `DropdownMenu` anchored to the username badge in NavBar.
+
 ## Cook Mode: Sticky Ingredients
 
 When Cook Now mode is active, ingredients should follow the user while scrolling
