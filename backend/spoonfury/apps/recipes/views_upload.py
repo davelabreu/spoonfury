@@ -28,5 +28,5 @@ def upload_recipe_image(request):
         for chunk in file.chunks():
             f.write(chunk)
 
-    url = request.build_absolute_uri(f"{settings.MEDIA_URL}{filename}")
+    url = f"{settings.MEDIA_URL}{filename}"
     return Response({"url": url})
