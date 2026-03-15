@@ -66,7 +66,7 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -4 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-200 rounded-2xl shadow-2xl p-3 w-[min(460px,90vw)]"
+            className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-200 rounded-2xl shadow-2xl p-3 w-[min(90vw,calc(100vw-4rem))] max-w-4xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-2">
@@ -81,7 +81,7 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
             </div>
 
             {/* Categories — 2-col on desktop, 1-col on mobile */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
               {PICKER_CATEGORIES.map(cat => (
                 <div key={cat.label} className={`rounded-lg px-2.5 py-1.5 ${cat.color}`}>
                   <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500">{cat.label}</span>
@@ -91,7 +91,7 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
                         key={emoji}
                         type="button"
                         onClick={() => pick(emoji)}
-                        className={`text-xl w-8 h-8 flex items-center justify-center rounded-md
+                        className={`text-2xl w-9 h-9 flex items-center justify-center rounded-md
                           hover:scale-[1.35] hover:shadow-md hover:-translate-y-0.5
                           active:scale-110
                           transition-all duration-150
