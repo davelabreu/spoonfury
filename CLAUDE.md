@@ -14,10 +14,11 @@ This is the canonical project context for Spoonfury. All AI agents should read t
 
 Spoonfury — a recipe-first social platform. Core mechanic: fork a recipe, make it yours, build curated digital recipe books.
 
-**Status**: Prototype v0.4.2 — Ingredient emoji system (auto-guess, picker, tooltips with health info), CartCapsule nav pill, persistent in-list badge, Shopping List feedback polish, and all v0.4 features (Shopping List, Buy it NOW! / Instacart, Cook Now / Wake Lock, NavBar theme toggle) and all v0.3 features (Stir the Pot, Sharing, fork-to-book loop, ownership security).
+**Status**: Prototype v0.4.3 — Recipe images (upload + URL paste, hero with category fallback, image-forward RecipeCards, shopping list thumbnails), B1 recipe page layout (title above image, fused action strip), and all prior features.
 
 **Active worktrees**:
 - `.worktrees/test-kitchen` — test kitchen / recipe privacy feature
+- `.worktrees/v0.4.3-recipe-images` — recipe images feature branch
 
 **Stack**: Django 5 + DRF + PostgreSQL | React 19 + Vite + Tailwind 4 + Shadcn UI + Framer Motion
 
@@ -56,10 +57,16 @@ npm run dev
 
 - **Recipe Data**: Blank ingredient rows (empty `name`) must be filtered before API submission and during rendering.
 - **Forking**: "Fork" creates a copy and saves it to a selected book. No ingredient editing during the fork step.
-- **Action Bar**: Compact header area for recipe actions (Edit, Fork, Share, Delete).
-  - **Styling**: `bg-indigo-50/50`, `border-indigo-100/50`, `px-4 py-2.5`.
+- **Recipe Page Layout (B1)**: Title/author/fork-badge sit **above** the hero image. The hero image and action strip are fused into one visual unit with shared `rounded-2xl` border-radius (image gets top corners, action strip gets bottom corners, wrapped in `overflow-hidden`).
+- **Action Bar**: Indigo action strip fused to the bottom of the hero image.
+  - **Styling**: `bg-indigo-50`, `border-t border-indigo-100/50`, `px-4 py-2.5`.
   - **Visibility**: Shown to all users (Share always visible). Auth-gated actions appear based on role.
   - **Owner Actions**: Labeled `Owner Actions` in small caps.
+- **Recipe Images**: Recipes can have a hero photo via file upload or URL paste.
+  - **ImageUploadField**: Unified drop zone (drag-and-drop + click-to-browse) with secondary URL paste toggle. States: idle → dragover → uploading → preview → error.
+  - **Hero Fallback**: When no image exists (or image URL is broken), shows a category emoji on a gradient background via `getCategoryFallback()`. Owners see an "Add a photo" overlay linking to the edit page.
+  - **RecipeCard**: Compact horizontal card on the home page — thumbnail left, text right. Uses the same image/fallback pattern. Fork badge shows "Forked X times".
+  - **Shopping List Thumbnails**: Recipe group headers include a small circular thumbnail (image or category fallback with `onError` handling).
 - **NavBar**: "Fridge Sticker" / "Cookbook Tab" aesthetic. Uses `NavSticker` component with `tab` (desktop) and `button` (mobile) variants. Bottom edges anchored to nav border via dynamic `clip-path`. Supports two themes (`fridge-sticker` / `minimal`) stored in localStorage.
 - **Logo**: Spoon emoji features a "Pro" fire effect using an SVG gooey filter (`#goo`) and screen blend mode on hover.
 - **Modal Pattern**: `ForkModal` and `ShareModal` use `backdrop-blur-[2px]`, `bg-black/30` overlay, solid `bg-white` card.
@@ -78,15 +85,20 @@ npm run dev
 | `backend/spoonfury/apps/recipes/views.py` | `RecipeViewSet` — ownership, fork action |
 | `backend/spoonfury/apps/books/views.py` | Book management, add/remove recipe actions |
 | `backend/spoonfury/apps/shopping/views.py` | Shopping list add, clear, status endpoints |
-| `frontend/src/pages/RecipePage.tsx` | Main recipe UI — action bar, checklist, modals |
+| `frontend/src/pages/RecipePage.tsx` | Main recipe UI — B1 layout, fused hero+actions, checklist, modals |
 | `frontend/src/components/IngredientChecklist.tsx` | Shopping list add + Buy Now buttons + in-list badge + emoji tooltips |
 | `frontend/src/components/IngredientEmojiPicker.tsx` | Categorized emoji picker for create/edit recipe pages |
 | `frontend/src/lib/ingredientEmoji.ts` | Auto-emoji matching (regex → emoji) + picker categories |
 | `frontend/src/lib/ingredientInfo.ts` | Ingredient tooltips — description, nutrition, cooking tips |
 | `frontend/src/components/NavBar.tsx` | NavBar, CartCapsule, useShoppingData, SHOPPING_LIST_UPDATED |
+| `frontend/src/components/ImageUploadField.tsx` | Unified image upload (drop zone + URL paste) for create/edit pages |
+| `frontend/src/components/RecipeCard.tsx` | Compact horizontal recipe card with image thumbnail + fallback |
+| `frontend/src/lib/categoryFallback.ts` | Maps recipe categories → emoji + Tailwind gradient (shared fallback) |
 | `frontend/src/lib/api.ts` | Typed API utility (all HTTP calls go through here) |
 | `frontend/src/index.css` | Global styles, Tailwind plugins |
+| `backend/spoonfury/apps/recipes/views_upload.py` | `POST /api/recipes/upload-image/` — file upload endpoint |
 | `docs/context-scopes/core-flow.md` | Fork lineage + book association data model |
+| `docs/api-reference.md` | REST API reference for all endpoints |
 
 ## Git & Environment
 
@@ -135,3 +147,4 @@ The `components.json` for this project is at `frontend/components.json`. The `@s
 | v0.4 Shopping List | `docs/plans/2026-02-27-v0.4-shopping-list-design.md` |
 | v0.4 Shopping Feedback | `docs/plans/2026-03-08-shopping-list-feedback-design.md` |
 | v0.4.1 CartCapsule Nav | `docs/superpowers/specs/2026-03-14-cart-capsule-nav-design.md` |
+| v0.4.3 Recipe Images | `docs/superpowers/specs/2026-03-15-recipe-images-design.md` |
