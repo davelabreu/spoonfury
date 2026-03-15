@@ -125,46 +125,8 @@ export function RecipePage() {
         </Button>
       </div>
 
-      {/* Hero image — always rendered. Shows the actual image, or a category
-          placeholder with an "Add a photo" prompt for owners. This prevents
-          layout shift and encourages photo uploads. */}
-      <div className="rounded-2xl overflow-hidden shadow-md aspect-video w-full relative">
-        {recipe.image_url && !heroImgError ? (
-          <img
-            src={recipe.image_url}
-            alt={recipe.title}
-            className="w-full h-full object-cover"
-            onError={() => setHeroImgError(true)}
-          />
-        ) : (
-          /* Category placeholder — emoji on gradient background */
-          (() => {
-            const heroFallback = getCategoryFallback(recipe.category);
-            return (
-              <div
-                className={`w-full h-full bg-gradient-to-br ${heroFallback.gradient} flex items-center justify-center`}
-              >
-                <span className="text-6xl sm:text-7xl drop-shadow-md">
-                  {heroFallback.emoji}
-                </span>
-              </div>
-            );
-          })()
-        )}
-
-        {/* Owner prompt: "Add a photo" overlay — only shown on the placeholder */}
-        {isOwner && (!recipe.image_url || heroImgError) && (
-          <Link
-            to={`/recipes/${slug}/edit`}
-            className="absolute bottom-0 inset-x-0 bg-black/40 backdrop-blur-sm text-white px-4 py-2.5 flex items-center gap-2 text-sm font-medium hover:bg-black/50 transition-colors"
-          >
-            <Camera className="w-4 h-4" />
-            Add a photo to your recipe
-          </Link>
-        )}
-      </div>
-
-      {/* Header */}
+      {/* Header — title, author, and fork badge sit ABOVE the hero image
+          so the recipe identity is visible before scrolling past the photo. */}
       <div>
         <div className="flex items-start justify-between gap-4">
           <h1 className="text-3xl font-bold leading-tight">{recipe.title}</h1>
@@ -181,7 +143,7 @@ export function RecipePage() {
         <p className="text-sm text-muted-foreground mt-1">
           by @{recipe.author_username}
         </p>
-        
+
         {recipe.fork_count > 0 && (
           <div className="mt-2">
             <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
@@ -189,9 +151,53 @@ export function RecipePage() {
             </Badge>
           </div>
         )}
+      </div>
 
-        {/* Action bar — visible to all, contents depend on role/auth */}
-        <div className="flex flex-wrap items-center gap-3 mt-4 px-4 py-2.5 bg-indigo-50/50 rounded-lg border border-indigo-100/50">
+      {/* Hero image + attached action strip (B1 layout).
+          The image gets top border-radius, the action strip gets bottom border-radius,
+          forming one fused visual unit. Shadow wraps the whole group. */}
+      <div className="shadow-md rounded-2xl overflow-hidden">
+        {/* Hero image — top half of the fused unit */}
+        <div className="aspect-video w-full relative">
+          {recipe.image_url && !heroImgError ? (
+            <img
+              src={recipe.image_url}
+              alt={recipe.title}
+              className="w-full h-full object-cover"
+              onError={() => setHeroImgError(true)}
+            />
+          ) : (
+            /* Category placeholder — emoji on gradient background when no image exists */
+            (() => {
+              const heroFallback = getCategoryFallback(recipe.category);
+              return (
+                <div
+                  className={`w-full h-full bg-gradient-to-br ${heroFallback.gradient} flex items-center justify-center`}
+                >
+                  <span className="text-6xl sm:text-7xl drop-shadow-md">
+                    {heroFallback.emoji}
+                  </span>
+                </div>
+              );
+            })()
+          )}
+
+          {/* Owner prompt: "Add a photo" overlay — only shown on the placeholder */}
+          {isOwner && (!recipe.image_url || heroImgError) && (
+            <Link
+              to={`/recipes/${slug}/edit`}
+              className="absolute bottom-0 inset-x-0 bg-black/40 backdrop-blur-sm text-white px-4 py-2.5 flex items-center gap-2 text-sm font-medium hover:bg-black/50 transition-colors"
+            >
+              <Camera className="w-4 h-4" />
+              Add a photo to your recipe
+            </Link>
+          )}
+        </div>
+
+        {/* Action strip — bottom half of the fused unit, visually attached to image.
+            Uses indigo tint to match Spoonfury's action bar style.
+            Contents change based on whether the viewer is the recipe owner. */}
+        <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 bg-indigo-50 border-t border-indigo-100/50">
           {isOwner ? (
             <div className="flex flex-col gap-1 w-full">
               <span className="text-[10px] uppercase font-bold text-indigo-400/80 tracking-wider">Owner Actions</span>
@@ -199,9 +205,9 @@ export function RecipePage() {
                 <Button variant="outline" size="sm" asChild className="bg-white/50 border-indigo-100">
                   <Link to={`/recipes/${slug}/edit`}>Edit recipe</Link>
                 </Button>
-                
+
                 <div className="h-4 w-px bg-indigo-200/50 mx-1" />
-                
+
                 {books.length > 0 ? (
                   <div className="flex items-center gap-2">
                     <select
