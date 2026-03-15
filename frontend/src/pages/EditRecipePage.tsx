@@ -22,6 +22,7 @@ export function EditRecipePage() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [instructions, setInstructions] = useState("");
   const [notes, setNotes] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
     if (!slug) return;
@@ -38,6 +39,7 @@ export function EditRecipePage() {
         setIngredients(r.ingredients);
         setInstructions(r.instructions);
         setNotes(r.notes || "");
+        setImageUrl(r.image_url || "");
       })
       .catch(() => setError("Failed to load recipe."))
       .finally(() => setLoading(false));
@@ -66,6 +68,7 @@ export function EditRecipePage() {
         ingredients: ingredients.filter(i => i.name.trim() !== ""),
         instructions,
         notes,
+        image_url: imageUrl,
       }, token);
       navigate(`/recipes/${slug}`);
     } catch (err: unknown) {
@@ -112,6 +115,12 @@ export function EditRecipePage() {
         value={serves}
         onChange={e => setServes(e.target.value)}
         placeholder="Serves"
+      />
+      <input
+        className="w-full border rounded px-3 py-2 text-sm"
+        value={imageUrl}
+        onChange={e => setImageUrl(e.target.value)}
+        placeholder="Photo URL (optional — paste any image link)"
       />
 
       <div>

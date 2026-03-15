@@ -13,7 +13,7 @@ export function CreateRecipePage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     title: "", description: "", serves: "",
-    instructions: "", notes: "", category: "other",
+    instructions: "", notes: "", category: "other", image_url: "",
   });
   const [ingredients, setIngredients] = useState([{ quantity: "", unit: "", name: "", note: "", emoji: "" }]);
   const [error, setError] = useState("");
@@ -55,6 +55,8 @@ export function CreateRecipePage() {
               {CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
             </select>
           </div>
+          <input className="w-full border rounded px-3 py-2 text-sm" placeholder="Photo URL (optional — paste any image link)"
+            value={form.image_url} onChange={e => setForm(f => ({ ...f, image_url: e.target.value }))} />
 
           <div>
             <h3 className="text-sm font-semibold mb-2">Ingredients</h3>

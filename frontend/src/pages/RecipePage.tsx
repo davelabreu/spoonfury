@@ -121,6 +121,17 @@ export function RecipePage() {
         </Button>
       </div>
 
+      {/* Hero image */}
+      {recipe.image_url && (
+        <div className="rounded-2xl overflow-hidden shadow-md aspect-video w-full">
+          <img
+            src={recipe.image_url}
+            alt={recipe.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
       {/* Header */}
       <div>
         <div className="flex items-start justify-between gap-4">

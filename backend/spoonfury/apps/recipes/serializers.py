@@ -20,6 +20,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = [
             "id", "slug", "title", "description", "serves",
             "ingredients", "instructions", "notes", "category",
+            "image_url",
             "author_username", "author_display_name",
             "parent_recipe_slug", "parent_recipe_title", "parent_recipe_author",
             "fork_count", "created_at",

@@ -38,6 +38,7 @@ class Recipe(models.Model):
         related_name="forks",
     )
     fork_count = models.PositiveIntegerField(default=0)
+    image_url = models.URLField(blank=True, default="")
     slug = models.SlugField(unique=True, max_length=120)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
