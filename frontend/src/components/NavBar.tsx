@@ -140,11 +140,36 @@ function NavSticker({ label, to, color, icon: Icon, isSpecial, isActive, onClick
 
 /** UsernameBadge — the purple pill in the nav bar.
  *  When `onSignOut` is provided, wraps itself in a DropdownMenu with
- *  "My Books" and "Sign out" options. Otherwise renders as a plain badge. */
-function UsernameBadge({ username, className, onSignOut }: { username: string; className?: string; onSignOut?: () => void }) {
+ *  "My Books" and "Sign out" options. Otherwise renders as a plain badge.
+ *  `variant="capsule"` renders a shimmer-gradient pill matching CartCapsule. */
+function UsernameBadge({ username, className, onSignOut, variant = "sticker" }: { username: string; className?: string; onSignOut?: () => void; variant?: "sticker" | "capsule" }) {
   const navigate = useNavigate();
+  const [hovered, setHovered] = useState(false);
 
-  const badge = (
+  const badge = variant === "capsule" ? (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        backgroundImage: "linear-gradient(270deg, #c4b5fd, #93c5fd, #86efac, #fda4af, #c4b5fd)",
+        backgroundSize: "300% 300%",
+        animation: "shimmer 8s ease infinite",
+        boxShadow: hovered ? "0 4px 14px rgba(147,197,253,0.5)" : "0 2px 8px rgba(147,197,253,0.3)",
+        padding: 2,
+        borderRadius: 9999,
+        transition: "box-shadow 0.15s ease",
+      }}
+      className={className || ""}
+    >
+      <div
+        className="inline-flex items-center gap-1.5 rounded-full bg-white transition-colors"
+        style={{ padding: "4px 12px", fontSize: 12, fontWeight: 600, lineHeight: "20px" }}
+      >
+        <span className="text-sm leading-none">👨‍🍳</span>
+        <span className="leading-none text-gray-700">@{username}</span>
+      </div>
+    </div>
+  ) : (
     <div
       className={`
         inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-black
@@ -419,7 +444,7 @@ function MinimalNav({
 
         {isMobile ? (
           <div className="ml-auto flex items-center gap-2">
-            {username && <UsernameBadge username={username} />}
+            {username && <UsernameBadge username={username} variant="capsule" />}
             <button
               type="button"
               className="p-2 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white active:translate-y-[2px] active:shadow-none transition-all"
@@ -467,7 +492,7 @@ function MinimalNav({
             <div className="flex items-center gap-3 shrink-0">
               {username && <CartCapsule count={cartCount} items={cartItems} />}
               {username ? (
-                <UsernameBadge username={username} onSignOut={onSignOut} />
+                <UsernameBadge username={username} onSignOut={onSignOut} variant="capsule" />
               ) : (
                 <>
                   <Link to="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -528,7 +553,7 @@ function MinimalNav({
               <div className="h-px bg-border my-2" />
               {username ? (
                 <>
-                  <div className="px-4 py-2"><UsernameBadge username={username} /></div>
+                  <div className="px-4 py-2"><UsernameBadge username={username} variant="capsule" /></div>
                   <button
                     type="button"
                     onClick={() => { onSignOut(); setMobileOpen(false); }}
