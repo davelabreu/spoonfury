@@ -9,7 +9,8 @@ import { Separator } from "@/components/ui/separator";
 import { IngredientChecklist } from "@/components/IngredientChecklist";
 import { ForkModal } from "@/components/ForkModal";
 import { ShareModal } from "@/components/ShareModal";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Camera } from "lucide-react";
+import { getCategoryFallback } from "@/lib/categoryFallback";
 import type { Ingredient } from "@/types";
 import { BuyNowSheet } from "@/components/BuyNowSheet";
 import { useWakeLock } from "@/hooks/useWakeLock";
@@ -35,6 +36,8 @@ export function RecipePage() {
   const [buyNowIngredients, setBuyNowIngredients] = useState<Ingredient[] | null>(null);
   const [listMsg, setListMsg] = useState("");
   const [inList, setInList] = useState(false);
+  // Tracks broken hero image URLs — falls back to category placeholder on error
+  const [heroImgError, setHeroImgError] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -121,16 +124,39 @@ export function RecipePage() {
         </Button>
       </div>
 
-      {/* Hero image */}
-      {recipe.image_url && (
-        <div className="rounded-2xl overflow-hidden shadow-md aspect-video w-full">
+      {/* Hero image — always rendered. Shows the actual image, or a category
+          placeholder with an "Add a photo" prompt for owners. This prevents
+          layout shift and encourages photo uploads. */}
+      <div className="rounded-2xl overflow-hidden shadow-md aspect-video w-full relative">
+        {recipe.image_url && !heroImgError ? (
           <img
             src={recipe.image_url}
             alt={recipe.title}
             className="w-full h-full object-cover"
+            onError={() => setHeroImgError(true)}
           />
-        </div>
-      )}
+        ) : (
+          /* Category placeholder — emoji on gradient background */
+          <div
+            className={`w-full h-full bg-gradient-to-br ${getCategoryFallback(recipe.category).gradient} flex items-center justify-center`}
+          >
+            <span className="text-6xl sm:text-7xl drop-shadow-md">
+              {getCategoryFallback(recipe.category).emoji}
+            </span>
+          </div>
+        )}
+
+        {/* Owner prompt: "Add a photo" overlay — only shown on the placeholder */}
+        {isOwner && (!recipe.image_url || heroImgError) && (
+          <Link
+            to={`/recipes/${slug}/edit`}
+            className="absolute bottom-0 inset-x-0 bg-black/40 backdrop-blur-sm text-white px-4 py-2.5 flex items-center gap-2 text-sm font-medium hover:bg-black/50 transition-colors"
+          >
+            <Camera className="w-4 h-4" />
+            Add a photo to your recipe
+          </Link>
+        )}
+      </div>
 
       {/* Header */}
       <div>
