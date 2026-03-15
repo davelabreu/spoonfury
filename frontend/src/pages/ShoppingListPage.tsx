@@ -9,6 +9,7 @@ import { buildInstacartUrl } from "@/lib/instacart";
 import { getIngredientEmoji } from "@/lib/ingredientEmoji";
 import { getIngredientInfo } from "@/lib/ingredientInfo";
 import { Trash2, Plus, Minus } from "lucide-react";
+import { getCategoryFallback } from "@/lib/categoryFallback";
 import type { Ingredient } from "@/types";
 
 interface ShoppingItem {
@@ -25,6 +26,8 @@ interface ShoppingItem {
 interface RecipeGroup {
   recipe_slug: string;
   recipe_title: string;
+  recipe_image_url: string;
+  recipe_category: string;
   multiplier: number;
   items: ShoppingItem[];
 }
@@ -396,12 +399,31 @@ export function ShoppingListPage() {
               <div className="space-y-6">
                 {groups.map((group, idx) => (
                   <div key={group.recipe_slug} className="space-y-1">
+                    {/* Recipe group header — thumbnail + name pill + multiplier.
+                        The thumbnail shows the recipe's hero image (or a category
+                        emoji fallback) so you can visually identify each recipe. */}
                     <div className="flex items-center justify-between gap-3 mb-3">
                       <Link
                         to={`/recipes/${group.recipe_slug}`}
-                        className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground bg-muted px-3 py-1.5 rounded-full hover:bg-muted/80 transition-colors"
+                        className="flex items-center gap-2 bg-muted rounded-full pr-3 hover:bg-muted/80 transition-colors"
                       >
-                        {group.recipe_title}
+                        {/* Small circular thumbnail — image or category fallback */}
+                        {group.recipe_image_url ? (
+                          <img
+                            src={group.recipe_image_url}
+                            alt=""
+                            className="w-7 h-7 rounded-full object-cover shrink-0"
+                          />
+                        ) : (
+                          <span
+                            className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-sm bg-gradient-to-br ${getCategoryFallback(group.recipe_category).gradient}`}
+                          >
+                            {getCategoryFallback(group.recipe_category).emoji}
+                          </span>
+                        )}
+                        <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground py-1.5">
+                          {group.recipe_title}
+                        </span>
                       </Link>
                       <MultiplierWidget group={group} />
                     </div>

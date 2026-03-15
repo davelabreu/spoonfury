@@ -1,5 +1,6 @@
 from collections import defaultdict
 from rest_framework import serializers
+from spoonfury.apps.recipes.models import Recipe
 from .models import ShoppingList, ShoppingListItem, RecipeMultiplier
 
 
@@ -38,10 +39,20 @@ class ShoppingListSerializer(serializers.ModelSerializer):
             for m in RecipeMultiplier.objects.filter(shopping_list=obj)
         }
 
+        # Bulk-fetch image URLs + categories for all recipes in the list.
+        # Single query — avoids N per-group lookups. Returns a dict keyed by slug.
+        recipe_meta = {
+            slug: {"image_url": img or "", "category": cat or "other"}
+            for slug, img, cat in Recipe.objects.filter(slug__in=groups.keys())
+            .values_list("slug", "image_url", "category")
+        } if groups else {}
+
         return [
             {
                 "recipe_slug": slug,
                 "recipe_title": items[0].recipe_title,
+                "recipe_image_url": recipe_meta.get(slug, {}).get("image_url", ""),
+                "recipe_category": recipe_meta.get(slug, {}).get("category", "other"),
                 "multiplier": multipliers.get(slug, 1),
                 "items": ShoppingListItemSerializer(items, many=True).data,
             }
