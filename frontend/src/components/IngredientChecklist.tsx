@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { ShoppingCart, Zap } from "lucide-react";
 import type { Ingredient } from "@/types";
 import { getIngredientEmoji } from "@/lib/ingredientEmoji";
 import { getIngredientInfo } from "@/lib/ingredientInfo";
@@ -120,30 +121,34 @@ export function IngredientChecklist({ ingredients, inList, onAddToList, onBuyNow
               size="sm"
               disabled={needed.length === 0 || inList}
               onClick={() => onAddToList(needed)}
-              className="flex-1 border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800"
+              className="flex-1 relative overflow-hidden border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800 before:absolute before:inset-0 before:rounded-[inherit] before:bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.55)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:transition-[background-position_0s_ease] before:duration-1000 hover:before:bg-[position:-100%_0,0_0]"
             >
-              + Add {needed.length} to Shopping List
+              <ShoppingCart className="w-3.5 h-3.5" />
+              Add {needed.length} to List
             </Button>
           )}
           {onBuyNow && (
             <Button
               type="button"
-              variant="outline"
               size="sm"
               disabled={needed.length === 0}
               onClick={() => onBuyNow(needed)}
-              className="flex-1 border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 hover:text-amber-900 font-semibold"
+              className="flex-1 bg-gradient-to-r from-amber-600 via-amber-500/80 to-amber-600 [background-size:200%_auto] text-white hover:[background-position:99%_center] transition-[background-position] duration-500 border-0 font-semibold focus-visible:ring-amber-600/20"
             >
-              🛒 Buy it NOW!
+              <Zap className="w-3.5 h-3.5" />
+              Buy it NOW!
             </Button>
           )}
         </div>
       )}
 
       {inList && (
-        <Alert className="border-green-600 bg-green-50 animate-in fade-in slide-in-from-bottom-1">
-          <AlertTitle className="text-green-700">🛍️❤️ In your shopping list</AlertTitle>
-        </Alert>
+        <div className="animate-in fade-in slide-in-from-bottom-1 duration-300">
+          <Badge className="w-full justify-center gap-2 py-2 text-sm border-green-200 bg-green-600/10 text-green-700 hover:bg-green-600/10">
+            <span className="size-1.5 rounded-full bg-green-600" aria-hidden="true" />
+            🛍️❤️ In your shopping list
+          </Badge>
+        </div>
       )}
     </div>
   );
