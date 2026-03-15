@@ -292,15 +292,19 @@ export function ShoppingListPage() {
           className="w-4 h-4 rounded accent-indigo-500 cursor-pointer shrink-0"
           aria-label={`Mark ${item.name} as picked up`}
         />
+        {/* Tooltip wraps emoji+label; inline-flex on trigger keeps the
+            tooltip anchored right next to the text, not the page edge. */}
         {info ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div tabIndex={0} className="cursor-default outline-none flex-1 min-w-0">{emojiAndLabel}</div>
-            </TooltipTrigger>
-            <TooltipContent side="right" sideOffset={14} className={TOOLTIP_CONTENT_CLASS}>
-              {tooltipInner}
-            </TooltipContent>
-          </Tooltip>
+          <div className="flex-1 min-w-0">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div tabIndex={0} className="cursor-default outline-none inline-flex">{emojiAndLabel}</div>
+              </TooltipTrigger>
+              <TooltipContent side="right" sideOffset={14} className={TOOLTIP_CONTENT_CLASS}>
+                {tooltipInner}
+              </TooltipContent>
+            </Tooltip>
+          </div>
         ) : emojiAndLabel}
         <button
           type="button"
