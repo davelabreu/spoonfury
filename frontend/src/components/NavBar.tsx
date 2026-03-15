@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
 import { Menu, X, Utensils, ShoppingCart, BookOpen, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useShopping, SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useNavTheme } from "@/hooks/useNavTheme";
 import { api } from "@/lib/api";
@@ -138,10 +139,6 @@ function NavSticker({ label, to, color, icon: Icon, isSpecial, isActive, onClick
   );
 }
 
-/** UsernameBadge — the purple pill in the nav bar.
- *  When `onSignOut` is provided, wraps itself in a DropdownMenu with
- *  "My Books" and "Sign out" options. Otherwise renders as a plain badge.
- *  `variant="capsule"` renders a shimmer-gradient pill matching CartCapsule. */
 function UsernameBadge({ username, className, onSignOut, variant = "sticker" }: { username: string; className?: string; onSignOut?: () => void; variant?: "sticker" | "capsule" }) {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
@@ -183,7 +180,6 @@ function UsernameBadge({ username, className, onSignOut, variant = "sticker" }: 
     </div>
   );
 
-  // If no sign-out handler, just render the badge (e.g. in mobile drawer)
   if (!onSignOut) return badge;
 
   return (
@@ -206,32 +202,6 @@ function UsernameBadge({ username, className, onSignOut, variant = "sticker" }: 
   );
 }
 
-export const SHOPPING_LIST_UPDATED = "shopping-list-updated";
-
-function useShoppingData(token: string | null | undefined, locationKey: string) {
-  const [count, setCount] = useState(0);
-  const [items, setItems] = useState<Ingredient[]>([]);
-  const [bump, setBump] = useState(0);
-  useEffect(() => {
-    const onUpdate = () => setBump(b => b + 1);
-    window.addEventListener(SHOPPING_LIST_UPDATED, onUpdate);
-    return () => window.removeEventListener(SHOPPING_LIST_UPDATED, onUpdate);
-  }, []);
-  useEffect(() => {
-    if (!token) { setCount(0); setItems([]); return; }
-    api.get("/shopping-list/", token)
-      .then((d: any) => {
-        setCount(d.total_items ?? 0);
-        const unchecked: Ingredient[] = (d.items_by_recipe ?? [])
-          .flatMap((g: any) => g.items.filter((i: any) => !i.is_checked))
-          .map((i: any) => ({ quantity: i.quantity, unit: i.unit, name: i.name, note: i.note }));
-        setItems(unchecked);
-      })
-      .catch(() => {});
-  }, [token, locationKey, bump]);
-  return { count, items };
-}
-
 function CartButton({ count, onClick }: { count: number; onClick?: () => void }) {
   return (
     <Link
@@ -251,15 +221,10 @@ function CartButton({ count, onClick }: { count: number; onClick?: () => void })
 }
 
 const FOOD_EMOJIS = [
-  // Vegetables
   "🥕", "🌽", "🥦", "🧅", "🧄", "🥔", "🍅", "🍆", "🥑", "🥬", "🥒",
-  // Fruit
   "🍋", "🍎", "🍊", "🍇", "🍓", "🍌", "🍉", "🍑", "🫐", "🥝",
-  // Meat & protein
   "🥩", "🍗", "🥚", "🧀", "🥓",
-  // Bread & grains
   "🍞", "🥐", "🥖",
-  // Dairy & other
   "🧈", "🥛",
 ];
 
@@ -271,17 +236,16 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
   const capsuleControls = useAnimationControls();
   const cartIconControls = useAnimationControls();
 
-  // Capsule wiggle + emoji burst when item is added
   useEffect(() => {
     const onUpdate = () => {
       capsuleControls.start({ x: [0, -5, 5, -3, 3, -1, 1, 0], transition: { duration: 0.4, ease: "easeInOut" } });
-      const burstCount = 2 + Math.floor(Math.random() * 2); // 2 or 3
+      const burstCount = 2 + Math.floor(Math.random() * 2); 
       const burst = Array.from({ length: burstCount }, (_, i) => ({
         id: Date.now() + i,
         emoji: FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)],
         dx: (i - (burstCount - 1) / 2) * 22,
         delay: i * 0.07,
-        duration: 1.3 + Math.random() * 1.1, // 1.3s–2.4s
+        duration: 1.3 + Math.random() * 1.1, 
       }));
       setFlyEmojis(burst);
       setTimeout(() => setFlyEmojis([]), 3000);
@@ -290,13 +254,11 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
     return () => window.removeEventListener(SHOPPING_LIST_UPDATED, onUpdate);
   }, [capsuleControls]);
 
-  // Badge spring pop on count increase
   useEffect(() => {
     if (count > prevCount.current) setBadgeKey(k => k + 1);
     prevCount.current = count;
   }, [count]);
 
-  // Cart icon rocks on hover
   useEffect(() => {
     if (hovered === "cart") {
       cartIconControls.start({ rotate: [-7, 7, -5, 5, -2, 2, 0], transition: { duration: 0.5, ease: "easeInOut" } });
@@ -361,7 +323,6 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
         </Link>
       </div>
 
-      {/* Food emoji burst on item added */}
       <AnimatePresence>
         {flyEmojis.map(({ id, emoji, dx, delay, duration }) => (
           <motion.span
@@ -377,7 +338,6 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
         ))}
       </AnimatePresence>
 
-      {/* Badge with spring pop on count change */}
       {count > 0 && (
         <motion.span
           key={badgeKey}
@@ -436,7 +396,6 @@ function MinimalNav({
   return (
     <nav ref={navRef} className="sticky top-0 z-50 bg-background border-b border-border">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-1">
-        {/* Logo */}
         <Link to="/" className="text-xl font-black tracking-tighter mr-6 flex items-center gap-1 shrink-0">
           <span>🥄</span>
           <span>Spoonfury</span>
@@ -456,7 +415,6 @@ function MinimalNav({
           </div>
         ) : (
           <>
-            {/* Nav tabs */}
             <div className="flex items-center gap-0.5 flex-1">
               {visibleStickers.map((sticker) => {
                 const isActive = location.pathname === sticker.to;
@@ -488,7 +446,6 @@ function MinimalNav({
               })}
             </div>
 
-            {/* Auth + theme toggle */}
             <div className="flex items-center gap-3 shrink-0">
               {username && <CartCapsule count={cartCount} items={cartItems} />}
               {username ? (
@@ -517,7 +474,6 @@ function MinimalNav({
         )}
       </div>
 
-      {/* Mobile drawer */}
       <AnimatePresence>
         {isMobile && mobileOpen && (
           <motion.div
@@ -589,14 +545,14 @@ function MinimalNav({
 }
 
 export function NavBar() {
-  const { username, logout, token } = useAuth();
+  const { username, logout } = useAuth();
+  const { count: cartCount, items: cartItems } = useShopping();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useMediaQuery("(max-width: 850px)");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoHovered, setLogoHovered] = useState(false);
   const { theme, setTheme } = useNavTheme();
-  const { count: cartCount, items: cartItems } = useShoppingData(token, location.key);
 
   const navRef = useRef<HTMLElement>(null);
 
@@ -612,7 +568,6 @@ export function NavBar() {
   }, [mobileOpen]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!isMobile && mobileOpen) setMobileOpen(false);
   }, [isMobile, mobileOpen]);
 
@@ -644,7 +599,6 @@ export function NavBar() {
 
   return (
     <nav ref={navRef} className="bg-background sticky top-0 z-50">
-      {/* 1. SVG Gooey Filter Definition - Sharpened for more "licking" definition */}
       <svg className="absolute h-0 w-0 pointer-events-none">
         <defs>
           <filter id="goo">
@@ -656,7 +610,6 @@ export function NavBar() {
       </svg>
 
       <div className="max-w-6xl mx-auto px-4 flex items-end h-14 relative">
-        {/* Column 1: Logo */}
         <Link
           to="/"
           className="text-2xl font-black tracking-tighter flex-shrink-0 mr-8 mb-2.5 z-30 group flex items-center"
@@ -665,7 +618,6 @@ export function NavBar() {
           onMouseLeave={() => setLogoHovered(false)}
         >
           <div className="relative flex items-center justify-center w-10 h-10">
-            {/* Turbo Fire Effect - 24 particles, 'Bed of Flames' base, massive lift */}
             <AnimatePresence>
               {logoHovered && (
                 <div 
@@ -678,22 +630,22 @@ export function NavBar() {
                       initial={{ opacity: 0, y: 10, scale: 0.2 }}
                       animate={{ 
                         opacity: [0, 1, 1, 0], 
-                        y: [20, -10, -85], // Reduced vertical reach
+                        y: [20, -10, -85], 
                         x: [(i - 11.5) * 0.8, (i - 11.5) * 1.5, (i - 11.5) * 3],
                         scaleY: [0.4, 5, 0.1],
                         scaleX: [1.8, 0.5, 0.1],
                       }}
-                      exit={{ opacity: 0, transition: { duration: 0.1 } }} // Snappy exit
+                      exit={{ opacity: 0, transition: { duration: 0.1 } }} 
                       transition={{ 
                         duration: 0.4 + Math.random() * 0.6, 
                         repeat: Infinity, 
                         delay: i * 0.02,
                         ease: "easeOut" 
                       }}
-                      className="absolute w-6 h-12 rounded-full" // Increased height
+                      className="absolute w-6 h-12 rounded-full" 
                       style={{ 
                         backgroundColor: i % 3 === 0 ? "#FFD700" : (i % 3 === 1 ? "#FF8E53" : "#FF4D00"),
-                        bottom: "-25%", // Moved spawn point up
+                        bottom: "-25%", 
                         mixBlendMode: "screen"
                       }}
                     />
@@ -715,7 +667,6 @@ export function NavBar() {
                   "drop-shadow(0 0 8px #FF4D00)"
                 ]
               } : {
-                // Intensified idle pulse/glow
                 filter: [
                   "drop-shadow(0 0 4px #FF4D00)",
                   "drop-shadow(0 0 15px #FF9100)",
@@ -749,7 +700,6 @@ export function NavBar() {
           </div>
         ) : (
           <>
-            {/* Column 2: Stickers (grounded in the z-slot) */}
             <div className="flex-1 flex items-end justify-center gap-4 h-full relative z-10">
               {visibleStickers.map((sticker) => (
                 <NavSticker
@@ -760,7 +710,6 @@ export function NavBar() {
               ))}
             </div>
 
-            {/* Column 3: Identity / auth actions */}
             <div className="flex-shrink-0 flex items-end gap-2 h-full z-30">
               {username && cartCount > 0 && (
                 <div className="mb-3.5">
@@ -805,11 +754,9 @@ export function NavBar() {
           </>
         )}
 
-        {/* The Slot Edge: A black line that sits ABOVE the stickers but BELOW the logo/auth */}
         <div className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-black z-[25]" />
       </div>
 
-      {/* ── Mobile drawer ── */}
       <AnimatePresence>
         {isMobile && mobileOpen && (
           <motion.div

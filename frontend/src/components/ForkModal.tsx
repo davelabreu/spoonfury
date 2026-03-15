@@ -2,17 +2,13 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Recipe, Book } from "@/types";
 
 interface ForkModalProps {
-  recipe: any;
+  recipe: Recipe;
   token: string;
   onClose: () => void;
   onSuccess: (bookId: number) => void;
-}
-
-interface Book {
-  id: number;
-  title: string;
 }
 
 export function ForkModal({ recipe, token, onClose, onSuccess }: ForkModalProps) {

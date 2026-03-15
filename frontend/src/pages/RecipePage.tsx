@@ -11,21 +11,16 @@ import { ForkModal } from "@/components/ForkModal";
 import { ShareModal } from "@/components/ShareModal";
 import { ChevronLeft, Camera } from "lucide-react";
 import { getCategoryFallback } from "@/lib/categoryFallback";
-import type { Ingredient } from "@/types";
+import type { Ingredient, Recipe, Book } from "@/types";
 import { BuyNowSheet } from "@/components/BuyNowSheet";
 import { useWakeLock } from "@/hooks/useWakeLock";
-import { SHOPPING_LIST_UPDATED } from "@/components/NavBar";
-
-interface Book {
-  id: number;
-  title: string;
-}
+import { SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
 
 export function RecipePage() {
   const { slug } = useParams<{ slug: string }>();
   const { token, username } = useAuth();
   const navigate = useNavigate();
-  const [recipe, setRecipe] = useState<any>(null);
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [error, setError] = useState("");
   const [forking, setForking] = useState(false);
   const [books, setBooks] = useState<Book[]>([]);
@@ -42,7 +37,7 @@ export function RecipePage() {
   useEffect(() => {
     if (!slug) return;
     setHeroImgError(false); // Reset broken-image state when navigating to a new recipe
-    api.get(`/recipes/${slug}/`).then(setRecipe).catch(() => setError("Recipe not found."));
+    api.get(`/recipes/${slug}/`).then((data: Recipe) => setRecipe(data)).catch(() => setError("Recipe not found."));
   }, [slug]);
 
   useEffect(() => {

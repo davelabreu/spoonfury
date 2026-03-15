@@ -2,27 +2,10 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { getCategoryFallback } from "@/lib/categoryFallback";
 import { useState } from "react";
-
-/**
- * RecipeCard — compact horizontal card for recipe listings.
- *
- * Layout: thumbnail on the left (~140px, shrinks to ~100px on mobile),
- * text content on the right (title, description, author, fork count).
- *
- * When the recipe has no image (or the image fails to load), we show
- * a category-themed emoji + gradient placeholder instead.
- */
+import type { Recipe } from "@/types";
 
 interface RecipeCardProps {
-  recipe: {
-    slug: string;
-    title: string;
-    description: string;
-    image_url: string;
-    category: string;
-    author_username: string;
-    fork_count: number;
-  };
+  recipe: Recipe;
 }
 
 /**

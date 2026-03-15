@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ShoppingProvider } from "@/contexts/ShoppingContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { RecipePage } from "@/pages/RecipePage";
 import { EditRecipePage } from "@/pages/EditRecipePage";
@@ -15,25 +16,27 @@ import { NavBar } from "@/components/NavBar";
 export default function App() {
   return (
     <AuthProvider>
-      <TooltipProvider delayDuration={300}>
-      <BrowserRouter>
-        <NavBar />
-        <main className="w-full max-w-5xl mx-auto px-4 py-6 flex-1">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/recipes/new" element={<CreateRecipePage />} />
-            <Route path="/recipes/:slug/edit" element={<EditRecipePage />} />
-            <Route path="/recipes/:slug" element={<RecipePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/books" element={<BooksPage />} />
-            <Route path="/books/share/:token" element={<BookDetailPage shared />} />
-            <Route path="/books/:id" element={<BookDetailPage />} />
-            <Route path="/shopping-list" element={<ShoppingListPage />} />
-          </Routes>
-        </main>
-      </BrowserRouter>
-      </TooltipProvider>
+      <ShoppingProvider>
+        <TooltipProvider delayDuration={300}>
+          <BrowserRouter>
+            <NavBar />
+            <main className="w-full max-w-5xl mx-auto px-4 py-6 flex-1">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/recipes/new" element={<CreateRecipePage />} />
+                <Route path="/recipes/:slug/edit" element={<EditRecipePage />} />
+                <Route path="/recipes/:slug" element={<RecipePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/books" element={<BooksPage />} />
+                <Route path="/books/share/:token" element={<BookDetailPage shared />} />
+                <Route path="/books/:id" element={<BookDetailPage />} />
+                <Route path="/shopping-list" element={<ShoppingListPage />} />
+              </Routes>
+            </main>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ShoppingProvider>
     </AuthProvider>
   );
 }

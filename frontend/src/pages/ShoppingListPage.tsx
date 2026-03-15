@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -10,32 +11,7 @@ import { getIngredientEmoji } from "@/lib/ingredientEmoji";
 import { getIngredientInfo } from "@/lib/ingredientInfo";
 import { Trash2, Plus, Minus } from "lucide-react";
 import { getCategoryFallback } from "@/lib/categoryFallback";
-import type { Ingredient } from "@/types";
-
-interface ShoppingItem {
-  id: number;
-  recipe_title: string;
-  recipe_slug: string;
-  name: string;
-  quantity: string;
-  unit: string;
-  note: string;
-  is_checked: boolean;
-}
-
-interface RecipeGroup {
-  recipe_slug: string;
-  recipe_title: string;
-  recipe_image_url: string;
-  recipe_category: string;
-  multiplier: number;
-  items: ShoppingItem[];
-}
-
-interface ShoppingListData {
-  total_items: number;
-  items_by_recipe: RecipeGroup[];
-}
+import type { Ingredient, ShoppingItem, RecipeGroup, ShoppingListData } from "@/types";
 
 function itemToIngredient(item: ShoppingItem): Ingredient {
   return { quantity: item.quantity, unit: item.unit, name: item.name, note: item.note };
@@ -98,7 +74,7 @@ export function ShoppingListPage() {
     } : prev);
     try {
       await api.delete(`/shopping-list/items/${item.id}/`, token);
-      window.dispatchEvent(new Event("shopping-list-updated"));
+      window.dispatchEvent(new Event(SHOPPING_LIST_UPDATED));
     } catch {
       load();
     }
@@ -115,7 +91,7 @@ export function ShoppingListPage() {
     } : prev);
     try {
       await api.post("/shopping-list/remove-recipe/", { recipe_slug: recipeSlug }, token);
-      window.dispatchEvent(new Event("shopping-list-updated"));
+      window.dispatchEvent(new Event(SHOPPING_LIST_UPDATED));
     } catch {
       load();
     }
@@ -142,7 +118,7 @@ export function ShoppingListPage() {
     try {
       await api.post("/shopping-list/clear/", {}, token);
       setData(prev => prev ? { ...prev, total_items: 0, items_by_recipe: [] } : prev);
-      window.dispatchEvent(new Event("shopping-list-updated"));
+      window.dispatchEvent(new Event(SHOPPING_LIST_UPDATED));
     } catch {
       setError("Failed to clear list.");
     } finally {

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { RecipeCard } from "@/components/RecipeCard";
+import type { Recipe } from "@/types";
 
 export function HomePage() {
-  const [recipes, setRecipes] = useState<any[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export function HomePage() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Latest Recipes</h1>
       <div className="space-y-3">
-        {recipes.map((r: any) => (
+        {recipes.map((r: Recipe) => (
           <RecipeCard key={r.slug} recipe={r} />
         ))}
         {recipes.length === 0 && (

@@ -18,8 +18,26 @@
     "hooks": "@/hooks"
   },
   "registries": {
-    "@ss-components": "https://shadcnstudio.com/r/components/{name}.json",
-    "@ss-themes": "https://shadcnstudio.com/r/themes/{name}.json",
-    "@ss-blocks": "https://shadcnstudio.com/r/blocks/{name}.json"
+    "@ss-components": {
+      "url": "https://shadcnstudio.com/r/components/{name}.json",
+      "params": {
+        "email": "${EMAIL}",
+        "license_key": "${LICENSE_KEY}"
+      }
+    },
+    "@ss-themes": {
+      "url": "https://shadcnstudio.com/r/themes/{name}.json",
+      "params": {
+        "email": "${EMAIL}",
+        "license_key": "${LICENSE_KEY}"
+      }
+    },
+    "@ss-blocks": {
+      "url": "https://shadcnstudio.com/r/blocks/{name}.json",
+      "params": {
+        "email": "${EMAIL}",
+        "license_key": "${LICENSE_KEY}"
+      }
+    }
   }
 }
