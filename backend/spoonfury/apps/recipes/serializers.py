@@ -15,7 +15,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         source="parent_recipe.author.username", read_only=True
     )
 
-    image_url = serializers.URLField(allow_blank=True, required=False, default="")
+    # CharField instead of URLField — accepts both relative paths (/media/...)
+    # from the file upload endpoint and full URLs pasted by the user.
+    image_url = serializers.CharField(allow_blank=True, required=False, default="")
 
     class Meta:
         model = Recipe
