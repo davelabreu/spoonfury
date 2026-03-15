@@ -7,7 +7,9 @@ from .views_upload import upload_recipe_image
 router = DefaultRouter()
 router.register(r"recipes", RecipeViewSet, basename="recipe")
 
-urlpatterns = router.urls + [
-    path("recipes/<slug:slug>/fork/", fork_recipe, name="recipe-fork"),
+urlpatterns = [
+    # Fixed paths must come before the router's <slug> catch-all
     path("recipes/upload-image/", upload_recipe_image, name="recipe-upload-image"),
+] + router.urls + [
+    path("recipes/<slug:slug>/fork/", fork_recipe, name="recipe-fork"),
 ]

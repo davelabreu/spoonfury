@@ -29,8 +29,8 @@ export function CreateRecipePage() {
       const data = await api.post("/recipes/", payload, token);
       navigate(`/recipes/${data.slug}`);
     } catch (err: unknown) {
-      const e = err as { data?: unknown };
-      setError(JSON.stringify(e.data || "Failed to create recipe."));
+      const e = err as { status?: number; data?: unknown };
+      setError(`Error ${e.status ?? "?"}: ${JSON.stringify(e.data) || "Failed to create recipe."}`);
     }
   };
 
