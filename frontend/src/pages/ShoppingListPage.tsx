@@ -4,7 +4,10 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { buildInstacartUrl } from "@/lib/instacart";
+import { getIngredientEmoji } from "@/lib/ingredientEmoji";
+import { getIngredientInfo } from "@/lib/ingredientInfo";
 import { Trash2, Plus, Minus } from "lucide-react";
 import type { Ingredient } from "@/types";
 
@@ -39,18 +42,6 @@ function titleCase(s: string): string {
   return s.replace(/\b\w/g, c => c.toUpperCase());
 }
 
-const ingredientEmoji: Record<string, string> = {
-  egg: "🥚", eggs: "🥚", salt: "🧂", pepper: "🌶️", butter: "🧈",
-  milk: "🥛", cheese: "🧀", garlic: "🧄", onion: "🧅", tomato: "🍅",
-  lemon: "🍋", chicken: "🍗", beef: "🥩", rice: "🍚", bread: "🍞",
-  pasta: "🍝", olive: "🫒", carrot: "🥕", potato: "🥔", corn: "🌽",
-  mushroom: "🍄", mushrooms: "🍄", avocado: "🥑", honey: "🍯",
-  chocolate: "🍫", sugar: "🍬", water: "💧", oil: "🫒", flour: "🌾",
-  shrimp: "🦐", fish: "🐟", salmon: "🐟", bacon: "🥓", apple: "🍎",
-  banana: "🍌", strawberry: "🍓", blueberry: "🫐", peach: "🍑",
-  peanut: "🥜", coconut: "🥥", broccoli: "🥦", cucumber: "🥒",
-  "coca cola": "🥤", soda: "🥤", wine: "🍷", beer: "🍺", coffee: "☕", tea: "🍵",
-};
 
 export function ShoppingListPage() {
   const { token } = useAuth();
@@ -220,8 +211,22 @@ export function ShoppingListPage() {
       }
     };
 
-    const nameLower = item.name.toLowerCase();
-    const emoji = ingredientEmoji[nameLower] || Object.entries(ingredientEmoji).find(([k]) => nameLower.includes(k))?.[1] || "";
+    const rawEmoji = getIngredientEmoji(item.name);
+    const emoji = rawEmoji !== "🛒" ? rawEmoji : "";
+    const info = getIngredientInfo(item.name);
+
+    const itemContent = (
+      <span className={`flex-1 text-sm leading-5 ${item.is_checked ? "line-through text-muted-foreground" : ""}`}>
+        {emoji && <span className="mr-1">{emoji}</span>}
+        {item.quantity && <span className="font-medium">{
+          multiplier > 1 && !isNaN(Number(item.quantity))
+            ? String(Number(item.quantity) * multiplier)
+            : item.quantity
+        }{item.unit && ` ${item.unit}`} </span>}
+        {titleCase(item.name)}
+        {item.note && <span className="text-muted-foreground ml-1">({item.note})</span>}
+      </span>
+    );
 
     return (
       <div
@@ -238,16 +243,40 @@ export function ShoppingListPage() {
             className="w-4 h-4 rounded accent-indigo-500 cursor-pointer shrink-0 mt-px"
             aria-label={`Mark ${item.name} as picked up`}
           />
-          <span className={`flex-1 text-sm leading-5 ${item.is_checked ? "line-through text-muted-foreground" : ""}`}>
-            {emoji && <span className="mr-1">{emoji}</span>}
-            {item.quantity && <span className="font-medium">{
-              multiplier > 1 && !isNaN(Number(item.quantity))
-                ? String(Number(item.quantity) * multiplier)
-                : item.quantity
-            }{item.unit && ` ${item.unit}`} </span>}
-            {titleCase(item.name)}
-            {item.note && <span className="text-muted-foreground ml-1">({item.note})</span>}
-          </span>
+          {info ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div tabIndex={0} className="flex-1 cursor-default outline-none">{itemContent}</div>
+              </TooltipTrigger>
+              <TooltipContent
+                side="right"
+                sideOffset={14}
+                className="max-w-sm p-0 text-pretty bg-neutral-100 text-neutral-950 border border-neutral-300 shadow-lg rounded-xl overflow-hidden [&>svg]:bg-neutral-100 [&>svg]:fill-neutral-100 [&>svg]:size-4 [&>svg]:translate-y-[calc(-50%_-_1px)]"
+              >
+                <div className="flex">
+                  <div className="w-1 shrink-0 bg-indigo-400 rounded-l-xl" />
+                  <div className="px-3 py-2.5 space-y-1.5">
+                    <div>
+                      <p className="text-sm font-semibold">{emoji || "🛒"} {item.name}</p>
+                      <p className="text-[10px] text-neutral-500 leading-tight mt-0.5">{info.description}</p>
+                    </div>
+                    {info.nutrition && (
+                      <p className="text-xs leading-snug">
+                        <span className="font-semibold text-green-700">🌱 Health: </span>
+                        <span className="text-neutral-700">{info.nutrition}</span>
+                      </p>
+                    )}
+                    {info.tip && (
+                      <p className="text-xs leading-snug">
+                        <span className="font-semibold text-amber-600">✦ Tip: </span>
+                        <span className="text-neutral-700">{info.tip}</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          ) : itemContent}
           <button
             type="button"
             onClick={() => deleteItem(item)}

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getIngredientEmoji, PICKER_CATEGORIES } from "@/lib/ingredientEmoji";
+import { getIngredientInfo } from "@/lib/ingredientInfo";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Props {
   value: string | undefined;
@@ -35,6 +37,7 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
   }, [open]);
 
   const displayed = value || autoEmoji;
+  const info = getIngredientInfo(ingredientName);
 
   const pick = (emoji: string) => {
     onChange(emoji);
@@ -42,23 +45,58 @@ export function IngredientEmojiPicker({ value, ingredientName, onChange }: Props
     setOpen(false);
   };
 
+  const triggerButton = (
+    <button
+      type="button"
+      onClick={() => setOpen(o => !o)}
+      title="Change emoji"
+      className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 text-base transition-colors overflow-hidden"
+    >
+      <motion.span
+        key={popKey}
+        initial={popKey > 0 ? { scale: 0.2, rotate: -20 } : false}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ type: "spring", stiffness: 500, damping: 12 }}
+      >
+        {displayed}
+      </motion.span>
+    </button>
+  );
+
   return (
     <div ref={ref} className="relative shrink-0">
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        title="Change emoji"
-        className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 text-base transition-colors overflow-hidden"
-      >
-        <motion.span
-          key={popKey}
-          initial={popKey > 0 ? { scale: 0.2, rotate: -20 } : false}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 500, damping: 12 }}
-        >
-          {displayed}
-        </motion.span>
-      </button>
+      {info ? (
+        <Tooltip open={open ? false : undefined}>
+          <TooltipTrigger asChild>{triggerButton}</TooltipTrigger>
+          <TooltipContent
+            side="right"
+            sideOffset={10}
+            className="max-w-sm p-0 text-pretty bg-neutral-100 text-neutral-950 border border-neutral-300 shadow-lg rounded-xl overflow-hidden [&>svg]:bg-neutral-100 [&>svg]:fill-neutral-100 [&>svg]:size-4 [&>svg]:translate-y-[calc(-50%_-_1px)]"
+          >
+            <div className="flex">
+              <div className="w-1 shrink-0 bg-indigo-400 rounded-l-xl" />
+              <div className="px-3 py-2.5 space-y-1.5">
+                <div>
+                  <p className="text-sm font-semibold">{displayed} {ingredientName}</p>
+                  <p className="text-[10px] text-neutral-500 leading-tight mt-0.5">{info.description}</p>
+                </div>
+                {info.nutrition && (
+                  <p className="text-xs leading-snug">
+                    <span className="font-semibold text-green-700">🌱 Health: </span>
+                    <span className="text-neutral-700">{info.nutrition}</span>
+                  </p>
+                )}
+                {info.tip && (
+                  <p className="text-xs leading-snug">
+                    <span className="font-semibold text-amber-600">✦ Tip: </span>
+                    <span className="text-neutral-700">{info.tip}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      ) : triggerButton}
 
       <AnimatePresence>
         {open && (
