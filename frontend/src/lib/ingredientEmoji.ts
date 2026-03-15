@@ -122,14 +122,18 @@ export function getIngredientEmoji(name: string): string {
 }
 
 // Categorized emoji palette for the picker UI
+// Ordered by cooking logic: proteins → produce → pantry → fun stuff
+// Within each category: most common first
 export const PICKER_CATEGORIES = [
-  { label: "🥬 Vegetables",         color: "bg-green-50",   emojis: ["🥕","🌽","🥦","🧅","🧄","🥔","🍅","🍆","🥑","🥬","🥒","🫑","🍄","🫛","🫘","🎃"] },
-  { label: "🍎 Fruit",              color: "bg-red-50",     emojis: ["🍋","🍎","🍊","🍇","🍓","🍌","🍉","🍑","🫐","🥝","🥭","🍍","🍒","🥥","🍐"] },
-  { label: "🥩 Meat & Seafood",     color: "bg-rose-50",    emojis: ["🍗","🥩","🥓","🌭","🐟","🦐","🦀","🦞","🦑"] },
-  { label: "🥚 Dairy & Eggs",       color: "bg-amber-50",   emojis: ["🥚","🧀","🧈","🥛"] },
-  { label: "🍞 Bread & Grains",     color: "bg-yellow-50",  emojis: ["🍞","🥐","🥖","🍝","🍚","🌾","🥨","🧇"] },
-  { label: "🌿 Herbs & Spices",     color: "bg-emerald-50", emojis: ["🌿","🧂","🌶️","🫚","🫙","🫒","🍯","🍬","🍫","🍷","🍲"] },
-  { label: "🥤 Beverages",          color: "bg-sky-50",     emojis: ["🥤","🧃","🍺","☕","🍵","💧","🍸","🥃"] },
-  { label: "🍕 Prepared & Sweets",  color: "bg-purple-50",  emojis: ["🍕","🌮","🌯","🥪","🥧","🎂","🍪","🍩","🍦","🍭","🍿"] },
-  { label: "🥜 Nuts & Seeds",       color: "bg-orange-50",  emojis: ["🥜","🌰"] },
+  { label: "🍗 Meat & Poultry",          color: "bg-rose-50",    emojis: ["🍗","🥩","🍖","🥓","🌭","🦃"] },
+  { label: "🐟 Seafood",                 color: "bg-cyan-50",    emojis: ["🐟","🦐","🍤","🍣","🦀","🦞","🦑","🦪","🐙","🍥"] },
+  { label: "🥚 Dairy & Eggs",            color: "bg-amber-50",   emojis: ["🥚","🧀","🧈","🥛","🍳"] },
+  { label: "🧅 Vegetables",              color: "bg-green-50",   emojis: ["🧅","🧄","🍅","🥔","🥕","🌽","🥦","🥬","🥒","🫑","🍆","🥑","🍄","🫛","🫘","🎃","🥗","🌱"] },
+  { label: "🍋 Fruit",                   color: "bg-red-50",     emojis: ["🍋","🍎","🍏","🍊","🍌","🍓","🫐","🍇","🍑","🥝","🥭","🍍","🍉","🍒","🍐","🍈","🥥"] },
+  { label: "🍞 Bread & Grains",          color: "bg-yellow-50",  emojis: ["🍞","🥖","🍝","🍜","🍚","🌾","🥐","🫓","🥨","🧇","🥞","🥣"] },
+  { label: "🧂 Herbs, Spices & Sauces",  color: "bg-emerald-50", emojis: ["🧂","🌿","🌶️","🫚","🫙","🫒","🍯","🥫","🍲","🍶","🫕","🥢"] },
+  { label: "🥜 Nuts, Seeds & Legumes",   color: "bg-orange-50",  emojis: ["🥜","🌰","🫘","🫛","🥥","🍠","🧆","🌻"] },
+  { label: "🍕 Prepared Foods",          color: "bg-purple-50",  emojis: ["🍕","🌮","🌯","🥪","🥟","🍱","🫔","🍛","🍜","🍣"] },
+  { label: "🍰 Sweets & Baking",        color: "bg-pink-50",    emojis: ["🍫","🍬","🥧","🎂","🧁","🍪","🍩","🍦","🍭","🍿","🍮"] },
+  { label: "☕ Beverages",               color: "bg-sky-50",     emojis: ["💧","☕","🍵","🥛","🧃","🥤","🍺","🍻","🍷","🍸","🥃","🍹","🍾","🥂","🧋","🫖","🧉"] },
 ];

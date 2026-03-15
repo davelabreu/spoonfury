@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { RecipePage } from "@/pages/RecipePage";
 import { EditRecipePage } from "@/pages/EditRecipePage";
 import { LoginPage } from "@/pages/LoginPage";
@@ -14,6 +15,7 @@ import { NavBar } from "@/components/NavBar";
 export default function App() {
   return (
     <AuthProvider>
+      <TooltipProvider delayDuration={300}>
       <BrowserRouter>
         <NavBar />
         <main className="w-full max-w-5xl mx-auto px-4 py-6 flex-1">
@@ -31,6 +33,7 @@ export default function App() {
           </Routes>
         </main>
       </BrowserRouter>
+      </TooltipProvider>
     </AuthProvider>
   );
 }
