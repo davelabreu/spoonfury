@@ -30,11 +30,23 @@ Unified the minimal theme navbar with a cohesive glass pill design language, add
 - Logged-out users: standalone theme toggle button
 - Mobile: theme switch in expanded nav menu
 
+### Emoji Flair: "Pop & Land" Animation
+- Replaced the original float-up-and-fade emoji burst with a **Pop & Land** animation
+- Emojis snap into existence (urgent appear), pop up to 15px, then one at a time spring-bounce into the cart center and vanish
+- Sequential per-emoji timing via index-based keyframe offsets (`EMOJI_FLAIR_CONFIGS`)
+- Tighter horizontal spread (18px spacing vs 22px) for a focused feel
+- Configurable via `EmojiFlairStyle` type and `EMOJI_FLAIR_CONFIGS` record (extensible for future A/B testing)
+- `fireBurst()` extracted as reusable function; `onManualTrigger` ref allows external triggering
+- Cart icon wiggle added alongside capsule shake on burst
+
 ### Bug Fixes
 - Fixed `@keyframes badge-shimmer` missing closing `}` that swallowed all subsequent CSS in `index.css`
 - Fixed `load_dotenv` precedence: `backend/.env` (dev overrides) loads before root `.env` (prod defaults)
+- Fixed atomic fork count increment using Django `F()` expression (`views_fork.py`)
+- Removed dead `badge-shimmer` keyframe and comparison HTML artifacts
 
 ## Files Modified
-- `frontend/src/components/NavBar.tsx` — UsernameBadge, CartCapsule, MinimalNav
-- `frontend/src/index.css` — breathing glow keyframe + classes
+- `frontend/src/components/NavBar.tsx` — UsernameBadge, CartCapsule (Pop & Land flair), MinimalNav
+- `frontend/src/index.css` — breathing glow keyframe + classes, dead CSS removed
 - `backend/config/settings.py` — dotenv load order
+- `backend/spoonfury/apps/recipes/views_fork.py` — atomic fork count

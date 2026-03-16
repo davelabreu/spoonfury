@@ -236,7 +236,36 @@ const FOOD_EMOJIS = [
   "🧈", "🥛",
 ];
 
-function CartCapsule({ count, items, compact = false }: { count: number; items: Ingredient[]; compact?: boolean }) {
+export type EmojiFlairStyle = "current";
+
+const EMOJI_FLAIR_CONFIGS: Record<EmojiFlairStyle, {
+  animate: (dx: number, index: number, count: number) => Record<string, any>;
+  transition: (duration: number, delay: number, index: number, count: number) => Record<string, any>;
+}> = {
+  current: {
+    // Pop & Land: pop to 15px, fast sequential spring-bounce into cart center
+    animate: (dx, i, n) => ({
+      opacity: [0, 1, 1, 1, 1, 1, 0],
+      y: [5, -15, -15, -2, -5, -3, -1],
+      x: [dx, dx, dx, dx * 0.2, dx * 0.05, 0, 0],
+      scale: [0, 2, 2, 1.3, 1.55, 1.45, 1.2],
+    }),
+    transition: (dur, delay, i, n) => {
+      const wait = 0.06 + (i / Math.max(n - 1, 1)) * 0.28;
+      const land = Math.min(wait + 0.18, 0.78);
+      const b1 = Math.min(land + 0.06, 0.84);
+      const b2 = Math.min(b1 + 0.06, 0.9);
+      return {
+        duration: dur * 1.3,
+        ease: [0.34, 1.56, 0.64, 1],
+        delay: delay,
+        opacity: { times: [0, 0.04, wait, land, b1, b2, 1], duration: dur * 1.3, ease: "easeIn", delay },
+      };
+    },
+  },
+};
+
+export function CartCapsule({ count, items, compact = false, emojiStyle = "current" as EmojiFlairStyle, onManualTrigger }: { count: number; items: Ingredient[]; compact?: boolean; emojiStyle?: EmojiFlairStyle; onManualTrigger?: React.MutableRefObject<(() => void) | null> }) {
   const [hovered, setHovered] = useState<"pickup" | "delivery" | "cart" | null>(null);
   const [flyEmojis, setFlyEmojis] = useState<Array<{ id: number; emoji: string; dx: number; delay: number; duration: number }>>([]);
   const [badgeKey, setBadgeKey] = useState(0);
@@ -244,20 +273,28 @@ function CartCapsule({ count, items, compact = false }: { count: number; items: 
   const capsuleControls = useAnimationControls();
   const cartIconControls = useAnimationControls();
 
+  const fireBurst = () => {
+    capsuleControls.start({ x: [0, -5, 5, -3, 3, -1, 1, 0], transition: { duration: 0.4, ease: "easeInOut" } });
+    cartIconControls.start({ rotate: [-7, 7, -5, 5, -2, 2, 0], transition: { duration: 0.5, ease: "easeInOut" } });
+    const burstCount = 2 + Math.floor(Math.random() * 2);
+    const burst = Array.from({ length: burstCount }, (_, i) => ({
+      id: Date.now() + i,
+      emoji: FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)],
+      dx: (i - (burstCount - 1) / 2) * 18,
+      delay: i * 0.07,
+      duration: 2.8 + Math.random() * 1.5,
+    }));
+    setFlyEmojis(burst);
+    setBadgeKey(k => k + 1);
+    setTimeout(() => setFlyEmojis([]), 5500);
+  };
+
   useEffect(() => {
-    const onUpdate = () => {
-      capsuleControls.start({ x: [0, -5, 5, -3, 3, -1, 1, 0], transition: { duration: 0.4, ease: "easeInOut" } });
-      const burstCount = 2 + Math.floor(Math.random() * 2); 
-      const burst = Array.from({ length: burstCount }, (_, i) => ({
-        id: Date.now() + i,
-        emoji: FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)],
-        dx: (i - (burstCount - 1) / 2) * 22,
-        delay: i * 0.07,
-        duration: 1.3 + Math.random() * 1.1, 
-      }));
-      setFlyEmojis(burst);
-      setTimeout(() => setFlyEmojis([]), 3000);
-    };
+    if (onManualTrigger) onManualTrigger.current = fireBurst;
+  });
+
+  useEffect(() => {
+    const onUpdate = () => fireBurst();
     window.addEventListener(SHOPPING_LIST_UPDATED, onUpdate);
     return () => window.removeEventListener(SHOPPING_LIST_UPDATED, onUpdate);
   }, [capsuleControls]);
@@ -266,12 +303,6 @@ function CartCapsule({ count, items, compact = false }: { count: number; items: 
     if (count > prevCount.current) setBadgeKey(k => k + 1);
     prevCount.current = count;
   }, [count]);
-
-  useEffect(() => {
-    if (hovered === "cart") {
-      cartIconControls.start({ rotate: [-7, 7, -5, 5, -2, 2, 0], transition: { duration: 0.5, ease: "easeInOut" } });
-    }
-  }, [hovered, cartIconControls]);
 
   const segmentBase = { padding: "0 13px", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" as const, lineHeight: "32px", textDecoration: "none", transition: "background 0.15s ease, color 0.15s ease" };
 
@@ -338,18 +369,21 @@ function CartCapsule({ count, items, compact = false }: { count: number; items: 
       </div>
 
       <AnimatePresence>
-        {flyEmojis.map(({ id, emoji, dx, delay, duration }) => (
-          <motion.span
-            key={id}
-            initial={{ opacity: 1, y: 4, x: 0, scale: 0.5 }}
-            animate={{ opacity: [1, 1, 0], y: -60, x: dx, scale: 2.0 }}
-            exit={{}}
-            transition={{ duration, ease: "easeOut", delay, opacity: { times: [0, 0.55, 1], duration, ease: "easeIn", delay } }}
-            style={{ position: "absolute", right: 14, top: 0, pointerEvents: "none", fontSize: 15, zIndex: 10 }}
-          >
-            {emoji}
-          </motion.span>
-        ))}
+        {flyEmojis.map(({ id, emoji, dx, delay, duration }, idx) => {
+          const flair = EMOJI_FLAIR_CONFIGS[emojiStyle];
+          return (
+            <motion.span
+              key={id}
+              initial={{ opacity: 1, y: 4, x: 0, scale: 0.5 }}
+              animate={flair.animate(dx, idx, flyEmojis.length)}
+              exit={{}}
+              transition={flair.transition(duration, delay, idx, flyEmojis.length)}
+              style={{ position: "absolute", right: 14, top: 0, pointerEvents: "none", fontSize: 15, zIndex: 10 }}
+            >
+              {emoji}
+            </motion.span>
+          );
+        })}
       </AnimatePresence>
 
       {count > 0 && (
