@@ -54,11 +54,6 @@ body {
   50%       { background-position: 100% 50%; }
 }
 
-@keyframes badge-shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
 @keyframes badge-breathe {
   0%, 100% { opacity: 0.1; }
   50%      { opacity: 0.22; }

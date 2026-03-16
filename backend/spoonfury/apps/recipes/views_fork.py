@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 from .models import Recipe
 from .serializers import RecipeSerializer
@@ -48,8 +49,8 @@ def fork_recipe(request, slug):
         **fork_data,
     )
 
-    # Increment parent fork count
-    Recipe.objects.filter(pk=parent.pk).update(fork_count=parent.fork_count + 1)
+    # Increment parent fork count (atomic to avoid race conditions)
+    Recipe.objects.filter(pk=parent.pk).update(fork_count=F("fork_count") + 1)
 
     serializer = RecipeSerializer(recipe, context={"request": request})
     return Response(serializer.data, status=status.HTTP_201_CREATED)
