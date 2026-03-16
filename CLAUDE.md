@@ -10,7 +10,7 @@ Canonical project context for Spoonfury. AI agents: Read this first.
 ## Project Overview
 Spoonfury — a recipe-first social platform. Core mechanic: **Fork** a recipe, make it yours, build curated digital recipe books.
 
-**Status**: Prototype v0.4.3 (Recipe images, B1 fused hero+actions, shopping list refactor).
+**Status**: Prototype v0.4.4 (Navbar polish: B4a breathing badge, combined mobile hamburger+badge, compact cart pill).
 
 ## Core Architecture
 - **Data Model**: Recipe (fork lineage) -> User -> RecipeBook -> ShoppingList.
@@ -40,3 +40,4 @@ AI agents have access to specialized tools for development:
 | v0.4 Shopping Feedback | `docs/plans/2026-03-08-shopping-list-feedback-design.md` |
 | v0.4.1 CartCapsule Nav | `docs/superpowers/specs/2026-03-14-cart-capsule-nav-design.md` |
 | v0.4.3 Recipe Images | `docs/superpowers/specs/2026-03-15-recipe-images-design.md` |
+| v0.4.4 Navbar Polish | `docs/superpowers/specs/2026-03-15-navbar-polish-design.md` |
