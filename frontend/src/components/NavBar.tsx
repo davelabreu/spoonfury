@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
-import { Menu, X, Utensils, ShoppingCart, BookOpen, LogOut } from "lucide-react";
+import { Menu, X, Utensils, ShoppingCart, BookOpen, LogOut, Palette } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useShopping, SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -139,31 +139,30 @@ function NavSticker({ label, to, color, icon: Icon, isSpecial, isActive, onClick
   );
 }
 
-function UsernameBadge({ username, className, onSignOut, variant = "sticker" }: { username: string; className?: string; onSignOut?: () => void; variant?: "sticker" | "capsule" }) {
+function UsernameBadge({ username, className, onSignOut, onSwitchTheme, switchThemeLabel, variant = "sticker" }: { username: string; className?: string; onSignOut?: () => void; onSwitchTheme?: () => void; switchThemeLabel?: string; variant?: "sticker" | "capsule" }) {
   const navigate = useNavigate();
-  const [hovered, setHovered] = useState(false);
 
   const badge = variant === "capsule" ? (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        backgroundImage: "linear-gradient(270deg, #c4b5fd, #93c5fd, #86efac, #fda4af, #c4b5fd)",
-        backgroundSize: "300% 300%",
-        animation: "shimmer 8s ease infinite",
-        boxShadow: hovered ? "0 4px 14px rgba(147,197,253,0.5)" : "0 2px 8px rgba(147,197,253,0.3)",
-        padding: 2,
-        borderRadius: 9999,
-        transition: "box-shadow 0.15s ease",
-      }}
-      className={className || ""}
-    >
+    <div className={`relative badge-wrap ${className || ""}`}>
+      <div className="badge-glow" />
       <div
-        className="inline-flex items-center gap-1.5 rounded-full bg-white transition-colors"
-        style={{ padding: "4px 12px", fontSize: 12, fontWeight: 600, lineHeight: "20px" }}
+        className={`
+          badge-capsule relative
+          inline-flex items-center gap-2 px-3.5 py-1.5
+          border border-slate-200 bg-white/50 backdrop-blur-sm
+          rounded-full shadow-sm
+          hover:shadow-md
+          transition-all cursor-pointer
+        `}
       >
         <span className="text-sm leading-none">👨‍🍳</span>
-        <span className="leading-none text-gray-700">@{username}</span>
+        <div className="w-px h-4 bg-slate-300" />
+        <span className="text-sm font-medium text-slate-700 leading-none">@{username}</span>
+        {onSignOut && (
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="text-slate-400">
+            <path d="M2.5 4L5 6.5L7.5 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
       </div>
     </div>
   ) : (
@@ -192,6 +191,15 @@ function UsernameBadge({ username, className, onSignOut, variant = "sticker" }: 
           <BookOpen className="w-4 h-4" />
           My Books
         </DropdownMenuItem>
+        {onSwitchTheme && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onSwitchTheme} className="gap-2 cursor-pointer">
+              <Palette className="w-4 h-4" />
+              {switchThemeLabel || "Switch theme"}
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onSignOut} className="gap-2 cursor-pointer text-red-500 focus:text-red-500">
           <LogOut className="w-4 h-4" />
@@ -228,7 +236,7 @@ const FOOD_EMOJIS = [
   "🧈", "🥛",
 ];
 
-function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
+function CartCapsule({ count, items, compact = false }: { count: number; items: Ingredient[]; compact?: boolean }) {
   const [hovered, setHovered] = useState<"pickup" | "delivery" | "cart" | null>(null);
   const [flyEmojis, setFlyEmojis] = useState<Array<{ id: number; emoji: string; dx: number; delay: number; duration: number }>>([]);
   const [badgeKey, setBadgeKey] = useState(0);
@@ -282,41 +290,47 @@ function CartCapsule({ count, items }: { count: number; items: Ingredient[] }) {
       }}
     >
       <div style={{ borderRadius: 9999, overflow: "hidden", background: "#fff", display: "flex", alignItems: "center" }}>
-        <a
-          href={buildInstacartUrl(items, "pickup")}
-          target="_blank"
-          rel="noopener noreferrer"
-          onMouseEnter={() => setHovered("pickup")}
-          onMouseLeave={() => setHovered(null)}
-          style={{ ...segmentBase, background: hovered === "pickup" ? "#fde8ea" : "#fff", color: hovered === "pickup" ? "#9f1239" : "#374151" }}
-        >
-          🚗 Pickup
-        </a>
-        <div style={{ width: 1, height: 20, backgroundColor: "#e5e7eb", flexShrink: 0 }} />
-        <a
-          href={buildInstacartUrl(items, "delivery")}
-          target="_blank"
-          rel="noopener noreferrer"
-          onMouseEnter={() => setHovered("delivery")}
-          onMouseLeave={() => setHovered(null)}
-          style={{ ...segmentBase, background: hovered === "delivery" ? "#ede9fe" : "#fff", color: hovered === "delivery" ? "#5b21b6" : "#374151" }}
-        >
-          🏠 Delivery
-        </a>
+        {!compact && (
+          <>
+            <a
+              href={buildInstacartUrl(items, "pickup")}
+              target="_blank"
+              rel="noopener noreferrer"
+              onMouseEnter={() => setHovered("pickup")}
+              onMouseLeave={() => setHovered(null)}
+              style={{ ...segmentBase, background: hovered === "pickup" ? "#fde8ea" : "#fff", color: hovered === "pickup" ? "#9f1239" : "#374151" }}
+            >
+              🚗 Pickup
+            </a>
+            <div style={{ width: 1, height: 20, backgroundColor: "#e5e7eb", flexShrink: 0 }} />
+            <a
+              href={buildInstacartUrl(items, "delivery")}
+              target="_blank"
+              rel="noopener noreferrer"
+              onMouseEnter={() => setHovered("delivery")}
+              onMouseLeave={() => setHovered(null)}
+              style={{ ...segmentBase, background: hovered === "delivery" ? "#ede9fe" : "#fff", color: hovered === "delivery" ? "#5b21b6" : "#374151" }}
+            >
+              🏠 Delivery
+            </a>
+          </>
+        )}
         <Link
           to="/shopping-list"
           onMouseEnter={() => setHovered("cart")}
           onMouseLeave={() => setHovered(null)}
           style={{
             display: "flex", alignItems: "center", justifyContent: "center",
-            padding: "0 13px",
+            padding: compact ? "0 15px" : "0 13px",
             background: hovered === "cart" ? "#f0fdf4" : "#fff",
             color: "#15803d",
-            borderLeft: "1px solid rgba(0,0,0,0.06)",
+            borderLeft: compact ? "none" : "1px solid rgba(0,0,0,0.06)",
             alignSelf: "stretch",
+            lineHeight: compact ? "34px" : "32px",
             transition: "background 0.15s ease",
           }}
         >
+          {compact && <span style={{ fontSize: 12, fontWeight: 700, color: "#15803d", marginRight: 6, whiteSpace: "nowrap" }}>Order now!</span>}
           <motion.div animate={cartIconControls}>
             <ShoppingCart className="w-[22px] h-[22px]" />
           </motion.div>
@@ -403,15 +417,56 @@ function MinimalNav({
 
         {isMobile ? (
           <div className="ml-auto flex items-center gap-2">
-            {username && <UsernameBadge username={username} variant="capsule" />}
-            <button
-              type="button"
-              className="p-2 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white active:translate-y-[2px] active:shadow-none transition-all"
-              onClick={() => setMobileOpen((o) => !o)}
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            >
-              {mobileOpen ? <X size={22} strokeWidth={2.5} /> : <Menu size={22} strokeWidth={2.5} />}
-            </button>
+            {username && cartCount > 0 && (
+              <CartCapsule count={cartCount} items={cartItems} compact />
+            )}
+            {username ? (
+              /* Logged-in: combined badge + hamburger capsule */
+              <div className="relative badge-wrap">
+                <div className="badge-glow" />
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen((o) => !o)}
+                  className={`
+                    badge-capsule relative
+                    inline-flex items-center gap-2 px-3.5 py-1.5
+                    border bg-white/50 backdrop-blur-sm
+                    rounded-full shadow-sm
+                    transition-all cursor-pointer
+                    ${mobileOpen ? "border-violet-300 bg-white/85" : "border-slate-200"}
+                  `}
+                >
+                  <span className="text-sm leading-none">👨‍🍳</span>
+                  <div className="w-px h-4 bg-slate-300" />
+                  <span className="text-sm font-medium text-slate-700 leading-none">@{username}</span>
+                  <div className="w-px h-4 bg-slate-300" />
+                  {mobileOpen
+                    ? <X size={16} strokeWidth={2} className="text-slate-500" />
+                    : <Menu size={16} strokeWidth={2} className="text-slate-500" />
+                  }
+                </button>
+              </div>
+            ) : (
+              /* Logged-out: glass pill hamburger */
+              <button
+                type="button"
+                onClick={() => setMobileOpen((o) => !o)}
+                className={`
+                  inline-flex items-center gap-1.5 px-3 py-1.5
+                  border bg-white/50 backdrop-blur-sm
+                  rounded-full shadow-sm
+                  hover:bg-white/80 hover:shadow-md
+                  transition-all cursor-pointer
+                  ${mobileOpen ? "border-slate-300 bg-white/80" : "border-slate-200"}
+                `}
+                aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              >
+                {mobileOpen
+                  ? <X size={18} strokeWidth={2} className="text-slate-600" />
+                  : <Menu size={18} strokeWidth={2} className="text-slate-600" />
+                }
+              </button>
+            )}
           </div>
         ) : (
           <>
@@ -449,7 +504,7 @@ function MinimalNav({
             <div className="flex items-center gap-3 shrink-0">
               {username && <CartCapsule count={cartCount} items={cartItems} />}
               {username ? (
-                <UsernameBadge username={username} onSignOut={onSignOut} variant="capsule" />
+                <UsernameBadge username={username} onSignOut={onSignOut} onSwitchTheme={onSwitchTheme} switchThemeLabel="Fridge Sticker theme" variant="capsule" />
               ) : (
                 <>
                   <Link to="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -458,17 +513,17 @@ function MinimalNav({
                   <Link to="/register" className="text-sm font-medium px-3 py-1.5 bg-foreground text-background rounded-md hover:opacity-90 transition-opacity">
                     Join
                   </Link>
+                  <button
+                    type="button"
+                    onClick={onSwitchTheme}
+                    title="Switch to Fridge Sticker theme"
+                    className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-base"
+                    aria-label="Switch to Fridge Sticker theme"
+                  >
+                    🏷️
+                  </button>
                 </>
               )}
-              <button
-                type="button"
-                onClick={onSwitchTheme}
-                title="Switch to Fridge Sticker theme"
-                className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-base"
-                aria-label="Switch to Fridge Sticker theme"
-              >
-                🏷️
-              </button>
             </div>
           </>
         )}
@@ -512,6 +567,14 @@ function MinimalNav({
                   <div className="px-4 py-2"><UsernameBadge username={username} variant="capsule" /></div>
                   <button
                     type="button"
+                    onClick={() => { onSwitchTheme(); setMobileOpen(false); }}
+                    className="px-4 py-3 text-base font-semibold rounded-lg text-left hover:bg-muted/50 transition-colors flex items-center gap-2"
+                  >
+                    <Palette className="w-4 h-4" />
+                    Fridge Sticker theme
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => { onSignOut(); setMobileOpen(false); }}
                     className="px-4 py-3 text-base font-semibold rounded-lg text-left text-red-500 hover:bg-muted/50 transition-colors"
                   >
@@ -526,16 +589,16 @@ function MinimalNav({
                   <Link to="/register" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-base font-semibold rounded-lg bg-foreground text-background text-center hover:opacity-90 transition-opacity">
                     Join
                   </Link>
+                  <div className="h-px bg-border my-2" />
+                  <button
+                    type="button"
+                    onClick={() => { onSwitchTheme(); setMobileOpen(false); }}
+                    className="px-4 py-3 text-sm font-medium text-muted-foreground rounded-lg hover:bg-muted/50 transition-colors text-left"
+                  >
+                    🏷️ Switch to Fridge Sticker theme
+                  </button>
                 </>
               )}
-              <div className="h-px bg-border my-2" />
-              <button
-                type="button"
-                onClick={() => { onSwitchTheme(); setMobileOpen(false); }}
-                className="px-4 py-3 text-sm font-medium text-muted-foreground rounded-lg hover:bg-muted/50 transition-colors text-left"
-              >
-                🏷️ Switch to Fridge Sticker theme
-              </button>
             </div>
           </motion.div>
         )}
@@ -719,7 +782,7 @@ export function NavBar() {
               {username ? (
                 <div className="flex items-end gap-3 h-full">
                   <div className="mb-3.5">
-                    <UsernameBadge username={username} onSignOut={handleSignOut} />
+                    <UsernameBadge username={username} onSignOut={handleSignOut} onSwitchTheme={() => setTheme("minimal")} switchThemeLabel="Minimal theme" />
                   </div>
                 </div>
               ) : (
@@ -737,19 +800,19 @@ export function NavBar() {
                     isActive={location.pathname === "/register"}
                     className="text-primary-foreground"
                   />
+                  <div className="mb-3.5">
+                    <button
+                      type="button"
+                      onClick={() => setTheme("minimal")}
+                      title="Switch to Minimal theme"
+                      className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-base"
+                      aria-label="Switch to Minimal theme"
+                    >
+                      ☰
+                    </button>
+                  </div>
                 </div>
               )}
-              <div className="mb-3.5">
-                <button
-                  type="button"
-                  onClick={() => setTheme("minimal")}
-                  title="Switch to Minimal theme"
-                  className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-base"
-                  aria-label="Switch to Minimal theme"
-                >
-                  ☰
-                </button>
-              </div>
             </div>
           </>
         )}
@@ -791,6 +854,14 @@ export function NavBar() {
 
               {username ? (
                 <div className="flex flex-col gap-6">
+                  <button
+                    type="button"
+                    onClick={() => { setTheme("minimal"); setMobileOpen(false); }}
+                    className="text-left px-1 text-sm font-medium text-muted-foreground flex items-center gap-2"
+                  >
+                    <Palette className="w-4 h-4" />
+                    Minimal theme
+                  </button>
                   <NavSticker
                     label="Sign out"
                     color="bg-white"
@@ -817,17 +888,16 @@ export function NavBar() {
                     onClick={() => setMobileOpen(false)}
                     className="text-primary-foreground"
                   />
+                  <div className="h-[2.5px] bg-black/10 my-2" />
+                  <button
+                    type="button"
+                    onClick={() => { setTheme("minimal"); setMobileOpen(false); }}
+                    className="text-left px-1 text-sm font-medium text-muted-foreground"
+                  >
+                    ☰ Switch to Minimal theme
+                  </button>
                 </div>
               )}
-
-              <div className="h-[2.5px] bg-black/10 my-2" />
-              <button
-                type="button"
-                onClick={() => { setTheme("minimal"); setMobileOpen(false); }}
-                className="text-left px-1 text-sm font-medium text-muted-foreground"
-              >
-                ☰ Switch to Minimal theme
-              </button>
             </div>
           </motion.div>
         )}

@@ -4,7 +4,10 @@ from dotenv import load_dotenv
 
 import socket
 
-load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
+# Local .env (dev overrides) first, then root .env (prod/deploy defaults)
+_root = Path(__file__).resolve().parent.parent.parent
+load_dotenv(_root / "backend" / ".env")   # dev-local (optional, not committed)
+load_dotenv(_root / ".env")                # prod defaults
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
