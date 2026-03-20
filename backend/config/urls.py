@@ -3,8 +3,25 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from config.throttles import AuthRateThrottle
+from dj_rest_auth.views import LoginView
+from dj_rest_auth.registration.views import RegisterView
+
+
+class ThrottledLoginView(LoginView):
+    throttle_classes = [AuthRateThrottle]
+
+
+class ThrottledRegisterView(RegisterView):
+    throttle_classes = [AuthRateThrottle]
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # Throttled auth endpoints (override before dj-rest-auth catch-all)
+    path("api/auth/login/", ThrottledLoginView.as_view(), name="rest_login"),
+    path("api/auth/registration/", ThrottledRegisterView.as_view(), name="rest_register"),
+    # Remaining dj-rest-auth endpoints
     path("api/auth/", include("dj_rest_auth.urls")),
     path("api/auth/registration/", include("dj_rest_auth.registration.urls")),
     path("api/", include("spoonfury.apps.recipes.urls")),
