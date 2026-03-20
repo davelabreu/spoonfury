@@ -18,10 +18,10 @@ class ThrottledRegisterView(RegisterView):
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # Throttled auth endpoints (override before dj-rest-auth catch-all)
+    # Throttled auth endpoints — placed before includes so they match first
     path("api/auth/login/", ThrottledLoginView.as_view(), name="rest_login"),
     path("api/auth/registration/", ThrottledRegisterView.as_view(), name="rest_register"),
-    # Remaining dj-rest-auth endpoints
+    # Remaining dj-rest-auth endpoints (sub-paths like /verify-email/ still route here)
     path("api/auth/", include("dj_rest_auth.urls")),
     path("api/auth/registration/", include("dj_rest_auth.registration.urls")),
     path("api/", include("spoonfury.apps.recipes.urls")),
