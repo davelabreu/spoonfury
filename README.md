@@ -1,7 +1,7 @@
 # Spoonfury 🥄💢
 [🙆🏼Human written!!]
 
-Spoonfury is an [🚧🏗️under construction🏗️🚧] recipe-first social platform designed to bring joy and efficiency back to cooking and meal planning. No fluff, no endless stories or ads —— just recipes, ingredients, and method.
+Spoonfury is an [🚧🏗️*under construction*🏗️🚧] recipe-first social platform designed to bring joy and efficiency back to cooking and meal planning. No fluff, no endless stories or ads —— just recipes, ingredients, and method.
 
 ## Reason to be
 Spoonfury is built on aggressive simplicity, aiming to bring utility to the cooking experience. Leveraging Twitter-style descriptions followed immediately by ingredients and instructions, Spoonfury aims to empower users to cook and iterate through clarity and utility.
