@@ -91,18 +91,11 @@ export function CreateRecipePage() {
                 value={form.description}
                 onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
             </div>
-            <div className="flex gap-3 items-end">
-              <div className="flex-1">
-                <Label htmlFor="serves">Serves</Label>
-                <Input id="serves" placeholder='e.g. "4" or "2-3"'
-                  value={form.serves} onChange={e => setForm(f => ({ ...f, serves: e.target.value }))} />
-              </div>
-              <ImageUploadField
-                value={form.image_url}
-                onChange={url => setForm(f => ({ ...f, image_url: url }))}
-                token={token}
-              />
-            </div>
+            <ImageUploadField
+              value={form.image_url}
+              onChange={url => setForm(f => ({ ...f, image_url: url }))}
+              token={token}
+            />
           </section>
 
           <Separator />
@@ -143,11 +136,18 @@ export function CreateRecipePage() {
 
           {/* ── Section 3: The Blueprint ── */}
           <section className="space-y-3">
-            <div>
-              <h3 className="text-sm font-semibold mb-1">Ingredients</h3>
-              <p className="text-xs text-muted-foreground mb-3">
-                Add each ingredient with an amount, unit, and optional note.
-              </p>
+            <div className="flex items-baseline justify-between">
+              <div>
+                <h3 className="text-sm font-semibold mb-1">Ingredients</h3>
+                <p className="text-xs text-muted-foreground">
+                  Add each ingredient with an amount, unit, and optional note.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="serves" className="text-xs whitespace-nowrap">Serves</Label>
+                <Input id="serves" className="w-20 text-xs" placeholder='e.g. 4'
+                  value={form.serves} onChange={e => setForm(f => ({ ...f, serves: e.target.value }))} />
+              </div>
             </div>
             {ingredients.map((ing, i) => (
               <div key={i} className="flex gap-2 items-center">
