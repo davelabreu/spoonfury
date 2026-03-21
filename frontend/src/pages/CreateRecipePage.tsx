@@ -4,6 +4,10 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -15,22 +19,22 @@ import { IngredientEmojiPicker } from "@/components/IngredientEmojiPicker";
 import { ImageUploadField } from "@/components/ImageUploadField";
 import { TagInput } from "@/components/TagInput";
 
-const CATEGORIES: [string, string][] = [
-  ["sandwich_burger", "Sandwiches & Burgers"],
-  ["pizza", "Pizza & Flatbreads"],
-  ["soup", "Soup & Stews"],
-  ["salad", "Salads"],
-  ["pasta_noodles", "Pasta & Noodles"],
-  ["meat_seafood", "Meat & Seafood"],
-  ["bowl", "Bowls"],
-  ["casserole_bake", "Casseroles & Bakes"],
-  ["side_dish", "Side Dishes"],
-  ["sauce_condiment", "Sauces & Condiments"],
-  ["breakfast_bakery", "Breakfast & Bakery"],
-  ["dessert", "Desserts"],
-  ["drink", "Drinks"],
-  ["snack_app", "Snacks & Appetizers"],
-  ["other", "Other"],
+const CATEGORY_CHOICES = [
+  { value: "sandwich_burger", label: "Sandwiches & Burgers" },
+  { value: "pizza", label: "Pizza & Flatbreads" },
+  { value: "soup", label: "Soup & Stews" },
+  { value: "salad", label: "Salads" },
+  { value: "pasta_noodles", label: "Pasta & Noodles" },
+  { value: "meat_seafood", label: "Meat & Seafood" },
+  { value: "bowl", label: "Bowls" },
+  { value: "casserole_bake", label: "Casseroles & Bakes" },
+  { value: "side_dish", label: "Side Dishes" },
+  { value: "sauce_condiment", label: "Sauces & Condiments" },
+  { value: "breakfast_bakery", label: "Breakfast & Bakery" },
+  { value: "dessert", label: "Desserts" },
+  { value: "drink", label: "Drinks" },
+  { value: "snack_app", label: "Snacks & Appetizers" },
+  { value: "other", label: "Other" },
 ];
 
 export function CreateRecipePage() {
@@ -70,87 +74,113 @@ export function CreateRecipePage() {
     <Card className="max-w-4xl mx-auto">
       <CardHeader><CardTitle>New Recipe</CardTitle></CardHeader>
       <CardContent>
-        <form onSubmit={submit} className="space-y-4">
-          <input className="w-full border rounded px-3 py-2 text-sm" placeholder="Title (max 100 chars)"
-            maxLength={100} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
-          <textarea className="w-full border rounded px-3 py-2 text-sm" rows={2} maxLength={280}
-            placeholder="Description (max 280 chars — the elevator pitch)" value={form.description}
-            onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
-          <div className="flex gap-3">
-            <input className="border rounded px-3 py-2 text-sm flex-1" placeholder="Serves"
-              value={form.serves} onChange={e => setForm(f => ({ ...f, serves: e.target.value }))} />
-            <Select
-              value={form.category}
-              onValueChange={val => setForm(f => ({ ...f, category: val }))}
-            >
-              <SelectTrigger className="w-[220px] text-sm">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                {CATEGORIES.map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <form onSubmit={submit} className="space-y-8">
 
-          <div>
-            <h3 className="text-sm font-semibold mb-2">Tags</h3>
-            <TagInput tags={tags} onChange={setTags} />
-          </div>
+          {/* ── Section 1: The Identity ── */}
+          <section className="space-y-4">
+            <div>
+              <Label htmlFor="title">Title</Label>
+              <Input id="title" placeholder="What's this dish called? (max 100 chars)"
+                maxLength={100} value={form.title}
+                onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+            </div>
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea id="description" rows={2} maxLength={280}
+                placeholder="The elevator pitch — what makes this special? (max 280 chars)"
+                value={form.description}
+                onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+            </div>
+            <div className="flex gap-3 items-end">
+              <div className="flex-1">
+                <Label htmlFor="serves">Serves</Label>
+                <Input id="serves" placeholder='e.g. "4" or "2-3"'
+                  value={form.serves} onChange={e => setForm(f => ({ ...f, serves: e.target.value }))} />
+              </div>
+              <ImageUploadField
+                value={form.image_url}
+                onChange={url => setForm(f => ({ ...f, image_url: url }))}
+                token={token}
+              />
+            </div>
+          </section>
 
-          <ImageUploadField
-            value={form.image_url}
-            onChange={url => setForm(f => ({ ...f, image_url: url }))}
-            token={token}
-          />
+          <Separator />
 
-          <div>
-            <h3 className="text-sm font-semibold mb-2">Ingredients</h3>
+          {/* ── Section 2: The Classification ── */}
+          <section className="space-y-4">
+            <div>
+              <h3 className="text-sm font-semibold mb-1">Classify your dish</h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Pick one primary category, then add tags for cuisine, diet, or vibe.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Primary Category</Label>
+                <Select
+                  value={form.category}
+                  onValueChange={val => setForm(f => ({ ...f, category: val }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORY_CHOICES.map(c => (
+                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Tags (Cuisine, Diet, Vibe)</Label>
+                <TagInput tags={tags} onChange={setTags} />
+              </div>
+            </div>
+          </section>
+
+          <Separator />
+
+          {/* ── Section 3: The Blueprint ── */}
+          <section className="space-y-3">
+            <div>
+              <h3 className="text-sm font-semibold mb-1">Ingredients</h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Add each ingredient with an amount, unit, and optional note.
+              </p>
+            </div>
             {ingredients.map((ing, i) => (
-              <div key={i} className="flex gap-2 mb-2 items-center">
+              <div key={i} className="flex gap-2 items-center">
                 <IngredientEmojiPicker
                   value={ing.emoji}
                   ingredientName={ing.name}
                   onChange={v => updateIng(i, "emoji", v)}
                 />
-                <input className="border rounded px-2 py-1 text-xs w-14" placeholder="Qty"
+                <Input className="w-16 text-xs" placeholder="Qty"
                   value={ing.quantity} onChange={e => updateIng(i, "quantity", e.target.value)} />
-                <select className="border rounded px-2 py-1 text-xs w-20 bg-white" value={ing.unit}
-                  onChange={e => updateIng(i, "unit", e.target.value)}>
-                  <option value="">— unit</option>
+                <select className="h-9 rounded-md border border-input bg-transparent px-2 text-xs"
+                  value={ing.unit} onChange={e => updateIng(i, "unit", e.target.value)}>
+                  <option value="">unit</option>
                   <optgroup label="Volume">
-                    <option>tsp</option>
-                    <option>tbsp</option>
-                    <option>cup</option>
-                    <option>fl oz</option>
-                    <option>ml</option>
-                    <option>L</option>
+                    <option>tsp</option><option>tbsp</option><option>cup</option>
+                    <option>fl oz</option><option>ml</option><option>L</option>
                   </optgroup>
                   <optgroup label="Weight">
-                    <option>g</option>
-                    <option>kg</option>
-                    <option>oz</option>
-                    <option>lb</option>
+                    <option>g</option><option>kg</option><option>oz</option><option>lb</option>
                   </optgroup>
                   <optgroup label="Cooking">
-                    <option>pinch</option>
-                    <option>clove</option>
-                    <option>slice</option>
-                    <option>sprig</option>
-                    <option>bunch</option>
-                    <option>head</option>
-                    <option>can</option>
-                    <option>pkg</option>
+                    <option>pinch</option><option>clove</option><option>slice</option>
+                    <option>sprig</option><option>bunch</option><option>head</option>
+                    <option>can</option><option>pkg</option>
                   </optgroup>
                 </select>
-                <input className="border rounded px-2 py-1 text-xs flex-1" placeholder="Name"
+                <Input className="flex-1 text-xs" placeholder="Ingredient name"
                   value={ing.name} onChange={e => updateIng(i, "name", e.target.value)} />
-                <input className="border rounded px-2 py-1 text-xs w-24" placeholder="Note"
+                <Input className="w-24 text-xs" placeholder="Note"
                   value={ing.note} onChange={e => updateIng(i, "note", e.target.value)} />
                 {ingredients.length > 1 && (
                   <button type="button" onClick={() => setIngredients(p => p.filter((_, idx) => idx !== i))}
-                    className="text-xs text-red-500">✕</button>
+                    className="text-xs text-red-500 hover:text-red-700">✕</button>
                 )}
               </div>
             ))}
@@ -158,21 +188,32 @@ export function CreateRecipePage() {
               onClick={() => setIngredients(p => [...p, { quantity: "", unit: "", name: "", note: "", emoji: "" }])}>
               + Add ingredient
             </Button>
-          </div>
+          </section>
 
-          <div>
-            <h3 className="text-sm font-semibold mb-2">Instructions (markdown)</h3>
-            <textarea className="w-full border rounded px-3 py-2 text-sm font-mono" rows={10}
-              value={form.instructions} onChange={e => setForm(f => ({ ...f, instructions: e.target.value }))} />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold mb-2">Notes (optional markdown)</h3>
-            <textarea className="w-full border rounded px-3 py-2 text-sm font-mono" rows={4}
-              value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
-          </div>
+          <Separator />
+
+          {/* ── Section 4: The Execution ── */}
+          <section className="space-y-4">
+            <div>
+              <Label htmlFor="instructions">Instructions</Label>
+              <p className="text-xs text-muted-foreground mb-1">Markdown supported</p>
+              <Textarea id="instructions" className="font-mono" rows={10}
+                placeholder="Step-by-step instructions..."
+                value={form.instructions}
+                onChange={e => setForm(f => ({ ...f, instructions: e.target.value }))} />
+            </div>
+            <div>
+              <Label htmlFor="notes">Notes (optional)</Label>
+              <p className="text-xs text-muted-foreground mb-1">Tips, variations, or backstory</p>
+              <Textarea id="notes" className="font-mono" rows={4}
+                placeholder="Any extra notes or tips..."
+                value={form.notes}
+                onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+            </div>
+          </section>
 
           {error && <p className="text-sm text-red-500">{error}</p>}
-          <Button type="submit" className="w-full">Publish Recipe</Button>
+          <Button type="submit" className="w-full" size="lg">Publish Recipe</Button>
         </form>
       </CardContent>
     </Card>
