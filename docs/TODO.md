@@ -1,42 +1,17 @@
 # Spoonfury TODO
+[ AI assisted to do list ]
 
 Deferred items that need focused effort in future sessions.
+Organized by category — add new items under the right heading.
 
-## Instacart Integration
+---
+## Recipes
+- May need more information such as estimated cook time (active and passive), effort estimation, whatever
 
-The "Buy it NOW!" button links to Instacart but the URL builder is not yet producing
-results that match their product catalogue. This requires dedicated integration work:
 
-- Research Instacart's Partner API / Shoppable Recipes API for proper product lookup
-- Current approach: builds a search URL with ingredient terms joined by `\n` — works as
-  a fallback but doesn't reliably match products
-- Consider whether Instacart requires an API key / affiliate agreement for deep-linking
-- File: `frontend/src/lib/instacart.ts`
+## 🔍 Search & Discovery
 
-## NavBar Theme Toggle Button
-
-The ☰/🏷️ icons for switching between Fridge Sticker and Minimal nav themes are
-functional but not obvious to users. Revisit with a more intentional theme picker UI
-(e.g. a small labelled button or palette icon in the settings area).
-
-## Shopping List UX Polish
-
-- Ingredient count badge on the cart icon updates on navigation — consider real-time
-  updates via a shared context so the count updates immediately after "Add to List"
-  without requiring a page navigation.
-- BuyNowSheet UX/UI improvements deferred.
-
-## Social Login (Google, Facebook, Apple)
-
-Add OAuth quick-login alongside existing username/password auth. Reduces sign-up
-friction and improves security (no password to leak).
-
-- Backend: `django-allauth` (already using `dj-rest-auth` for token auth) handles the
-  OAuth provider dance. Add Google, Facebook, and Apple as providers.
-- Frontend: OAuth redirect flow or SDK-based sign-in buttons on login/register pages.
-- Decide whether to keep username/password as a fallback or go social-only.
-
-## Recipe Search & Filtering (HIGH PRIORITY — NEEDS BRAINSTORM)
+### Recipe Search & Filtering (HIGH PRIORITY — NEEDS BRAINSTORM)
 
 The Stir the Pot explore feed needs real search and filtering. This is central to making the platform useful and discoverable. **No decisions are final yet — this needs a full brainstorm session.**
 
@@ -60,10 +35,32 @@ The Stir the Pot explore feed needs real search and filtering. This is central t
 
 **Where it lives:** Stir the Pot page. This is the front door for discovery.
 
-## User Menu & Account Hub
+---
 
-The username badge (top-right) should be the entry point for a user dropdown menu.
+## 👥 Social & Auth
+
+### Social Login (Google, Facebook, Apple)
+
+Add OAuth quick-login alongside existing username/password auth. Reduces sign-up
+friction and improves security (no password to leak).
+
+- Backend: `django-allauth` (already using `dj-rest-auth` for token auth) handles the
+  OAuth provider dance. Add Google, Facebook, and Apple as providers.
+- Frontend: OAuth redirect flow or SDK-based sign-in buttons on login/register pages.
+- Decide whether to keep username/password as a fallback or go social-only.
+
+### User communication
+- Users should be able to tag others, and message them as well.
+
+### Community ratings for recipes
+- Recipes should include a voting, and recipe comment system (Use spoons instead of stars?)
+
+### User Menu & Account Hub
+
+The username badge (top-right) should be the entry point for a user acount page and dropdown menu.
 Currently sign-out is buried. Long-term this becomes the account hub.
+
+**Account hub**: Should celebrate a user's recipes, forked and original, and allow the user to edit their page for others to see! It could include social links, or favorite recipes.
 
 **MVP (done):** Dropdown with "My Books" link and "Sign out".
 
@@ -76,7 +73,17 @@ Currently sign-out is buried. Long-term this becomes the account hub.
 
 **Implementation:** Shadcn `DropdownMenu` anchored to the username badge in NavBar.
 
-## Cook Mode: Sticky Ingredients
+---
+
+## 🎨 UI / UX
+
+### NavBar Theme Toggle Button
+
+The ☰/🏷️ icons for switching between Fridge Sticker and Minimal nav themes are
+functional but not obvious to users. Revisit with a more intentional theme picker UI
+(e.g. a small labelled button or palette icon in the settings area).
+
+### Cook Mode: Sticky Ingredients
 
 When Cook Now mode is active, ingredients should follow the user while scrolling
 through instructions so they can reference amounts without losing their place.
@@ -85,3 +92,25 @@ through instructions so they can reference amounts without losing their place.
 - **Mobile**: Floating "Ingredients" pill/FAB that opens a bottom sheet drawer.
 - Step interactivity: border glow or slight scale-up on the active instruction step.
 - Activates when Cook Now is on — doesn't change layout in normal reading mode.
+
+### Shopping List UX Polish
+
+- Ingredient count badge on the cart icon updates on navigation — consider real-time
+  updates via a shared context so the count updates immediately after "Add to List"
+  without requiring a page navigation.
+- BuyNowSheet UX/UI improvements deferred.
+
+---
+
+## 🛒 Integrations
+
+### Instacart Integration
+
+The "Buy it NOW!" button links to Instacart but the URL builder is not yet producing
+results that match their product catalogue. This requires dedicated integration work:
+
+- Research Instacart's Partner API / Shoppable Recipes API for proper product lookup
+- Current approach: builds a search URL with ingredient terms joined by `\n` — works as
+  a fallback but doesn't reliably match products
+- Consider whether Instacart requires an API key / affiliate agreement for deep-linking
+- File: `frontend/src/lib/instacart.ts`
