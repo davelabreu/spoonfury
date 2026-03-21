@@ -5,8 +5,8 @@
 ## Quick Start for Gemini
 
 1. Read `CLAUDE.md` — full project context, architecture, conventions, design docs
-2. Read `docs/context-scopes/core-flow.md` — fork + book data model
-3. Read `docs/plans/` — latest implementation status
+2. Read `docs/context-scopes/` — system reference (data model, backend, frontend, API)
+3. Read `docs/plans/active/` — current work in progress
 
 ## Gemini-Specific Notes
 
