@@ -1,9 +1,19 @@
-# Spoonfury
+# Spoonfury 🥄💢
+[🙆🏼Human written!!]
 
-[Human Written!]
-Spoonfury is a recipe-first social platform. Users can discover, create, and **fork** recipes, building curated digital recipe books to share.
+Spoonfury is an [under construction] recipe-first social platform designed to bring joy and efficiency back to cooking and meal planning. No fluff, no endless stories or ads —— just recipes, ingredients, and method.
 
-## Core Features
+## Reason to be
+Spoonfury is built on aggressive simplicity. We aim to bring utility the cooking experience. Leveraging Twitter-style descriptions followed immediately by ingredients and instructions, Spoonfury aims to empower users to cook and iterate through clarity and utility.
+
+The core value propositions are:
+
+- **Organization**: Your personal cookbook is a living document! Recipes aren't just static text, but editable, tweakable, and shareable! 
+- **The Forking Standard**: Inspired by Github, users can FORK a recipe they love, and edit it as they please. If the forked recipe is unique enough, it can be made public! (This needs thought, unique thresholds are not yet defined. But it would be chaos for recipes to be forked a million times and on public accessible database!) 
+- **Aggressive Simplicity**: Straight to the point. Zero tolerance for fluffy stories about how egg-nog transformed your life one Christmas eve. Spoonfury is a zero distractions tool for recipe hosting and meal planning.
+- **Convenience**: Go from "I want to cook this recipe" to "Ingredients are on the way!" in seconds. Our planned Instacart integration will let you order recipe ingredients for quick pickup or delivery.
+
+### Core Features
 - **Recipe Forking**: Clone recipes and make personal tweaks (constrained to ±3 ingredient changes).
 - **Stir the Pot**: A public explore feed to discover the latest community recipes.
 - **Easy Sharing**: Share recipes instantly via QR codes, WhatsApp, or direct URL copy.
@@ -11,9 +21,9 @@ Spoonfury is a recipe-first social platform. Users can discover, create, and **f
 - **Recipe Books**: Organize and share collections of recipes.
 - **Mobile-First Design**: Optimized for use in the kitchen.
 
-## Project Architecture
+# Project Architecture
 
-The project follows a modern full-stack architecture optimized for deployment on low-power devices like the NVIDIA Jetson.
+The project follows a modern full-stack architecture.
 
 ### Backend
 - **Framework**: [Django](https://www.djangoproject.com/) + [Django REST Framework](https://www.django-rest-framework.org/)
@@ -31,25 +41,26 @@ The project follows a modern full-stack architecture optimized for deployment on
 
 ### Infrastructure
 - **Containerization**: [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
-- **Deployment**: Optimized for NVIDIA Jetson (Ubuntu) using `deploy.sh`.
+- **Deployment**: Temporarily optimized for NVIDIA Jetson (Ubuntu) using `deploy.sh`.
 
 ---
 
-## AI-Driven Development Workflow
+## 🤖 AI-Driven Development Workflow
 
-This project is built using a hybrid AI workflow, leveraging both Claude and Gemini.
+This project leverages an AI-forward workflow for development and documentation. Models used are mostly Claude and Gemini.
 
 ### Claude Integration
-- **Role**: Primarily used for initial scaffolding, large feature implementations, and complex refactorings.
+- **Role**: Used for initial scaffolding, large feature implementations, and complex refactorings.
 - **Guidance**: See `CLAUDE.md` for instructions and project conventions specific to Claude.
 
 ### Gemini Integration
-- **Role**: Used for ongoing development, code reviews, and specialized tasks.
+- **Role**: Used for ongoing development, code reviews, UI/UX vibes, and specialized tasks.
 - **Guidance**: See `GEMINI.md` for Gemini-specific context and the use of the `gemini-superpowers` extension.
 
 ### Developer Workflow
-1. **Planning**: Design specs (`*.spec.md`) and implementation plans (`*.impl.md`) live in `docs/plans/`.
-2. **Context**: Targeted architectural scopes are in `docs/context-scopes/`.
+Documentation is all housed in `/docs/`. AI plays a strong role to maintain this folder. Recommend strong hand holding.
+1. **Planning**: All feature implementations are found in `docs/plans/`. After enough prompting about "what the human wants", AI is instructed to document and follow Design specs (`*.spec.md`) and Implementation plans (`*.impl.md`). Spend time making sure your vision is properly prompted before executing, you won't regret it.
+2. **Context**: Architectural scopes are in `docs/context-scopes/`. These are important, as AI context is established here first!
 3. **Implementation**: AI agents follow the respective `CLAUDE.md` or `GEMINI.md` guides.
 3. **Verification**: Backend tests use `pytest`. Frontend is verified via Vite dev server.
 4. **Deployment**: Uses Docker Compose for consistent environments across development and production.
