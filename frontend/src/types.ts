@@ -6,6 +6,12 @@ export interface Ingredient {
   emoji?: string;
 }
 
+export interface Tag {
+  name: string;
+  slug: string;
+  kind: "cuisine" | "dietary" | "ingredient" | "vibe";
+}
+
 export interface Recipe {
   id: number;
   slug: string;
@@ -13,6 +19,7 @@ export interface Recipe {
   description: string;
   serves: string;
   category: string;
+  tags?: Tag[];
   ingredients: Ingredient[];
   instructions: string;
   notes?: string;

@@ -20,16 +20,21 @@ interface CategoryFallback {
  * Gradients are chosen to feel appetizing and category-appropriate.
  */
 const CATEGORY_MAP: Record<string, CategoryFallback> = {
-  pasta:     { emoji: "🍝", gradient: "from-orange-400 to-orange-600" },
-  salad:     { emoji: "🥗", gradient: "from-green-400 to-green-600" },
-  dessert:   { emoji: "🍰", gradient: "from-pink-300 to-pink-500" },
-  soup:      { emoji: "🍲", gradient: "from-amber-400 to-amber-600" },
-  breakfast: { emoji: "🍳", gradient: "from-yellow-300 to-yellow-500" },
-  grill:     { emoji: "🥩", gradient: "from-red-400 to-red-600" },
-  bake:      { emoji: "🍞", gradient: "from-amber-300 to-amber-500" },
-  drink:     { emoji: "🍹", gradient: "from-cyan-400 to-cyan-600" },
-  snack:     { emoji: "🍿", gradient: "from-violet-400 to-violet-600" },
-  other:     { emoji: "🍽️", gradient: "from-slate-400 to-slate-500" },
+  sandwich_burger:  { emoji: "🍔", gradient: "from-amber-400 to-amber-600" },
+  pizza:            { emoji: "🍕", gradient: "from-red-400 to-orange-500" },
+  soup:             { emoji: "🍲", gradient: "from-amber-400 to-amber-600" },
+  salad:            { emoji: "🥗", gradient: "from-green-400 to-green-600" },
+  pasta_noodles:    { emoji: "🍝", gradient: "from-orange-400 to-orange-600" },
+  meat_seafood:     { emoji: "🥩", gradient: "from-red-400 to-red-600" },
+  bowl:             { emoji: "🥣", gradient: "from-teal-400 to-teal-600" },
+  casserole_bake:   { emoji: "🍞", gradient: "from-amber-300 to-amber-500" },
+  side_dish:        { emoji: "🥦", gradient: "from-lime-400 to-lime-600" },
+  sauce_condiment:  { emoji: "🫙", gradient: "from-rose-400 to-rose-600" },
+  breakfast_bakery: { emoji: "🍳", gradient: "from-yellow-300 to-yellow-500" },
+  dessert:          { emoji: "🍰", gradient: "from-pink-300 to-pink-500" },
+  drink:            { emoji: "🍹", gradient: "from-cyan-400 to-cyan-600" },
+  snack_app:        { emoji: "🍿", gradient: "from-violet-400 to-violet-600" },
+  other:            { emoji: "🍽️", gradient: "from-slate-400 to-slate-500" },
 };
 
 /** Neutral fallback for categories not in the map */
