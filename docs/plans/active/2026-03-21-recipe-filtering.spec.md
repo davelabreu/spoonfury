@@ -145,33 +145,37 @@ Recipe responses include tags as:
 | Parameter | Example          | Behavior |
 |-----------|------------------|----------|
 | `kind`    | `?kind=cuisine`  | Filter by tag kind |
+| `search`  | `?search=veg`    | Case-insensitive prefix/substring match on tag name (for typeahead autocomplete) |
 
 Response: list of `{name, slug, kind}` objects. No pagination (tag count will stay small).
+
+The `search` parameter is required for the frontend tag picker — typeahead/autocomplete needs to suggest existing tags as the user types.
 
 ### Filtering Implementation
 
 Use `django-filter` library:
 
-- `FilterSet` on `RecipeViewSet` for `category` (exact match) and `tags` (custom AND filter)
-- **Tags AND filter:** Default django-filter M2M behavior is OR. Requires a custom filter method that chains `.filter(tags__name=x)` for each tag value to achieve AND semantics.
-- **Ingredient search:** Uses PostgreSQL `jsonb_array_elements` to scan the JSONField:
+- `FilterSet` on `RecipeViewSet` for `category` (exact match) and `tags` (AND filter)
+- **Tags AND filter:** Use `django_filters.ModelMultipleChoiceFilter` with `conjoined=True`. This is django-filter's built-in AND mode for M2M — no custom chaining logic needed. The library handles the SQL joins and `.distinct()` correctly.
+- **Ingredient search:** Uses a chainable `RawSQL` annotation with PostgreSQL `EXISTS` — never `.raw()` (which breaks django-filter's queryset chaining):
 
 ```python
-# Custom filter method for ingredient search
-Recipe.objects.filter(
-    pk__in=Recipe.objects.raw(
-        "SELECT id FROM recipes_recipe r, "
-        "jsonb_array_elements(r.ingredients) elem "
-        "WHERE LOWER(elem->>'name') LIKE LOWER(%%s)",
-        [f"%{value}%"]
+from django.db.models.expressions import RawSQL
+
+# Inside the custom filter method:
+queryset = queryset.annotate(
+    has_ingredient=RawSQL(
+        "EXISTS(SELECT 1 FROM jsonb_array_elements(ingredients) elem "
+        "WHERE LOWER(elem->>'name') LIKE LOWER(%s))",
+        (f"%{value}%",)
     )
-)
+).filter(has_ingredient=True)
 ```
 
-Alternatively, use Django's `__contains` lookup for exact ingredient name match if substring matching proves too slow at scale. For the prototype, the `jsonb_array_elements` approach is fine.
+This keeps the queryset pure and chainable so other filters (category, tags, search) compose correctly.
 
 - `SearchFilter` for title and description text search
-- `OrderingFilter` for sort options
+- `OrderingFilter` for sort options. Note: `?ordering=-fork_count` is acceptable for v0.1 but has a recency bias problem (old recipes with high fork counts dominate). A time-decay "Stir Score" will replace this in a future version.
 
 ### Performance
 
@@ -184,6 +188,8 @@ Use a custom `TagListField` for the `tags` field on `RecipeSerializer`:
 - **On read:** Returns `[{name, slug, kind}]` (list of tag objects via `TagSerializer`).
 
 Implement as a `serializers.ListField(child=CharField())` for input, with a custom `create`/`update` method on `RecipeSerializer` to handle the M2M assignment. Use `TagSerializer` as a read-only nested serializer via `to_representation`.
+
+**Concurrency safety:** The `create`/`update` methods must wrap tag get-or-create logic in `transaction.atomic()`. Because `Tag.name` is `unique=True`, two simultaneous requests creating the same novel tag (e.g. `#girldinner`) will race on `get_or_create` and one will hit an `IntegrityError`. The atomic block with a retry-on-conflict pattern (or simply catching `IntegrityError` and re-fetching) prevents 500 crashes.
 
 ### Tag Endpoint
 
