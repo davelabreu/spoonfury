@@ -1,10 +1,10 @@
 # Spoonfury 🥄💢
 [🙆🏼Human written!!]
 
-Spoonfury is an [under construction] recipe-first social platform designed to bring joy and efficiency back to cooking and meal planning. No fluff, no endless stories or ads —— just recipes, ingredients, and method.
+Spoonfury is an [🚧🏗️under construction🏗️🚧] recipe-first social platform designed to bring joy and efficiency back to cooking and meal planning. No fluff, no endless stories or ads —— just recipes, ingredients, and method.
 
 ## Reason to be
-Spoonfury is built on aggressive simplicity. We aim to bring utility the cooking experience. Leveraging Twitter-style descriptions followed immediately by ingredients and instructions, Spoonfury aims to empower users to cook and iterate through clarity and utility.
+Spoonfury is built on aggressive simplicity, aiming to bring utility to the cooking experience. Leveraging Twitter-style descriptions followed immediately by ingredients and instructions, Spoonfury aims to empower users to cook and iterate through clarity and utility.
 
 The core value propositions are:
 
@@ -17,9 +17,9 @@ The core value propositions are:
 - **Recipe Forking**: Clone recipes and make personal tweaks (constrained to ±3 ingredient changes).
 - **Stir the Pot**: A public explore feed to discover the latest community recipes.
 - **Easy Sharing**: Share recipes instantly via QR codes, WhatsApp, or direct URL copy.
-- **Instacart Integration**: Order ingredients directly from a recipe page.
+- **Instacart Integration**: Order ingredients directly from a recipe page. (NOT YET FINALIZED)
 - **Recipe Books**: Organize and share collections of recipes.
-- **Mobile-First Design**: Optimized for use in the kitchen.
+- **Mobile-First Design**: Optimized for use in the kitchen. (NEED TO ENFORCE THIS!)
 
 # Project Architecture
 
