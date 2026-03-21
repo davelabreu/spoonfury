@@ -83,8 +83,10 @@ docs/
     active/                Work in progress or queued next
     completed/             Shipped and archived
 
+  visual-mockups/        Interactive HTML mockups from UI brainstorming sessions
   references/            External templates and reference material
   snapshots/             Point-in-time UI/state captures
+  CHANGELOG.md           Human-first dev log — what changed, when, and why
   TODO.md                Deferred backlog items
   TODO-future-shopping.md  Shopping list enhancement ideas
 ```
