@@ -7,9 +7,9 @@ export function useNavTheme() {
   const [theme, setThemeState] = useState<NavTheme>(() => {
     try {
       const stored = localStorage.getItem(KEY);
-      return stored === "minimal" ? "minimal" : "sticker";
+      return stored === "sticker" ? "sticker" : "minimal";
     } catch {
-      return "sticker";
+      return "minimal";
     }
   });
 
