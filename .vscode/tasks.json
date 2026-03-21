@@ -8,6 +8,8 @@
       "options": {
         "shell": { "executable": "C:\\Program Files\\Git\\bin\\bash.exe", "args": ["-c"] }
       },
+      "isBackground": true,
+      "problemMatcher": [],
       "runOptions": { "runOn": "folderOpen" },
       "presentation": { "panel": "dedicated", "reveal": "always", "showReuseMessage": false }
     },
@@ -18,6 +20,8 @@
       "options": {
         "shell": { "executable": "C:\\Program Files\\Git\\bin\\bash.exe", "args": ["-c"] }
       },
+      "isBackground": true,
+      "problemMatcher": [],
       "runOptions": { "runOn": "folderOpen" },
       "presentation": { "panel": "dedicated", "reveal": "always", "showReuseMessage": false }
     },
@@ -28,6 +32,8 @@
       "options": {
         "shell": { "executable": "C:\\Program Files\\Git\\bin\\bash.exe", "args": ["-c"] }
       },
+      "isBackground": true,
+      "problemMatcher": [],
       "runOptions": { "runOn": "folderOpen" },
       "presentation": { "panel": "dedicated", "reveal": "always", "showReuseMessage": false }
     }
