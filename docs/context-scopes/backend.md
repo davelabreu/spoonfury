@@ -23,14 +23,24 @@ Custom `AbstractUser`. Added fields: `display_name`, `bio`, `avatar`.
 
 ### Recipe (recipes)
 Core domain model. Key fields:
-- `title`, `description` (280 char), `serves`, `category` (10 choices), `image_url` (URLField, accepts relative + full URLs)
+- `title`, `description` (280 char), `serves`, `category` (15 choices), `image_url` (URLField, accepts relative + full URLs)
 - `ingredients`: **JSONField** — list of `{name, quantity, unit, note}` dicts
 - `instructions`, `notes`: TextField (markdown)
 - `slug`: unique, auto-generated from title on `save()`
 - `author`: FK → User (CASCADE)
 - `parent_recipe`: self-FK (null=True) — fork lineage
 - `fork_count`: PositiveIntegerField, incremented atomically via `F()` on fork
+- `tags`: M2M → Tag (blank=True)
 - Ordering: `-created_at`
+- Categories: `sandwich_burger`, `pizza`, `soup`, `salad`, `pasta_noodles`, `meat_seafood`, `bowl`, `casserole_bake`, `side_dish`, `sauce_condiment`, `breakfast_bakery`, `dessert`, `drink`, `snack_app`, `other`
+
+### Tag (recipes)
+Flexible labeling for recipes. Key fields:
+- `name`: CharField(50), unique, auto-lowercased + stripped on save
+- `slug`: SlugField(50), unique, auto-generated from name
+- `kind`: CharField(20), choices: `cuisine`, `dietary`, `ingredient`, `vibe` (default: `vibe`)
+- Ordering: `["kind", "name"]`
+- Seeded with 15 initial tags (8 cuisine, 3 dietary, 4 ingredient)
 
 ### RecipeBook (books)
 - `owner`: FK → User (CASCADE)
@@ -59,7 +69,15 @@ Denormalized — copies `recipe_title` and `recipe_slug` at add time so items su
 ### RecipeViewSet (`ModelViewSet`, lookup by `slug`)
 - **GET list/retrieve**: `AllowAny` (public)
 - **POST/PATCH/DELETE**: `IsAuthenticated`, ownership enforced in `perform_update`/`perform_destroy`
-- `select_related("author", "parent_recipe__author")`
+- `select_related("author", "parent_recipe__author")`, `prefetch_related("tags")`
+- **Filtering** (django-filter): `?category=`, `?tags=` (AND logic via `conjoined=True`), `?ingredient=` (jsonb EXISTS)
+- **Search**: `?search=` (title, description)
+- **Ordering**: `?ordering=` (`created_at`, `fork_count`, `title`)
+
+### TagListView (`ListAPIView`)
+- **GET**: `AllowAny` (public), no pagination
+- Filters: `?kind=` (exact), `?search=` (name icontains)
+- Used for tag autocomplete in the frontend
 
 ### RecipeBookViewSet (`ModelViewSet`, lookup by `id`)
 - Queryset filtered to `owner=request.user`
@@ -81,7 +99,8 @@ All `IsAuthenticated`. Auto `get_or_create` ShoppingList per user.
 
 ## Serializer Patterns
 
-- `RecipeSerializer`: Flattens author/parent info into read-only fields. Uses `CharField` for `image_url` (not URLField) to accept both relative paths and full URLs.
+- `RecipeSerializer`: Flattens author/parent info into read-only fields. Uses `CharField` for `image_url` (not URLField) to accept both relative paths and full URLs. Tags: accepts list of strings on write (get_or_create with per-tag savepoints), returns full Tag objects on read via `to_representation` override.
+- `TagSerializer`: Read-only `ModelSerializer` — fields: `name`, `slug`, `kind`.
 - `RecipeBookDetailSerializer` extends `RecipeBookSerializer` with nested `recipes` (full `RecipeSerializer`).
 - `ShoppingListSerializer`: Groups items by `recipe_slug`, bulk-fetches recipe metadata for image/category.
 

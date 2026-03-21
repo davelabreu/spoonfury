@@ -4,6 +4,28 @@ Dev log for Spoonfury. **Focus** statements are top-level human summaries of dev
 
 ---
 
+## 2026-03-21 — v0.5 Recipe Filtering
+
+**Focus**: I want to future proof the recipe categorization, so that the database can support a robust search filtering mechanism for finding recipes based on tags, ingredients, category, vibe, meal type, etc!
+
+- Hybrid "Bones + Vibes" architecture: 15 strict categories (the bones) + flexible Tag M2M with 4 kinds — cuisine, dietary, ingredient, vibe (the vibes)
+- Tag model with auto-lowercase, slug generation, and `kind` field (default "vibe" so user-created tags just work)
+- django-filter integration: `?category=`, `?tags=` (AND logic via `conjoined=True`), `?ingredient=` (PostgreSQL jsonb EXISTS annotation), `?search=`, `?ordering=`
+- Data migration expanding 10 categories to 15 (sandwich_burger, pizza, bowl, casserole_bake, side_dish, sauce_condiment added) with reversible RunPython
+- Seed migration with 15 initial tags (8 cuisine, 3 dietary, 4 ingredient)
+- GET /api/tags/ endpoint with `?kind=` and `?search=` params for frontend autocomplete
+- Tag admin with kind filter, recipe admin with tag picker (`filter_horizontal`)
+- RecipeSerializer read/write asymmetry: accepts tag name strings on write, returns full `{name, slug, kind}` objects on read
+- Per-tag savepoints (`transaction.atomic()` inside the loop) for race condition safety on `get_or_create`
+- CreateRecipePage completely overhauled: 4-section cognitive layout (Identity → Classification → Blueprint → Execution)
+- Shadcn Select for category dropdown with human-readable labels
+- TagInput component: debounced autocomplete from /api/tags/?search=, keyboard nav (arrows, enter, escape, backspace), removable Badge pills, novel tags accepted on Enter
+- Frontend types updated: Tag interface, Recipe.tags optional field, 15-key categoryFallback map
+- 64 backend tests passing (30 new), TypeScript clean
+- Worktree-isolated development on `recipe-filtering` branch, fast-forward merged to master
+
+---
+
 ## 2026-03-21 — Cart Animation & Minimal Default
 
 **Focus**: The shopping cart and recipe page interaction with it needed soul and refinement. I want to implement a fun, simple animation that draws the user in to how powerful, slick, and sexy this website may be.

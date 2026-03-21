@@ -9,6 +9,13 @@ All endpoints are prefixed with `/api/`. Auth uses DRF token auth: `Authorizatio
 ### `GET /api/recipes/`
 List all recipes. **Public.**
 
+Query params:
+- `?category=pasta_noodles` — filter by category (exact)
+- `?tags=vegan&tags=mexican` — filter by tags (AND logic — recipe must have ALL specified tags)
+- `?ingredient=chicken` — search ingredients by name (case-insensitive, partial match via jsonb)
+- `?search=tacos` — full-text search on title and description
+- `?ordering=-fork_count` — sort by `created_at`, `fork_count`, or `title` (prefix `-` for descending)
+
 ### `POST /api/recipes/`
 Create a recipe. **Auth required.**
 
@@ -17,7 +24,8 @@ Create a recipe. **Auth required.**
   "title": "Spicy Rigatoni",
   "description": "Creamy vodka sauce...",
   "serves": "4",
-  "category": "pasta",
+  "category": "pasta_noodles",
+  "tags": ["italian", "comfort food"],
   "image_url": "/media/recipes/abc.webp",
   "ingredients": [
     { "quantity": "1", "unit": "lb", "name": "rigatoni", "note": "", "emoji": "" }
@@ -28,13 +36,14 @@ Create a recipe. **Auth required.**
 ```
 
 - `image_url` — optional. Accepts both relative paths (`/media/...` from upload endpoint) and full URLs (`https://...` pasted by user).
-- `category` — one of: `soup`, `pasta`, `bake`, `salad`, `grill`, `breakfast`, `dessert`, `drink`, `snack`, `other`.
+- `category` — one of: `sandwich_burger`, `pizza`, `soup`, `salad`, `pasta_noodles`, `meat_seafood`, `bowl`, `casserole_bake`, `side_dish`, `sauce_condiment`, `breakfast_bakery`, `dessert`, `drink`, `snack_app`, `other`.
+- `tags` — optional list of tag name strings. Existing tags are matched; new names are auto-created as `kind="vibe"`.
 - `ingredients[].emoji` — optional override. If blank, the frontend auto-guesses from the ingredient name.
 
 ### `GET /api/recipes/:slug/`
 Get a single recipe by slug. **Public.**
 
-Response includes: `id`, `slug`, `title`, `description`, `serves`, `category`, `image_url`, `ingredients`, `instructions`, `notes`, `author_username`, `author_display_name`, `parent_recipe_slug`, `parent_recipe_title`, `parent_recipe_author`, `fork_count`, `created_at`.
+Response includes: `id`, `slug`, `title`, `description`, `serves`, `category`, `image_url`, `tags` (array of `{name, slug, kind}`), `ingredients`, `instructions`, `notes`, `author_username`, `author_display_name`, `parent_recipe_slug`, `parent_recipe_title`, `parent_recipe_author`, `fork_count`, `created_at`.
 
 ### `PATCH /api/recipes/:slug/`
 Update a recipe. **Auth required. Owner only.**
@@ -69,6 +78,25 @@ Returns:
 ```
 
 The returned URL is **relative** — use it directly as `image_url` when saving the recipe. The Vite dev proxy and production nginx both forward `/media` to the backend.
+
+---
+
+## Tags
+
+### `GET /api/tags/`
+List all tags. **Public.** No pagination (flat array).
+
+Query params:
+- `?kind=cuisine` — filter by kind (`cuisine`, `dietary`, `ingredient`, `vibe`)
+- `?search=veg` — case-insensitive name search (for autocomplete)
+
+Response:
+```json
+[
+  { "name": "vegan", "slug": "vegan", "kind": "dietary" },
+  { "name": "mexican", "slug": "mexican", "kind": "cuisine" }
+]
+```
 
 ---
 

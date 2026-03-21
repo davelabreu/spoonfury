@@ -10,11 +10,11 @@ Canonical project context for Spoonfury. AI agents: Read this first.
 ## Project Overview
 Spoonfury — a recipe-first social platform. Core mechanic: **Fork** a recipe, make it yours, build curated digital recipe books.
 
-**Status**: Prototype v0.4.4 (Navbar polish: B4a breathing badge, combined mobile hamburger+badge, compact cart pill).
+**Status**: Prototype v0.5 (Recipe filtering: Tag model, 15 categories, django-filter, Shadcn CreateRecipePage with TagInput autocomplete).
 
 ## Core Architecture
-- **Data Model**: Recipe (fork lineage) -> User -> RecipeBook -> ShoppingList.
-- **Backend Patterns**: Ownership-enforced ViewSets, POST-based custom actions (fork, add-to-book).
+- **Data Model**: Recipe (fork lineage) -> Tag (M2M, 4 kinds) -> User -> RecipeBook -> ShoppingList.
+- **Backend Patterns**: Ownership-enforced ViewSets, POST-based custom actions (fork, add-to-book), django-filter for search/filtering.
 - **Frontend Patterns**: Context-based global state, B1 layout (title above fused hero image), emoji-guessing logic for ingredients.
 
 ## Environment & Git
@@ -61,6 +61,7 @@ Active plans live in `docs/plans/active/`. Shipped features are archived in `doc
 
 | Feature | Spec | Impl |
 |---------|------|------|
+| v0.5 Recipe Filtering | `completed/2026-03-21-recipe-filtering.spec.md` | `completed/2026-03-21-recipe-filtering.impl.md` |
 | v0.1 Spoonfury | `completed/2026-02-15-v0.1-spoonfury.spec.md` | `completed/2026-02-15-v0.1-spoonfury.impl.md` |
 | v0.2 Animated Header | `completed/2026-02-16-v0.2-animated-header.spec.md` | `completed/2026-02-16-v0.2-animated-header.impl.md` |
 | v0.2 Improvements | `completed/2026-02-16-v0.2-improvements.spec.md` | `completed/2026-02-16-v0.2-improvements.impl.md` |

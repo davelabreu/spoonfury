@@ -9,9 +9,9 @@ frontend/src/
   App.tsx              # Router + layout (AuthProvider → ShoppingProvider → TooltipProvider)
   index.css            # Tailwind theme + custom keyframes
   main.tsx             # React entry
-  types.ts             # TypeScript interfaces (Recipe, Ingredient, Book, ShoppingItem, etc.)
-  components/          # Flat — NavBar, RecipeCard, ImageUploadField, ForkModal, ShareModal, etc.
-    ui/                # Shadcn components (button, card, badge, checkbox, dropdown-menu, tooltip, etc.)
+  types.ts             # TypeScript interfaces (Recipe, Ingredient, Tag, Book, ShoppingItem, etc.)
+  components/          # Flat — NavBar, RecipeCard, ImageUploadField, ForkModal, ShareModal, TagInput, etc.
+    ui/                # Shadcn components (button, card, badge, checkbox, dropdown-menu, tooltip, select, input, textarea, label, command, popover, etc.)
   contexts/
     AuthContext.tsx     # Token + username, login/register/logout
     ShoppingContext.tsx # Cart count + items, refresh from API
@@ -80,6 +80,7 @@ Token passed as `Authorization: Token <key>` header. 204 responses return `null`
 | **ForkModal** | Fork recipe → select book. Validates max 3 ingredient changes. |
 | **ShareModal** | QR code (qrcode.react) + copy URL + WhatsApp link. |
 | **IngredientChecklist** | Ingredient rows with emoji, checkbox, tooltips with cooking tips. |
+| **TagInput** | Autocomplete tag input. Debounced search against `/api/tags/?search=`, keyboard navigation, badges with remove. Novel tags accepted on Enter (backend creates as "vibe"). |
 | **CartCapsule** | Nav pill: `[Pickup | Delivery | 🛒⁴]`. Shimmer border, shake animation, emoji burst on add. `compact` prop for mobile. |
 
 ## Styling
@@ -93,7 +94,8 @@ Token passed as `Authorization: Token <key>` header. 204 responses return `null`
 ## TypeScript Interfaces (types.ts)
 
 - `Ingredient`: `{quantity, unit, name, note, emoji?}`
-- `Recipe`: Full recipe with author info, fork lineage, image_url
+- `Tag`: `{name, slug, kind}` — kind is `"cuisine" | "dietary" | "ingredient" | "vibe"`
+- `Recipe`: Full recipe with author info, fork lineage, image_url, optional `tags: Tag[]`
 - `Book`: Recipe book with optional nested recipes
 - `ShoppingItem`: Denormalized item with recipe_slug for grouping
 - `RecipeGroup`: Items grouped by recipe with multiplier + image/category
@@ -102,7 +104,7 @@ Token passed as `Authorization: Token <key>` header. 204 responses return `null`
 ## Key Utilities
 
 - **ingredientEmoji.ts**: Regex map of ~200 ingredients → emoji. `PICKER_CATEGORIES` for manual selection (11 categories).
-- **categoryFallback.ts**: Maps 10 recipe categories → `{emoji, gradient}` for placeholder images.
+- **categoryFallback.ts**: Maps 15 recipe categories → `{emoji, gradient}` for placeholder images.
 - **ingredientInfo.ts**: Cooking tips for 100+ ingredients (tooltips on hover).
 - **instacart.ts**: Builds Instacart search URL from ingredient list.
 
