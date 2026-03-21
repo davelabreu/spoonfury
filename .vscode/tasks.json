@@ -4,24 +4,32 @@
     {
       "label": "Postgres (WSL2)",
       "type": "shell",
-      "command": "wsl -e bash -c \"cd /mnt/g/Projects/dev/1.work/Spoonfury && echo '' && echo '=== Postgres (WSL2) ===' && echo 'Run: docker compose -f docker-compose.dev.yml up -d' && echo '' && exec bash\"",
+      "command": "echo '=== Postgres (WSL2) ===' && echo 'Run: docker compose -f docker-compose.dev.yml up -d' && echo '' && wsl bash -c 'cd /mnt/g/Projects/dev/1.work/Spoonfury && exec bash'",
+      "options": {
+        "shell": { "executable": "C:\\Program Files\\Git\\bin\\bash.exe", "args": ["-c"] }
+      },
       "runOptions": { "runOn": "folderOpen" },
       "presentation": { "panel": "dedicated", "reveal": "always", "showReuseMessage": false }
     },
     {
       "label": "Frontend",
       "type": "shell",
-      "command": "cd frontend && echo '' && echo '=== Frontend ===' && echo 'Run: npm run dev:network' && echo '' && bash",
+      "command": "cd frontend && echo '' && echo '=== Frontend ===' && echo 'Run: npm run dev:network' && echo '' && exec bash",
+      "options": {
+        "shell": { "executable": "C:\\Program Files\\Git\\bin\\bash.exe", "args": ["-c"] }
+      },
       "runOptions": { "runOn": "folderOpen" },
       "presentation": { "panel": "dedicated", "reveal": "always", "showReuseMessage": false }
     },
     {
       "label": "Backend",
       "type": "shell",
-      "command": "cd backend && echo '' && echo '=== Backend ===' && echo '1. source ../.venv/Scripts/activate' && echo '2. (If changes were made) python manage.py migrate' && echo '3. python manage.py runserver 0.0.0.0:8000' && echo '' && bash",
+      "command": "cd backend && echo '' && echo '=== Backend ===' && echo '1. source ../.venv/Scripts/activate' && echo '2. (If changes were made) python manage.py migrate' && echo '3. python manage.py runserver 0.0.0.0:8000' && echo '' && exec bash",
+      "options": {
+        "shell": { "executable": "C:\\Program Files\\Git\\bin\\bash.exe", "args": ["-c"] }
+      },
       "runOptions": { "runOn": "folderOpen" },
       "presentation": { "panel": "dedicated", "reveal": "always", "showReuseMessage": false }
-    },
-
+    }
   ]
 }
