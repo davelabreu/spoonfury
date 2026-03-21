@@ -2,8 +2,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .models import Recipe
-from .serializers import RecipeSerializer
+from rest_framework.generics import ListAPIView
+from .models import Recipe, Tag
+from .serializers import RecipeSerializer, TagSerializer
 from .filters import RecipeFilter
 
 
@@ -37,3 +38,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if instance.author != self.request.user:
             raise PermissionDenied("You can only delete your own recipes.")
         instance.delete()
+
+
+class TagListView(ListAPIView):
+    serializer_class = TagSerializer
+    permission_classes = [permissions.AllowAny]
+    pagination_class = None
+
+    def get_queryset(self):
+        qs = Tag.objects.all()
+        kind = self.request.query_params.get("kind")
+        if kind:
+            qs = qs.filter(kind=kind)
+        search = self.request.query_params.get("search")
+        if search:
+            qs = qs.filter(name__icontains=search)
+        return qs
