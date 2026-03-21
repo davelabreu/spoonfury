@@ -6,9 +6,9 @@ from spoonfury.apps.recipes.models import Tag
 @pytest.mark.django_db
 class TestTagModel:
     def test_create_tag(self):
-        tag = Tag.objects.create(name="Mexican", kind="cuisine")
-        assert tag.name == "mexican"  # lowercase enforced
-        assert tag.slug == "mexican"  # auto-generated
+        tag = Tag.objects.create(name="Peruvian", kind="cuisine")
+        assert tag.name == "peruvian"  # lowercase enforced
+        assert tag.slug == "peruvian"  # auto-generated
         assert tag.kind == "cuisine"
 
     def test_slug_auto_generated(self):
@@ -16,25 +16,29 @@ class TestTagModel:
         assert tag.slug == "gluten-free"
 
     def test_name_unique(self):
-        Tag.objects.create(name="vegan", kind="dietary")
+        Tag.objects.create(name="rawfood", kind="dietary")
         with pytest.raises(IntegrityError):
-            Tag.objects.create(name="vegan", kind="vibe")
+            Tag.objects.create(name="rawfood", kind="vibe")
 
     def test_name_stripped_and_lowered(self):
-        tag = Tag.objects.create(name="  Italian  ", kind="cuisine")
-        assert tag.name == "italian"
+        tag = Tag.objects.create(name="  Ethiopian  ", kind="cuisine")
+        assert tag.name == "ethiopian"
 
     def test_default_kind_is_vibe(self):
         tag = Tag.objects.create(name="girldinner")
         assert tag.kind == "vibe"
 
     def test_ordering(self):
-        Tag.objects.create(name="zebra", kind="cuisine")
-        Tag.objects.create(name="alpha", kind="cuisine")
-        Tag.objects.create(name="beta", kind="dietary")
-        names = list(Tag.objects.values_list("name", flat=True))
-        assert names == ["alpha", "zebra", "beta"]
+        # Use a filtered queryset to avoid seed data interference
+        Tag.objects.create(name="zzz-zebra", kind="cuisine")
+        Tag.objects.create(name="zzz-alpha", kind="cuisine")
+        Tag.objects.create(name="zzz-beta", kind="dietary")
+        names = list(
+            Tag.objects.filter(name__startswith="zzz-")
+            .values_list("name", flat=True)
+        )
+        assert names == ["zzz-alpha", "zzz-zebra", "zzz-beta"]
 
     def test_str(self):
-        tag = Tag.objects.create(name="vegan", kind="dietary")
-        assert str(tag) == "vegan"
+        tag = Tag.objects.create(name="paleo", kind="dietary")
+        assert str(tag) == "paleo"
