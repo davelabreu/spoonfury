@@ -36,27 +36,29 @@ friction and improves security (no password to leak).
 - Frontend: OAuth redirect flow or SDK-based sign-in buttons on login/register pages.
 - Decide whether to keep username/password as a fallback or go social-only.
 
-## Recipe Filtering & Smart Categories
+## Recipe Search & Filtering (HIGH PRIORITY — NEEDS BRAINSTORM)
 
-Replace the flat `category` field with three filtering dimensions:
+The Stir the Pot explore feed needs real search and filtering. This is central to making the platform useful and discoverable. **No decisions are final yet — this needs a full brainstorm session.**
 
-**1. Moment (meal type)** — Breakfast, Lunch, Dinner, Snack, Dessert.
-  - Single-select radio on create/edit.
-  - Smart default: suggest category from ingredients (eggs + toast → Breakfast).
+**Ideas on the table:**
 
-**2. Vibe / Effort** — Weeknight Dash (<30 min), Project Cook (longer/complex), Meal Prep (high yield).
-  - Auto-calculated from recipe metadata (prep time, cook time).
-  - If total <20 min → auto-tag "Quick Fix."
+- **Meal type** — Breakfast, Lunch, Dinner, Snack, Dessert, Any Time
+- **Main ingredients** — Search by what's in the recipe
+- **Cultural / Heritage** — Italian, Mexican, Japanese, Southern, Caribbean, etc. Celebrate where recipes come from
+- **Vibe / Effort** — Quick weeknight vs. weekend project vs. meal prep
+- **Dietary** — Vegetarian, Vegan, Keto, Gluten-Free, etc. Could be auto-derived from ingredients
+- **Similar recipes** — "Recipes like this one" — find related recipes across any dimension
+- **Smart auto-tagging** — Can we derive some of this automatically from ingredients and metadata?
 
-**3. Dietary Protocol** — Vegetarian, Vegan, Keto, Gluten-Free, High-Protein.
-  - Auto-derived from ingredient list (no meat → Vegetarian flag, etc.).
+**Open questions:**
+- Tag-based system (M2M) vs. flat fields vs. something else? Leaning tags for scalability but needs exploration.
+- How does this interact with the current `category` field? Replace it? Absorb it?
+- What does the UI look like? Filter bar? Sidebar? Search modal? Needs visual brainstorming.
+- How much is user-entered vs. auto-derived?
+- What makes search feel *good* on a recipe platform specifically?
+- How do we handle recipes that don't have tags yet (migration/backfill)?
 
-**UI: Horizontal Filter Bar** at top of HomePage/BooksPage (not a sidebar):
-  - Primary row: Icons (Sun, Sandwich, Moon) for Breakfast/Lunch/Dinner.
-  - Secondary row: Small outline badges for "High Protein", "< 30 mins", etc.
-  - Sorting dropdown: Newest, Most Forked, Trending.
-
-Current `category` (pasta, salad, etc.) may become a sub-category or "cuisine type."
+**Where it lives:** Stir the Pot page. This is the front door for discovery.
 
 ## User Menu & Account Hub
 
