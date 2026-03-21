@@ -1,5 +1,6 @@
 # Spoonfury
 
+[Human Written!]
 Spoonfury is a recipe-first social platform. Users can discover, create, and **fork** recipes, building curated digital recipe books to share.
 
 ## Core Features
@@ -47,11 +48,39 @@ This project is built using a hybrid AI workflow, leveraging both Claude and Gem
 - **Guidance**: See `GEMINI.md` for Gemini-specific context and the use of the `gemini-superpowers` extension.
 
 ### Developer Workflow
-1. **Planning**: Design docs are stored in `docs/plans/`.
-2. **Context**: Targeted architectural flows and system scopes are in `docs/context-scopes/`.
+1. **Planning**: Design specs (`*.spec.md`) and implementation plans (`*.impl.md`) live in `docs/plans/`.
+2. **Context**: Targeted architectural scopes are in `docs/context-scopes/`.
 3. **Implementation**: AI agents follow the respective `CLAUDE.md` or `GEMINI.md` guides.
 3. **Verification**: Backend tests use `pytest`. Frontend is verified via Vite dev server.
 4. **Deployment**: Uses Docker Compose for consistent environments across development and production.
+
+---
+
+## How `/docs/` Is Organized
+
+The `docs/` folder is the project's knowledge base — for both humans and AI agents.
+
+```
+docs/
+  context-scopes/        Standing reference. Understand the system before reading plans.
+    core-flow.md           Fork & book data model relationships
+    backend.md             Django patterns, models, ViewSets, dev server setup
+    frontend.md            React architecture, routing, state, components
+    api-reference.md       REST API endpoints, request/response shapes
+
+  plans/                 Feature lifecycle. Every feature gets a spec + impl pair.
+    active/                Work in progress or queued next
+    completed/             Shipped and archived
+
+  references/            External templates and reference material
+  snapshots/             Point-in-time UI/state captures
+  TODO.md                Deferred backlog items
+  TODO-future-shopping.md  Shopping list enhancement ideas
+```
+
+**Naming convention**: `YYYY-MM-DD-{version}-{feature}.spec.md` (design — what & why) and `*.impl.md` (implementation — step-by-step agent work order). The date prefix gives chronological ordering at a glance. When a feature ships, both files move from `active/` to `completed/`.
+
+**Entry points**: AI agents start at `CLAUDE.md` (or `GEMINI.md`). Humans start here.
 
 ---
 
