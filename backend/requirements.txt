@@ -12,3 +12,4 @@ pytest-django==4.8.0
 pytest==8.3.2
 factory-boy==3.3.1
 requests
+django-filter==24.3
