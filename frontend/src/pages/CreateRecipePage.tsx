@@ -4,10 +4,34 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { IngredientEmojiPicker } from "@/components/IngredientEmojiPicker";
 import { ImageUploadField } from "@/components/ImageUploadField";
+import { TagInput } from "@/components/TagInput";
 
-const CATEGORIES = ["soup","pasta","bake","salad","grill","breakfast","dessert","drink","snack","other"];
+const CATEGORIES: [string, string][] = [
+  ["sandwich_burger", "Sandwiches & Burgers"],
+  ["pizza", "Pizza & Flatbreads"],
+  ["soup", "Soup & Stews"],
+  ["salad", "Salads"],
+  ["pasta_noodles", "Pasta & Noodles"],
+  ["meat_seafood", "Meat & Seafood"],
+  ["bowl", "Bowls"],
+  ["casserole_bake", "Casseroles & Bakes"],
+  ["side_dish", "Side Dishes"],
+  ["sauce_condiment", "Sauces & Condiments"],
+  ["breakfast_bakery", "Breakfast & Bakery"],
+  ["dessert", "Desserts"],
+  ["drink", "Drinks"],
+  ["snack_app", "Snacks & Appetizers"],
+  ["other", "Other"],
+];
 
 export function CreateRecipePage() {
   const { token } = useAuth();
@@ -16,6 +40,7 @@ export function CreateRecipePage() {
     title: "", description: "", serves: "",
     instructions: "", notes: "", category: "other", image_url: "",
   });
+  const [tags, setTags] = useState<string[]>([]);
   const [ingredients, setIngredients] = useState([{ quantity: "", unit: "", name: "", note: "", emoji: "" }]);
   const [error, setError] = useState("");
 
@@ -24,7 +49,11 @@ export function CreateRecipePage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const payload: Record<string, unknown> = { ...form, ingredients: ingredients.filter(i => i.name.trim() !== "") };
+      const payload: Record<string, unknown> = {
+        ...form,
+        tags,
+        ingredients: ingredients.filter(i => i.name.trim() !== ""),
+      };
       if (!payload.image_url) delete payload.image_url;
       const data = await api.post("/recipes/", payload, token);
       navigate(`/recipes/${data.slug}`);
@@ -50,11 +79,26 @@ export function CreateRecipePage() {
           <div className="flex gap-3">
             <input className="border rounded px-3 py-2 text-sm flex-1" placeholder="Serves"
               value={form.serves} onChange={e => setForm(f => ({ ...f, serves: e.target.value }))} />
-            <select className="border rounded px-3 py-2 text-sm" value={form.category}
-              onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
-              {CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
-            </select>
+            <Select
+              value={form.category}
+              onValueChange={val => setForm(f => ({ ...f, category: val }))}
+            >
+              <SelectTrigger className="w-[220px] text-sm">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map(([value, label]) => (
+                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+
+          <div>
+            <h3 className="text-sm font-semibold mb-2">Tags</h3>
+            <TagInput tags={tags} onChange={setTags} />
+          </div>
+
           <ImageUploadField
             value={form.image_url}
             onChange={url => setForm(f => ({ ...f, image_url: url }))}
