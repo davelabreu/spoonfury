@@ -4,15 +4,20 @@ from django.utils.text import slugify
 
 
 CATEGORY_CHOICES = [
-    ("soup", "Soup"),
-    ("pasta", "Pasta"),
-    ("bake", "Bake"),
-    ("salad", "Salad"),
-    ("grill", "Grill"),
-    ("breakfast", "Breakfast"),
-    ("dessert", "Dessert"),
-    ("drink", "Drink"),
-    ("snack", "Snack"),
+    ("sandwich_burger", "Sandwiches & Burgers"),
+    ("pizza", "Pizza & Flatbreads"),
+    ("soup", "Soup & Stews"),
+    ("salad", "Salads"),
+    ("pasta_noodles", "Pasta & Noodles"),
+    ("meat_seafood", "Meat & Seafood"),
+    ("bowl", "Bowls"),
+    ("casserole_bake", "Casseroles & Bakes"),
+    ("side_dish", "Side Dishes"),
+    ("sauce_condiment", "Sauces & Condiments"),
+    ("breakfast_bakery", "Breakfast & Bakery"),
+    ("dessert", "Desserts"),
+    ("drink", "Drinks"),
+    ("snack_app", "Snacks & Appetizers"),
     ("other", "Other"),
 ]
 

@@ -18,7 +18,7 @@ def parent_recipe(user):
         serves="2",
         ingredients=BASE_INGREDIENTS,
         instructions="Cook.",
-        category="pasta",
+        category="pasta_noodles",
         author=user,
     )
 

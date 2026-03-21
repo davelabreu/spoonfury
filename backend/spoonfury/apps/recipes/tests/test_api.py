@@ -62,7 +62,7 @@ def test_create_recipe_authenticated(auth_client):
         "serves": "2",
         "ingredients": SAMPLE_INGREDIENTS,
         "instructions": "Cook pasta. Add eggs.",
-        "category": "pasta",
+        "category": "pasta_noodles",
     }
     response = auth_client.post(url, data, format="json")
     assert response.status_code == 201
