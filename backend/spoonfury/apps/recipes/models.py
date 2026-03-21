@@ -17,6 +17,32 @@ CATEGORY_CHOICES = [
 ]
 
 
+TAG_KIND_CHOICES = [
+    ("cuisine", "Cuisine"),
+    ("dietary", "Dietary"),
+    ("ingredient", "Ingredient"),
+    ("vibe", "Vibe"),
+]
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
+    kind = models.CharField(max_length=20, choices=TAG_KIND_CHOICES, default="vibe")
+
+    class Meta:
+        ordering = ["kind", "name"]
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower().strip()
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
 class Recipe(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=280)
@@ -39,6 +65,7 @@ class Recipe(models.Model):
     )
     fork_count = models.PositiveIntegerField(default=0)
     image_url = models.URLField(blank=True, default="")
+    tags = models.ManyToManyField("Tag", blank=True, related_name="recipes")
     slug = models.SlugField(unique=True, max_length=120)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
