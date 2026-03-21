@@ -118,7 +118,7 @@ export function ShoppingListPage() {
     try {
       await api.post("/shopping-list/clear/", {}, token);
       setData(prev => prev ? { ...prev, total_items: 0, items_by_recipe: [] } : prev);
-      window.dispatchEvent(new Event(SHOPPING_LIST_UPDATED));
+      window.dispatchEvent(new CustomEvent(SHOPPING_LIST_UPDATED, { detail: { cleared: true } }));
     } catch {
       setError("Failed to clear list.");
     } finally {

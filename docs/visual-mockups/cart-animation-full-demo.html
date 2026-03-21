@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spoonfury – Cart Animation Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fafafa; color: #1a1a1a; overflow-x: hidden; }
+
+  /* ─── Navbar ─── */
+  .navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 24px;
+    background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .logo { font-size: 20px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
+  .logo span { color: #7c3aed; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+
+  /* ─── CartCapsule ─── */
+  .cart-capsule-wrap {
+    position: relative;
+    background-image: linear-gradient(270deg, #86efac, #93c5fd, #c4b5fd, #fda4af, #86efac);
+    background-size: 300% 300%;
+    animation: shimmer 8s ease infinite;
+    padding: 2px; border-radius: 9999px;
+    box-shadow: 0 2px 8px rgba(147,197,253,0.3);
+    transition: box-shadow 0.15s ease, transform 0.4s ease;
+  }
+  .cart-capsule-inner {
+    border-radius: 9999px; overflow: hidden; background: #fff;
+    display: flex; align-items: center;
+  }
+  .cart-seg {
+    padding: 0 13px; font-size: 12px; font-weight: 600;
+    line-height: 32px; text-decoration: none; color: #374151;
+    transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap; cursor: pointer;
+  }
+  .cart-seg:hover { background: #fde8ea; color: #9f1239; }
+  .cart-seg.delivery:hover { background: #ede9fe; color: #5b21b6; }
+  .cart-seg.cart-icon {
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 13px; color: #15803d; border-left: 1px solid rgba(0,0,0,0.06);
+    line-height: 32px; transition: background 0.15s ease;
+  }
+  .cart-seg.cart-icon:hover { background: #f0fdf4; }
+  .cart-divider { width: 1px; height: 20px; background: #e5e7eb; flex-shrink: 0; }
+
+  /* Cart icon SVG */
+  .cart-svg { width: 20px; height: 20px; transition: transform 0.5s ease; }
+
+  /* Badge */
+  .cart-badge {
+    position: absolute; top: -3px; right: -3px;
+    min-width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 9999px; background: #22c55e; color: white;
+    font-size: 9px; font-weight: 900; border: 1.5px solid white;
+    padding: 0 3px; transform: scale(0); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .cart-badge.visible { transform: scale(1); }
+  .cart-badge.pulse {
+    animation: badgePulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* ─── Recipe page ─── */
+  .recipe-page { max-width: 640px; margin: 0 auto; padding: 80px 20px 40px; }
+  .recipe-hero {
+    width: 100%; height: 260px; border-radius: 16px; overflow: hidden;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #f59e0b 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 80px; margin-bottom: 20px;
+  }
+  .recipe-title { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+  .recipe-meta { font-size: 13px; color: #888; margin-bottom: 24px; }
+  .recipe-section-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .recipe-section-subtitle { font-size: 12px; color: #999; margin-bottom: 12px; }
+
+  /* ─── Ingredient list ─── */
+  .ingredient-list { list-style: none; margin-bottom: 16px; }
+  .ingredient-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 0; font-size: 14px; position: relative;
+  }
+  .ingredient-row .emoji { font-size: 22px; line-height: 1; }
+  .ingredient-row .check {
+    width: 16px; height: 16px; border-radius: 4px;
+    border: 2px solid #d1d5db; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s ease;
+  }
+  .ingredient-row .check.checked {
+    background: #6366f1; border-color: #6366f1;
+  }
+  .ingredient-row .check.checked::after {
+    content: '✓'; color: white; font-size: 11px; font-weight: 700;
+  }
+  .ingredient-row.checked-row .name { text-decoration: line-through; color: #aaa; }
+
+  /* ─── Add to List button ─── */
+  .add-btn {
+    position: relative; overflow: hidden;
+    width: 100%; padding: 10px 20px;
+    border: 1.5px solid #c7d2fe; background: #eef2ff; color: #4338ca;
+    border-radius: 10px; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s ease;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .add-btn:hover { background: #e0e7ff; border-color: #a5b4fc; }
+  .add-btn:active { transform: scale(0.97); }
+  .add-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .add-btn .shimmer-overlay {
+    position: absolute; inset: 0; border-radius: inherit;
+    background: linear-gradient(45deg, transparent 25%, rgba(255,255,255,0.55) 50%, transparent 75%, transparent 100%);
+    background-size: 250% 250%; background-position: 200% 0;
+    transition: background-position 1s ease;
+  }
+  .add-btn:hover .shimmer-overlay { background-position: -100% 0; }
+
+  /* ─── In-list badge ─── */
+  .in-list-badge {
+    display: none; width: 100%; padding: 10px;
+    border-radius: 10px; border: 1px solid #bbf7d0;
+    background: rgba(34,197,94,0.08); color: #15803d;
+    font-size: 14px; font-weight: 600; text-align: center;
+    animation: fadeSlideIn 0.3s ease;
+  }
+  .in-list-badge.visible { display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+  /* ─── Flying emoji ─── */
+  .fly-emoji {
+    position: fixed; z-index: 9999;
+    font-size: 22px; pointer-events: none;
+    will-change: transform, opacity;
+  }
+
+  /* ─── Reset button ─── */
+  .reset-btn {
+    display: none; margin-top: 12px; width: 100%;
+    padding: 8px; border: 1px solid #e5e7eb; background: white;
+    border-radius: 8px; font-size: 12px; color: #888; cursor: pointer;
+  }
+  .reset-btn:hover { background: #f9fafb; color: #555; }
+  .reset-btn.visible { display: block; }
+
+  /* ─── Info banner ─── */
+  .info-banner {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: #1a1a1a; color: white; padding: 10px 20px; border-radius: 10px;
+    font-size: 13px; font-weight: 500; z-index: 200;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    animation: fadeSlideIn 0.3s ease;
+  }
+
+  /* ─── Animations ─── */
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  @keyframes badgePulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.5); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes capsuleShake {
+    0% { transform: translateX(0); }
+    15% { transform: translateX(-4px); }
+    30% { transform: translateX(4px); }
+    45% { transform: translateX(-3px); }
+    60% { transform: translateX(3px); }
+    75% { transform: translateX(-1px); }
+    90% { transform: translateX(1px); }
+    100% { transform: translateX(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="logo">spoon<span>fury</span></div>
+  <div class="nav-right">
+    <span style="font-size: 13px; color: #888;">chef_dave</span>
+    <div class="cart-capsule-wrap" id="capsule">
+      <div class="cart-capsule-inner">
+        <span class="cart-seg">🚗 Pickup</span>
+        <div class="cart-divider"></div>
+        <span class="cart-seg delivery">🏠 Delivery</span>
+        <span class="cart-seg cart-icon" id="cartIcon">
+          <svg class="cart-svg" id="cartSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
+            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+          </svg>
+        </span>
+      </div>
+      <span class="cart-badge" id="badge">0</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Recipe -->
+<div class="recipe-page">
+  <div class="recipe-hero">🍲</div>
+  <h1 class="recipe-title">Grandma's Chicken Soup</h1>
+  <p class="recipe-meta">by chef_dave · 35 min · 4 servings · forked 12 times</p>
+
+  <h2 class="recipe-section-title">Ingredients</h2>
+  <p class="recipe-section-subtitle">Tick ingredients you already have. Click "Add to List" to send the rest to your cart.</p>
+
+  <ul class="ingredient-list" id="ingredientList">
+    <li class="ingredient-row" data-emoji="🍗">
+      <div class="check" onclick="toggleCheck(this)"></div>
+      <span class="emoji">🍗</span>
+      <span class="name"><b>2 lbs</b> chicken thighs</span>
+    </li>
+    <li class="ingredient-row" data-emoji="🥕">
+      <div class="check" onclick="toggleCheck(this)"></div>
+      <span class="emoji">🥕</span>
+      <span class="name"><b>3</b> carrots, diced</span>
+    </li>
+    <li class="ingredient-row" data-emoji="🧅">
+      <div class="check" onclick="toggleCheck(this)"></div>
+      <span class="emoji">🧅</span>
+      <span class="name"><b>1 large</b> onion, chopped</span>
+    </li>
+    <li class="ingredient-row" data-emoji="🧄">
+      <div class="check" onclick="toggleCheck(this)"></div>
+      <span class="emoji">🧄</span>
+      <span class="name"><b>4 cloves</b> garlic, minced</span>
+    </li>
+    <li class="ingredient-row" data-emoji="🥬">
+      <div class="check" onclick="toggleCheck(this)"></div>
+      <span class="emoji">🥬</span>
+      <span class="name"><b>2 stalks</b> celery, sliced</span>
+    </li>
+    <li class="ingredient-row" data-emoji="🍝">
+      <div class="check" onclick="toggleCheck(this)"></div>
+      <span class="emoji">🍝</span>
+      <span class="name"><b>8 oz</b> egg noodles</span>
+    </li>
+    <li class="ingredient-row" data-emoji="🧂">
+      <div class="check" onclick="toggleCheck(this)"></div>
+      <span class="emoji">🧂</span>
+      <span class="name"><b>1 tsp</b> salt</span>
+    </li>
+    <li class="ingredient-row" data-emoji="🌿">
+      <div class="check" onclick="toggleCheck(this)"></div>
+      <span class="emoji">🌿</span>
+      <span class="name"><b>2 sprigs</b> fresh thyme</span>
+    </li>
+  </ul>
+
+  <button class="add-btn" id="addBtn" onclick="addToList()">
+    <div class="shimmer-overlay"></div>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+    <span id="addBtnText">Add 8 to List</span>
+  </button>
+
+  <div class="in-list-badge" id="inListBadge">
+    <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;"></span>
+    🛍️❤️ In your shopping list
+  </div>
+
+  <button class="reset-btn" id="resetBtn" onclick="resetDemo()">↻ Reset demo</button>
+</div>
+
+<div class="info-banner" id="infoBanner">
+  👆 Try checking off ingredients you have, then click "Add to List"
+</div>
+
+<script>
+  let cartCount = 0;
+  let added = false;
+
+  // Hide info banner after 4s
+  setTimeout(() => {
+    const b = document.getElementById('infoBanner');
+    if (b) { b.style.opacity = '0'; b.style.transition = 'opacity 0.3s'; setTimeout(() => b.remove(), 300); }
+  }, 4000);
+
+  function toggleCheck(el) {
+    if (added) return;
+    el.classList.toggle('checked');
+    el.closest('.ingredient-row').classList.toggle('checked-row');
+    updateBtnCount();
+  }
+
+  function updateBtnCount() {
+    const unchecked = document.querySelectorAll('.ingredient-row:not(.checked-row)');
+    document.getElementById('addBtnText').textContent = `Add ${unchecked.length} to List`;
+    document.getElementById('addBtn').disabled = unchecked.length === 0;
+  }
+
+  function addToList() {
+    if (added) return;
+    added = true;
+
+    const btn = document.getElementById('addBtn');
+    const capsule = document.getElementById('capsule');
+    const cartIcon = document.getElementById('cartIcon');
+    const badge = document.getElementById('badge');
+
+    // Gather unchecked ingredient emojis (cap at 5)
+    const rows = Array.from(document.querySelectorAll('.ingredient-row:not(.checked-row)'));
+    const allEmojis = rows.map(r => r.dataset.emoji);
+    const flyEmojis = allEmojis.slice(0, 5);
+    const totalAdded = allEmojis.length;
+
+    // Get positions
+    const btnRect = btn.getBoundingClientRect();
+    const cartRect = cartIcon.getBoundingClientRect();
+
+    const startX = btnRect.left + btnRect.width / 2;
+    const startY = btnRect.top;
+    const endX = cartRect.left + cartRect.width / 2;
+    const endY = cartRect.top + cartRect.height / 2;
+
+    // Launch emojis with staggered timing
+    flyEmojis.forEach((emoji, i) => {
+      const delay = i * 120; // 120ms stagger
+
+      setTimeout(() => {
+        const el = document.createElement('span');
+        el.className = 'fly-emoji';
+        el.textContent = emoji;
+
+        // Slight horizontal spread at launch
+        const spread = (i - (flyEmojis.length - 1) / 2) * 16;
+        const sx = startX + spread;
+        const sy = startY;
+
+        el.style.left = sx + 'px';
+        el.style.top = sy + 'px';
+        el.style.opacity = '1';
+        el.style.transform = 'scale(1.3)';
+        document.body.appendChild(el);
+
+        // Animate: pop up slightly, then arc to cart
+        const duration = 700 + i * 60;
+        const midY = Math.min(sy, endY) - 80 - (i * 10); // arc peak
+        const midX = sx + (endX - sx) * 0.4;
+
+        // Phase 1: pop up (100ms)
+        requestAnimationFrame(() => {
+          el.style.transition = `all 0.1s cubic-bezier(0.34, 1.56, 0.64, 1)`;
+          el.style.transform = 'scale(1.6)';
+          el.style.top = (sy - 15) + 'px';
+
+          // Phase 2: arc to cart
+          setTimeout(() => {
+            el.style.transition = `all ${duration}ms cubic-bezier(0.22, 0.61, 0.36, 1)`;
+            el.style.left = endX + 'px';
+            el.style.top = endY + 'px';
+            el.style.transform = 'scale(0.3)';
+            el.style.opacity = '0.6';
+
+            // Use CSS offset-path for arc (fallback: keyframe approach)
+            animateArc(el, sx, sy - 15, endX, endY, midX, midY, duration);
+
+            // On arrival: remove + pulse badge
+            setTimeout(() => {
+              el.remove();
+
+              // Increment badge
+              cartCount++;
+              badge.textContent = cartCount;
+              badge.classList.add('visible');
+
+              // Badge pulse
+              badge.classList.remove('pulse');
+              void badge.offsetWidth;
+              badge.classList.add('pulse');
+
+              // If last emoji, do the capsule shake
+              if (i === flyEmojis.length - 1) {
+                capsule.style.animation = 'capsuleShake 0.4s ease-in-out';
+                setTimeout(() => capsule.style.animation = '', 400);
+
+                // Cart icon wobble
+                const svg = document.getElementById('cartSvg');
+                svg.style.transform = 'rotate(-7deg)';
+                setTimeout(() => svg.style.transform = 'rotate(7deg)', 80);
+                setTimeout(() => svg.style.transform = 'rotate(-4deg)', 160);
+                setTimeout(() => svg.style.transform = 'rotate(4deg)', 240);
+                setTimeout(() => svg.style.transform = 'rotate(0deg)', 320);
+
+                // Update count to total
+                setTimeout(() => {
+                  cartCount = totalAdded;
+                  badge.textContent = totalAdded;
+                  badge.classList.remove('pulse');
+                  void badge.offsetWidth;
+                  badge.classList.add('pulse');
+                }, 200);
+              }
+            }, duration + 20);
+          }, 100);
+        });
+      }, delay);
+    });
+
+    // Disable button, show in-list badge
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    setTimeout(() => {
+      btn.style.display = 'none';
+      document.getElementById('inListBadge').classList.add('visible');
+      document.getElementById('resetBtn').classList.add('visible');
+    }, flyEmojis.length * 120 + 900);
+  }
+
+  function animateArc(el, sx, sy, ex, ey, mx, my, duration) {
+    const startTime = performance.now();
+
+    function step(now) {
+      const elapsed = now - startTime;
+      const t = Math.min(elapsed / duration, 1);
+
+      // Quadratic bezier for arc path
+      const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // ease-in-out
+      const x = (1 - ease) * (1 - ease) * sx + 2 * (1 - ease) * ease * mx + ease * ease * ex;
+      const y = (1 - ease) * (1 - ease) * sy + 2 * (1 - ease) * ease * my + ease * ease * ey;
+
+      // Scale: 1.6 -> 0.3 with slight overshoot
+      const scale = 1.6 - (1.3 * ease);
+      // Opacity: 1 -> fade at the very end
+      const opacity = t > 0.7 ? 1 - ((t - 0.7) / 0.3) * 0.5 : 1;
+
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.style.transform = `scale(${Math.max(scale, 0.3)})`;
+      el.style.opacity = opacity;
+      el.style.transition = 'none';
+
+      if (t < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  function resetDemo() {
+    added = false;
+    cartCount = 0;
+
+    // Reset checkboxes
+    document.querySelectorAll('.check').forEach(c => c.classList.remove('checked'));
+    document.querySelectorAll('.ingredient-row').forEach(r => r.classList.remove('checked-row'));
+
+    // Reset button
+    const btn = document.getElementById('addBtn');
+    btn.style.display = '';
+    btn.style.opacity = '1';
+    btn.disabled = false;
+    updateBtnCount();
+
+    // Reset badge
+    const badge = document.getElementById('badge');
+    badge.classList.remove('visible', 'pulse');
+    badge.textContent = '0';
+
+    // Reset in-list badge
+    document.getElementById('inListBadge').classList.remove('visible');
+    document.getElementById('resetBtn').classList.remove('visible');
+  }
+</script>
+</body>
+</html>

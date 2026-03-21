@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
 import { Menu, X, Utensils, ShoppingCart, BookOpen, LogOut, Palette } from "lucide-react";
@@ -228,81 +228,201 @@ function CartButton({ count, onClick }: { count: number; onClick?: () => void })
   );
 }
 
-const FOOD_EMOJIS = [
-  "🥕", "🌽", "🥦", "🧅", "🧄", "🥔", "🍅", "🍆", "🥑", "🥬", "🥒",
-  "🍋", "🍎", "🍊", "🍇", "🍓", "🍌", "🍉", "🍑", "🫐", "🥝",
-  "🥩", "🍗", "🥚", "🧀", "🥓",
-  "🍞", "🥐", "🥖",
-  "🧈", "🥛",
-];
+const MAX_FLY_EMOJIS = 5;
+const STAGGER_MS = 120;
+const ARC_DURATION_MS = 700;
+const LAND_LINGER_MS = 600;
 
-export type EmojiFlairStyle = "current";
+/** Animate a DOM element along a quadratic bezier arc, then call onDone. */
+function animateArc(
+  el: HTMLElement,
+  sx: number, sy: number,
+  ex: number, ey: number,
+  duration: number,
+  onDone: () => void,
+) {
+  const mx = sx + (ex - sx) * 0.4;
+  const my = Math.min(sy, ey) - 80;
+  const startTime = performance.now();
 
-const EMOJI_FLAIR_CONFIGS: Record<EmojiFlairStyle, {
-  animate: (dx: number, index: number, count: number) => Record<string, any>;
-  transition: (duration: number, delay: number, index: number, count: number) => Record<string, any>;
-}> = {
-  current: {
-    // Pop & Land: pop to 15px, fast sequential spring-bounce into cart center
-    animate: (dx, i, n) => ({
-      opacity: [0, 1, 1, 1, 1, 1, 0],
-      y: [5, -15, -15, -2, -5, -3, -1],
-      x: [dx, dx, dx, dx * 0.2, dx * 0.05, 0, 0],
-      scale: [0, 2, 2, 1.3, 1.55, 1.45, 1.2],
-    }),
-    transition: (dur, delay, i, n) => {
-      const wait = 0.06 + (i / Math.max(n - 1, 1)) * 0.28;
-      const land = Math.min(wait + 0.18, 0.78);
-      const b1 = Math.min(land + 0.06, 0.84);
-      const b2 = Math.min(b1 + 0.06, 0.9);
-      return {
-        duration: dur * 1.3,
-        ease: [0.34, 1.56, 0.64, 1],
-        delay: delay,
-        opacity: { times: [0, 0.04, wait, land, b1, b2, 1], duration: dur * 1.3, ease: "easeIn", delay },
-      };
-    },
-  },
-};
+  function step(now: number) {
+    const t = Math.min((now - startTime) / duration, 1);
+    const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    const x = (1 - ease) ** 2 * sx + 2 * (1 - ease) * ease * mx + ease ** 2 * ex;
+    const y = (1 - ease) ** 2 * sy + 2 * (1 - ease) * ease * my + ease ** 2 * ey;
+    // Shrink less aggressively: 1.5 → 0.9 (stays readable)
+    const scale = 1.5 - 0.6 * ease;
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+    el.style.transform = `scale(${scale})`;
+    el.style.opacity = "1";
 
-export function CartCapsule({ count, items, compact = false, emojiStyle = "current" as EmojiFlairStyle, onManualTrigger }: { count: number; items: Ingredient[]; compact?: boolean; emojiStyle?: EmojiFlairStyle; onManualTrigger?: React.MutableRefObject<(() => void) | null> }) {
+    if (t < 1) requestAnimationFrame(step);
+    else onDone();
+  }
+  requestAnimationFrame(step);
+}
+
+/** "Drop into cart" — emoji settles into the cart icon, then shrinks away */
+function animateLand(el: HTMLElement, stackIndex: number) {
+  // Each emoji drops slightly lower into the cart, like items piling in
+  const yDrop = 4 + stackIndex * 3;
+  const xJitter = (stackIndex % 2 === 0 ? -1 : 1) * (2 + stackIndex);
+  el.style.transition = `all ${LAND_LINGER_MS}ms cubic-bezier(0.34, 1.56, 0.64, 1)`;
+  el.style.transform = `scale(0.85) translate(${xJitter}px, ${yDrop}px)`;
+  el.style.opacity = "1";
+
+  // Shrink into the cart after lingering
+  setTimeout(() => {
+    el.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+    el.style.opacity = "0";
+    el.style.transform = `scale(0.2) translate(${xJitter}px, ${yDrop + 6}px)`;
+    setTimeout(() => el.remove(), 250);
+  }, LAND_LINGER_MS);
+}
+
+export function CartCapsule({ count, items, compact = false, onManualTrigger }: { count: number; items: Ingredient[]; compact?: boolean; onManualTrigger?: React.MutableRefObject<(() => void) | null> }) {
   const [hovered, setHovered] = useState<"pickup" | "delivery" | "cart" | null>(null);
-  const [flyEmojis, setFlyEmojis] = useState<Array<{ id: number; emoji: string; dx: number; delay: number; duration: number }>>([]);
   const [badgeKey, setBadgeKey] = useState(0);
+  // Visual count: enumerates during animation, then settles to real count
+  const [visualCount, setVisualCount] = useState(count);
+  const animatingRef = useRef(false);
   const prevCount = useRef(count);
   const capsuleControls = useAnimationControls();
   const cartIconControls = useAnimationControls();
+  const cartIconRef = useRef<HTMLDivElement>(null);
 
-  const fireBurst = () => {
+  /** Shake capsule + wobble cart icon */
+  const shakeAndWobble = useCallback(() => {
     capsuleControls.start({ x: [0, -5, 5, -3, 3, -1, 1, 0], transition: { duration: 0.4, ease: "easeInOut" } });
     cartIconControls.start({ rotate: [-7, 7, -5, 5, -2, 2, 0], transition: { duration: 0.5, ease: "easeInOut" } });
-    const burstCount = 2 + Math.floor(Math.random() * 2);
-    const burst = Array.from({ length: burstCount }, (_, i) => ({
-      id: Date.now() + i,
-      emoji: FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)],
-      dx: (i - (burstCount - 1) / 2) * 18,
-      delay: i * 0.07,
-      duration: 2.8 + Math.random() * 1.5,
-    }));
-    setFlyEmojis(burst);
+  }, [capsuleControls, cartIconControls]);
+
+  /** Launch arc-and-absorb animation with real ingredient emojis */
+  const fireArcBurst = useCallback((emojis: string[], sourceRect: DOMRect | null, totalAdding: number) => {
+    const cartEl = cartIconRef.current;
+    if (!cartEl) return;
+
+    animatingRef.current = true;
+    const baseCount = prevCount.current;
+
+    const cartRect = cartEl.getBoundingClientRect();
+    // Target the basket opening of the cart icon
+    const endX = cartRect.left + cartRect.width * 0.001;
+    const endY = cartRect.top - cartRect.height * 0.75;
+
+    const startX = sourceRect ? sourceRect.left + sourceRect.width / 2 : endX;
+    const startY = sourceRect ? sourceRect.top : endY + 200;
+
+    const flyList = emojis.slice(0, MAX_FLY_EMOJIS);
+    // How much to increment per emoji (distributes totalAdding across flyList)
+    const countPerEmoji = Math.max(1, Math.round(totalAdding / flyList.length));
+
+    flyList.forEach((emoji, i) => {
+      setTimeout(() => {
+        const el = document.createElement("span");
+        el.textContent = emoji;
+        el.style.cssText = "position:fixed;z-index:9999;font-size:22px;pointer-events:none;will-change:transform,opacity;";
+
+        const spread = (i - (flyList.length - 1) / 2) * 16;
+        const sx = startX + spread;
+        el.style.left = `${sx}px`;
+        el.style.top = `${startY}px`;
+        el.style.transform = "scale(1.3)";
+        document.body.appendChild(el);
+
+        requestAnimationFrame(() => {
+          el.style.transition = "all 0.1s cubic-bezier(0.34, 1.56, 0.64, 1)";
+          el.style.transform = "scale(1.6)";
+          el.style.top = `${startY - 15}px`;
+
+          setTimeout(() => {
+            const dur = ARC_DURATION_MS + i * 60;
+            animateArc(el, sx, startY - 15, endX, endY, dur, () => {
+              // Land & stack instead of removing immediately
+              animateLand(el, i);
+
+              // Enumerate badge: tick up incrementally
+              const newVisual = Math.min(baseCount + (i + 1) * countPerEmoji, baseCount + totalAdding);
+              setVisualCount(newVisual);
+              setBadgeKey(k => k + 1);
+
+              // Shake + wobble on last arrival
+              if (i === flyList.length - 1) {
+                shakeAndWobble();
+                // Settle to final count after the stack lingers
+                setTimeout(() => {
+                  setVisualCount(baseCount + totalAdding);
+                  animatingRef.current = false;
+                }, LAND_LINGER_MS);
+              }
+            });
+          }, 100);
+        });
+      }, i * STAGGER_MS);
+    });
+  }, [shakeAndWobble]);
+
+  /** Empty cart: cart icon floats up and is replaced */
+  const fireEmptyAnimation = useCallback(() => {
+    const cartEl = cartIconRef.current;
+    if (!cartEl) return;
+
+    const rect = cartEl.getBoundingClientRect();
+    const ghost = document.createElement("span");
+    ghost.textContent = "🛒";
+    ghost.style.cssText = `position:fixed;z-index:9999;font-size:20px;pointer-events:none;
+      left:${rect.left + rect.width / 2 - 10}px;top:${rect.top}px;
+      opacity:1;transition:all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);`;
+    document.body.appendChild(ghost);
+
+    requestAnimationFrame(() => {
+      ghost.style.transform = "translateY(-40px) scale(0.4)";
+      ghost.style.opacity = "0";
+      setTimeout(() => ghost.remove(), 600);
+    });
+
+    capsuleControls.start({ scale: [1, 0.92, 1.05, 1], transition: { duration: 0.4 } });
+    setVisualCount(0);
     setBadgeKey(k => k + 1);
-    setTimeout(() => setFlyEmojis([]), 5500);
-  };
-
-  useEffect(() => {
-    if (onManualTrigger) onManualTrigger.current = fireBurst;
-  });
-
-  useEffect(() => {
-    const onUpdate = () => fireBurst();
-    window.addEventListener(SHOPPING_LIST_UPDATED, onUpdate);
-    return () => window.removeEventListener(SHOPPING_LIST_UPDATED, onUpdate);
   }, [capsuleControls]);
 
   useEffect(() => {
-    if (count > prevCount.current) setBadgeKey(k => k + 1);
+    if (onManualTrigger) onManualTrigger.current = () => fireArcBurst(["🛒"], null, 1);
+  });
+
+  useEffect(() => {
+    const onUpdate = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.emojis) {
+        // Add-to-cart: arc animation with real emojis
+        const emojis: string[] = detail.emojis;
+        const sourceRect: DOMRect | null = detail.sourceRect ?? null;
+        fireArcBurst(emojis, sourceRect, emojis.length);
+      } else if (detail?.cleared) {
+        // Clear cart: empty animation
+        fireEmptyAnimation();
+      } else {
+        // Generic update (no detail) — could be a clear or other action
+        // If count dropped to 0, treat as clear
+        // (handled by the count effect below)
+      }
+    };
+    window.addEventListener(SHOPPING_LIST_UPDATED, onUpdate);
+    return () => window.removeEventListener(SHOPPING_LIST_UPDATED, onUpdate);
+  }, [fireArcBurst, fireEmptyAnimation]);
+
+  // Sync visual count with real count when not animating
+  useEffect(() => {
+    if (!animatingRef.current) {
+      // Detect clear: count went to 0 from nonzero
+      if (count === 0 && prevCount.current > 0) {
+        fireEmptyAnimation();
+      }
+      setVisualCount(count);
+    }
     prevCount.current = count;
-  }, [count]);
+  }, [count, fireEmptyAnimation]);
 
   const segmentBase = { padding: "0 13px", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" as const, lineHeight: "32px", textDecoration: "none", transition: "background 0.15s ease, color 0.15s ease" };
 
@@ -362,31 +482,13 @@ export function CartCapsule({ count, items, compact = false, emojiStyle = "curre
           }}
         >
           {compact && <span style={{ fontSize: 12, fontWeight: 700, color: "#15803d", marginRight: 6, whiteSpace: "nowrap" }}>Order now!</span>}
-          <motion.div animate={cartIconControls}>
+          <motion.div ref={cartIconRef} animate={cartIconControls}>
             <ShoppingCart className="w-[22px] h-[22px]" />
           </motion.div>
         </Link>
       </div>
 
-      <AnimatePresence>
-        {flyEmojis.map(({ id, emoji, dx, delay, duration }, idx) => {
-          const flair = EMOJI_FLAIR_CONFIGS[emojiStyle];
-          return (
-            <motion.span
-              key={id}
-              initial={{ opacity: 1, y: 4, x: 0, scale: 0.5 }}
-              animate={flair.animate(dx, idx, flyEmojis.length)}
-              exit={{}}
-              transition={flair.transition(duration, delay, idx, flyEmojis.length)}
-              style={{ position: "absolute", right: 14, top: 0, pointerEvents: "none", fontSize: 15, zIndex: 10 }}
-            >
-              {emoji}
-            </motion.span>
-          );
-        })}
-      </AnimatePresence>
-
-      {count > 0 && (
+      {visualCount > 0 && (
         <motion.span
           key={badgeKey}
           initial={{ scale: 0 }}
@@ -395,7 +497,7 @@ export function CartCapsule({ count, items, compact = false, emojiStyle = "curre
           style={{ position: "absolute", top: 0, right: 0 }}
           className="min-w-[16px] h-[16px] flex items-center justify-center rounded-full bg-green-500 text-white text-[9px] font-black border-[1.5px] border-white px-0.5"
         >
-          {count > 99 ? "99+" : count}
+          {visualCount > 99 ? "99+" : visualCount}
         </motion.span>
       )}
     </motion.div>

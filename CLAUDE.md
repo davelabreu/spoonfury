@@ -28,6 +28,10 @@ AI agents have access to specialized tools for development:
 - **context7 (Upstash)**: Real-time documentation for modern frameworks (Next.js, Tailwind 4).
 - **postgresPRO (Crystal DBA)**: Database analysis, query plans, and index tuning.
 
+## Visual Mockups
+
+Interactive HTML mockups live in `docs/visual-mockups/`. Always save UI/UX brainstorming mockups here (not just in `.superpowers/brainstorm/`) so they persist and can be shared. Present visual options in the browser before implementing UI changes.
+
 ## Context Scopes
 
 Standing reference for the codebase. Read before diving into plans.

@@ -1,0 +1,99 @@
+<h2>Where should the ingredient emojis fly FROM?</h2>
+<p class="subtitle">The emojis will land at the CartCapsule in the navbar. But where do they start?</p>
+
+<div class="cards">
+  <div class="card" data-choice="button" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #eef2ff, #e0e7ff); padding: 24px; display: flex; flex-direction: column; gap: 12px; align-items: center; min-height: 200px; justify-content: center;">
+      <div style="width: 100%; max-width: 280px;">
+        <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+          <div style="font-size: 13px; color: #555; margin-bottom: 8px;">
+            <span>🥕</span> 2 cups carrots<br>
+            <span>🧅</span> 1 onion<br>
+            <span>🧄</span> 3 cloves garlic
+          </div>
+          <div style="position: relative;">
+            <div style="background: linear-gradient(135deg, #818cf8, #6366f1); color: white; border-radius: 8px; padding: 8px 16px; text-align: center; font-size: 13px; font-weight: 600;">
+              🛒 Add 3 to List
+            </div>
+            <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 18px; animation: float 1.5s ease-in-out infinite;">
+              🥕 🧅 🧄
+            </div>
+            <div style="position: absolute; top: -36px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #6366f1; font-weight: 600; white-space: nowrap;">
+              ↑ emojis launch from here
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. From the "Add to List" button</h3>
+      <p>Emojis burst upward from where you clicked, then arc toward the cart. Clean origin point, works on all screen sizes.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="ingredients" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 24px; display: flex; flex-direction: column; gap: 12px; align-items: center; min-height: 200px; justify-content: center;">
+      <div style="width: 100%; max-width: 280px;">
+        <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+          <div style="font-size: 13px; color: #555;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px; position: relative;">
+              <span>🥕</span> 2 cups carrots
+              <span style="position: absolute; right: -30px; font-size: 16px; opacity: 0.6;">🥕→</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px; position: relative;">
+              <span>🧅</span> 1 onion
+              <span style="position: absolute; right: -30px; font-size: 16px; opacity: 0.6;">🧅→</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px; position: relative;">
+              <span>🧄</span> 3 cloves garlic
+              <span style="position: absolute; right: -30px; font-size: 16px; opacity: 0.6;">🧄→</span>
+            </div>
+          </div>
+          <div style="font-size: 10px; color: #15803d; font-weight: 600; text-align: center; margin-top: 8px;">
+            ↑ each row launches its own emoji
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. From each ingredient row</h3>
+      <p>Each ingredient's emoji flies from its row position, staggered. Most theatrical — you see each item "leave" the list. More complex (needs DOM refs per row).</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="hybrid" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 24px; display: flex; flex-direction: column; gap: 12px; align-items: center; min-height: 200px; justify-content: center;">
+      <div style="width: 100%; max-width: 280px;">
+        <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+          <div style="font-size: 13px; color: #555; margin-bottom: 8px;">
+            <span>🥕</span> 2 cups carrots<br>
+            <span>🧅</span> 1 onion<br>
+            <span>🧄</span> 3 cloves garlic
+          </div>
+          <div style="position: relative;">
+            <div style="background: linear-gradient(135deg, #818cf8, #6366f1); color: white; border-radius: 8px; padding: 8px 16px; text-align: center; font-size: 13px; font-weight: 600;">
+              🛒 Add 3 to List
+            </div>
+            <div style="position: absolute; top: -28px; left: 30%; font-size: 16px;">🥕</div>
+            <div style="position: absolute; top: -22px; left: 50%; font-size: 16px;">🧅</div>
+            <div style="position: absolute; top: -32px; left: 65%; font-size: 16px;">🧄</div>
+            <div style="position: absolute; top: -44px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #b45309; font-weight: 600; white-space: nowrap;">
+              ↑ real emojis, clustered launch
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. Clustered from button (real emojis)</h3>
+      <p>Like A, but uses the actual ingredient emojis (🥕🧅🧄) instead of random ones. Simpler than B but still personalized. Closest to current code, just with real data.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes float {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-8px); }
+}
+</style>

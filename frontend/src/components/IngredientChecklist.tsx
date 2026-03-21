@@ -13,6 +13,7 @@ interface Props {
   inList?: boolean;
   onAddToList?: (needed: Ingredient[]) => void;
   onBuyNow?: (needed: Ingredient[]) => void;
+  addBtnRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
 function IngredientRow({ ing, index, checked, onToggle }: {
@@ -81,7 +82,7 @@ function IngredientRow({ ing, index, checked, onToggle }: {
   );
 }
 
-export function IngredientChecklist({ ingredients, inList, onAddToList, onBuyNow }: Props) {
+export function IngredientChecklist({ ingredients, inList, onAddToList, onBuyNow, addBtnRef }: Props) {
   const valid = ingredients.filter(i => i.name.trim() !== "");
 
   // checked = "I already have this" — start empty (assume you need everything)
@@ -116,6 +117,7 @@ export function IngredientChecklist({ ingredients, inList, onAddToList, onBuyNow
         <div className="flex gap-2 pt-1">
           {onAddToList && (
             <Button
+              ref={addBtnRef}
               type="button"
               variant="outline"
               size="sm"

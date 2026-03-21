@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { api } from "@/lib/api";
@@ -15,6 +15,7 @@ import type { Ingredient, Recipe, Book } from "@/types";
 import { BuyNowSheet } from "@/components/BuyNowSheet";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
+import { getIngredientEmoji } from "@/lib/ingredientEmoji";
 
 export function RecipePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -33,6 +34,7 @@ export function RecipePage() {
   const [inList, setInList] = useState(false);
   // Tracks broken hero image URLs — falls back to category placeholder on error
   const [heroImgError, setHeroImgError] = useState(false);
+  const addBtnRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (!slug) return;
@@ -90,7 +92,11 @@ export function RecipePage() {
         token
       );
       setInList(res.already_in_list);
-      window.dispatchEvent(new Event(SHOPPING_LIST_UPDATED));
+      const emojis = needed.map(i => i.emoji || getIngredientEmoji(i.name));
+      const sourceRect = addBtnRef.current?.getBoundingClientRect();
+      window.dispatchEvent(new CustomEvent(SHOPPING_LIST_UPDATED, {
+        detail: { emojis, sourceRect: sourceRect ?? null },
+      }));
     } catch {
       setListMsg("Failed to add to list.");
       setTimeout(() => setListMsg(""), 2500);
@@ -303,6 +309,7 @@ export function RecipePage() {
         inList={inList}
         onAddToList={token ? addToList : undefined}
         onBuyNow={setBuyNowIngredients}
+        addBtnRef={addBtnRef}
       />
       {listMsg && (
         <p className="text-sm font-medium text-indigo-600 animate-in fade-in slide-in-from-bottom-1">{listMsg}</p>
