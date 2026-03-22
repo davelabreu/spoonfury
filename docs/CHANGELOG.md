@@ -1,6 +1,23 @@
 # Changelog
 
-Dev log for Spoonfury. **Focus** statements are top-level human summaries of dev sessions. Below, AI dives what changed, why, and how it felt.
+Dev log for Spoonfury. **Focus** statements are top-level human summaries of dev sessions. Below, AI dives into what changed, why, and how it felt.
+
+---
+
+## 2026-03-22 — v0.5.2 Shopping Cart Rework
+
+**Focus:** Wanted the shopping cart to feel like a real checkout — not a checklist. Took inspiration from REI and Uber Eats cart pages to build something that respects the user with real data: per-ingredient prices, recipe subtotals, a receipt-style summary. The kind of page that makes you feel like you're actually about to go shopping.
+
+- Full ShoppingListPage rewrite: checklist replaced with professional two-column checkout layout
+- Left column: accordion-style recipe cards with emoji thumbnails, spoon ratings (🥄, mocked via slug hashing), fork multiplier widget (🍴), per-ingredient prices, per-recipe subtotals
+- Right column: sticky receipt-styled sidebar with SPOONFURY monospace branding, fulfillment toggle (Pickup $1.99 / Delivery $5.99), mini recipe preview thumbnails, itemized order summary, "Proceed to Instacart" CTA
+- Deterministic mock pricing system: `getEstimatedPrice()` and `getMockedRating()` use string hashing for consistent fake data — same ingredient always gets the same price across renders
+- Fee schedule: pickup $1.99, delivery $5.99, 8.5% tax — fulfillment toggle reactively updates the receipt total
+- 5 new focused components: `pricing.ts`, `ForkMultiplier.tsx`, `IngredientRow.tsx`, `RecipeCard.tsx`, `ReceiptSidebar.tsx`
+- All existing mechanics preserved: multiplier API calls, trash/remove recipe, swipe-to-delete, health tip tooltips, Instacart URL builder, auth guard, empty state, broken thumbnail tracking
+- Visual design evolution documented: 3 approaches → 3 hybrids → final lockup (A's cards + H3's receipt sidebar) saved to `docs/visual-mockups/shopping_cart_rework.html`
+- App max-width bumped from `max-w-5xl` to `max-w-6xl` for two-column breathing room
+- Spec and impl plan at `docs/plans/active/2026-03-22-shopping-cart-rework.{spec,impl}.md`
 
 ---
 
