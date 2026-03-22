@@ -40,6 +40,9 @@ AI agents have access to specialized tools for development:
 - **context7 (Upstash)**: Real-time documentation for modern frameworks (Next.js, Tailwind 4).
 - **postgresPRO (Crystal DBA)**: Database analysis, query plans, and index tuning.
 
+## 📋 TODO List
+`docs/TODO.md` — deferred work items organized by category. When something is out of scope for the current task, add it here instead of leaving inline `// TODO` comments in code. Check it before starting new work to avoid duplicating planned items.
+
 ## 📝 Changelog
 `docs/CHANGELOG.md` — human-first dev log. **Focus** lines are written by the human; bullet lists are AI-generated detail. Update it at the end of each session. **Always ask the user for their Focus statement before writing a changelog entry.** The Focus must capture the human's emotional intent and motivation — never generate it yourself.
 
