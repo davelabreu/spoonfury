@@ -1,5 +1,9 @@
 // frontend/src/lib/pricing.ts
 
+// TODO: Replace mock pricing with real data from Instacart API, grocery price
+// database, or web scraping. Current prices are fake — generated from ingredient
+// name hashing. See: https://docs.instacart.com/ (Instacart Connect / Catalog API)
+
 /**
  * Deterministic mock pricing for ingredients.
  * Uses simple string hashing so the same ingredient always gets the same price.
