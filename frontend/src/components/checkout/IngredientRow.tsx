@@ -104,7 +104,7 @@ export function IngredientRow({ item, multiplier = 1, onDelete, onToggle }: Ingr
       </span>
       {(qty || item.note) && (
         <span className="text-xs text-muted-foreground mt-0.5">
-          {qty && <>{qty}{item.unit ? ` ${item.unit}` : ""}</>}
+          {qty && <>{qty}{item.unit ? ` × ${item.unit}` : ""}</>}
           {qty && item.note && " · "}
           {item.note}
         </span>
