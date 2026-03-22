@@ -45,7 +45,11 @@
       "Bash(bash \"C:/Users/davel/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.2/skills/brainstorming/scripts/start-server.sh\" --project-dir \"G:/Projects/dev/1.work/Spoonfury\")",
       "Bash(curl:*)",
       "Bash(bash \"C:/Users/davel/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.2/skills/brainstorming/scripts/start-server.sh\" --project-dir \"G:/Projects/dev/1.work/Spoonfury\" --foreground)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Skill(update-config)",
+      "Read(//home/abrooski/.claude/**)",
+      "WebFetch(domain:shadcnstudio.com)",
+      "Bash(/home/abrooski/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.5/skills/brainstorming/scripts/start-server.sh --project-dir /home/abrooski/projects/dev/2.personal/spoonfury)"
     ]
   }
 }
