@@ -1,38 +1,22 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+// frontend/src/pages/ShoppingListPage.tsx
+import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { buildInstacartUrl } from "@/lib/instacart";
-import { getIngredientEmoji } from "@/lib/ingredientEmoji";
-import { getIngredientInfo } from "@/lib/ingredientInfo";
-import { Trash2, Plus, Minus } from "lucide-react";
-import { getCategoryFallback } from "@/lib/categoryFallback";
-import type { Ingredient, ShoppingItem, RecipeGroup, ShoppingListData } from "@/types";
-
-function itemToIngredient(item: ShoppingItem): Ingredient {
-  return { quantity: item.quantity, unit: item.unit, name: item.name, note: item.note };
-}
-
-function titleCase(s: string): string {
-  return s.replace(/\b\w/g, c => c.toUpperCase());
-}
-
-const TOOLTIP_CONTENT_CLASS =
-  "max-w-sm p-0 text-pretty bg-neutral-100 text-neutral-950 border border-neutral-300 shadow-lg rounded-xl overflow-hidden [&>svg]:bg-neutral-100 [&>svg]:fill-neutral-100 [&>svg]:size-4 [&>svg]:translate-y-[calc(-50%_-_1px)]";
+import { RecipeCard } from "@/components/checkout/RecipeCard";
+import { ReceiptSidebar } from "@/components/checkout/ReceiptSidebar";
+import type { Fulfillment } from "@/lib/pricing";
+import type { ShoppingItem, ShoppingListData } from "@/types";
 
 export function ShoppingListPage() {
   const { token } = useAuth();
   const [data, setData] = useState<ShoppingListData | null>(null);
   const [error, setError] = useState("");
-  const [view, setView] = useState<"recipe" | "all">("recipe");
   const [clearing, setClearing] = useState(false);
-  // Tracks recipe slugs whose thumbnail URLs returned errors (404, broken, etc.)
-  // so we can fall back to category emoji instead of showing a broken image.
   const [brokenThumbs, setBrokenThumbs] = useState<Set<string>>(new Set());
+  const [fulfillment, setFulfillment] = useState<Fulfillment>("pickup");
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -126,175 +110,11 @@ export function ShoppingListPage() {
     }
   };
 
-  // ── Multiplier widget ─────────────────────────────────────────────────────
-  function MultiplierWidget({ group }: { group: RecipeGroup }) {
-    return (
-      <div className="flex items-center border-2 border-amber-400 rounded-lg overflow-hidden shrink-0 shadow-sm">
-        <button
-          type="button"
-          onClick={() => group.multiplier > 1
-            ? updateMultiplier(group.recipe_slug, group.multiplier - 1)
-            : removeRecipe(group.recipe_slug)}
-          className="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 transition-colors border-r-2 border-amber-400"
-          aria-label={group.multiplier > 1
-            ? `Decrease ${group.recipe_title} to ${group.multiplier - 1}`
-            : `Remove ${group.recipe_title} from shopping list`}
-        >
-          {group.multiplier > 1 ? <Minus className="w-3.5 h-3.5" /> : <Trash2 className="w-3.5 h-3.5" />}
-        </button>
-        <span className="px-3 py-1.5 text-sm font-bold text-amber-900 bg-white min-w-[2rem] text-center">
-          {group.multiplier}
-        </span>
-        <button
-          type="button"
-          onClick={() => updateMultiplier(group.recipe_slug, group.multiplier + 1)}
-          className="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 transition-colors border-l-2 border-amber-400"
-          aria-label={`Increase ${group.recipe_title} to ${group.multiplier + 1}`}
-        >
-          <Plus className="w-3.5 h-3.5" />
-        </button>
-      </div>
-    );
-  }
+  const handleBrokenThumb = (slug: string) => {
+    setBrokenThumbs(prev => new Set(prev).add(slug));
+  };
 
-  // ── ItemRow ───────────────────────────────────────────────────────────────
-  function ItemRow({ item, multiplier = 1 }: { item: ShoppingItem; multiplier?: number }) {
-    const rowRef = useRef<HTMLDivElement>(null);
-    const startX = useRef(0);
-    const currentX = useRef(0);
-    const swiping = useRef(false);
-
-    const onTouchStart = (e: React.TouchEvent) => {
-      startX.current = e.touches[0].clientX;
-      currentX.current = 0;
-      swiping.current = true;
-    };
-
-    const onTouchMove = (e: React.TouchEvent) => {
-      if (!swiping.current || !rowRef.current) return;
-      const dx = e.touches[0].clientX - startX.current;
-      currentX.current = Math.min(0, dx);
-      rowRef.current.style.transform = `translateX(${currentX.current}px)`;
-      rowRef.current.style.transition = "none";
-      const progress = Math.min(1, Math.abs(currentX.current) / 80);
-      rowRef.current.style.backgroundColor = `rgba(239, 68, 68, ${progress * 0.15})`;
-    };
-
-    const onTouchEnd = () => {
-      if (!swiping.current || !rowRef.current) return;
-      swiping.current = false;
-      rowRef.current.style.transition = "transform 0.2s ease-out, background-color 0.2s ease-out";
-      if (currentX.current < -80) {
-        rowRef.current.style.transform = "translateX(-100%)";
-        rowRef.current.style.backgroundColor = "rgba(239, 68, 68, 0.3)";
-        setTimeout(() => deleteItem(item), 200);
-      } else {
-        rowRef.current.style.transform = "translateX(0)";
-        rowRef.current.style.backgroundColor = "";
-      }
-    };
-
-    const rawEmoji = getIngredientEmoji(item.name);
-    const emoji = rawEmoji !== "🛒" ? rawEmoji : "";
-    const info = getIngredientInfo(item.name);
-
-    const qty = item.quantity
-      ? (multiplier > 1 && !isNaN(Number(item.quantity))
-          ? String(Number(item.quantity) * multiplier)
-          : item.quantity)
-      : "";
-
-    const tooltipInner = info ? (
-      <div className="flex">
-        <div className="w-1 shrink-0 bg-indigo-400 rounded-l-xl" />
-        <div className="px-3 py-2.5 space-y-1.5">
-          <div>
-            <p className="text-sm font-semibold">{emoji || "🛒"} {item.name}</p>
-            <p className="text-[10px] text-neutral-500 leading-tight mt-0.5">{info.description}</p>
-          </div>
-          {info.nutrition && (
-            <p className="text-xs leading-snug">
-              <span className="font-semibold text-green-700">🌱 Health: </span>
-              <span className="text-neutral-700">{info.nutrition}</span>
-            </p>
-          )}
-          {info.tip && (
-            <p className="text-xs leading-snug">
-              <span className="font-semibold text-amber-600">✦ Tip: </span>
-              <span className="text-neutral-700">{info.tip}</span>
-            </p>
-          )}
-        </div>
-      </div>
-    ) : null;
-
-    // Emoji tile + text label — both wrapped in a single tooltip trigger
-    // so hovering over either shows the ingredient info popup.
-    const emojiTile = (
-      <div className={`w-8 h-8 flex items-center justify-center text-xl shrink-0 rounded-xl select-none transition-colors ${item.is_checked ? "bg-muted/30" : "bg-muted/50"}`}>
-        {emoji || "🛒"}
-      </div>
-    );
-
-    const label = (
-      <div className="flex flex-col min-w-0">
-        <span className={`text-sm font-medium leading-tight ${item.is_checked ? "line-through text-muted-foreground opacity-60" : ""}`}>
-          {qty && <span>{qty}{item.unit ? ` ${item.unit}` : ""} </span>}{titleCase(item.name)}
-        </span>
-        {item.note && <span className="text-xs text-muted-foreground mt-0.5">{item.note}</span>}
-      </div>
-    );
-
-    // Combines emoji tile + label into a single tooltip-triggerable unit
-    const emojiAndLabel = (
-      <div className="flex items-center gap-3 flex-1 min-w-0">
-        {emojiTile}
-        {label}
-      </div>
-    );
-
-    return (
-      <div
-        ref={rowRef}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-        className="flex items-center gap-3 py-1 px-1"
-      >
-        <input
-          type="checkbox"
-          checked={item.is_checked}
-          onChange={() => toggleItem(item)}
-          className="w-4 h-4 rounded accent-indigo-500 cursor-pointer shrink-0"
-          aria-label={`Mark ${item.name} as picked up`}
-        />
-        {/* Tooltip wraps emoji+label; inline-flex on trigger keeps the
-            tooltip anchored right next to the text, not the page edge. */}
-        {info ? (
-          <div className="flex-1 min-w-0">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div tabIndex={0} className="cursor-default outline-none inline-flex">{emojiAndLabel}</div>
-              </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={14} className={TOOLTIP_CONTENT_CLASS}>
-                {tooltipInner}
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        ) : emojiAndLabel}
-        <button
-          type="button"
-          onClick={() => deleteItem(item)}
-          className="trash-shake p-1.5 rounded text-muted-foreground hover:text-destructive transition-colors shrink-0"
-          aria-label={`Remove ${item.name}`}
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
-      </div>
-    );
-  }
-
-  // ── Guards ────────────────────────────────────────────────────────────────
+  // ── Guards ──
   if (!token) {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center">
@@ -313,137 +133,67 @@ export function ShoppingListPage() {
   }
   if (!data) return <p className="text-muted-foreground">Loading…</p>;
 
-  const allItems = data.items_by_recipe.flatMap(g => g.items);
-  const uncheckedAll = data.items_by_recipe.flatMap(g =>
-    g.items.filter(i => !i.is_checked).map(i => {
-      const ing = itemToIngredient(i);
-      if (g.multiplier > 1 && ing.quantity && !isNaN(Number(ing.quantity))) {
-        return { ...ing, quantity: String(Number(ing.quantity) * g.multiplier) };
-      }
-      return ing;
-    })
-  );
-
   const isEmpty = data.total_items === 0;
   const groups = data.items_by_recipe;
 
+  if (isEmpty) {
+    return (
+      <div className="max-w-2xl mx-auto w-full text-center py-16">
+        <p className="text-4xl mb-4">🛒</p>
+        <p className="text-muted-foreground font-medium">Your cart is empty</p>
+        <p className="text-sm text-muted-foreground mt-1">Open a recipe and tap "Add to List" to get started.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-2xl mx-auto w-full min-h-full space-y-4 flex flex-col">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold">Shopping List</h1>
-        {data.total_items > 0 && (
-          <span className="text-sm font-medium text-muted-foreground">
-            {data.total_items} item{data.total_items !== 1 ? "s" : ""}
+    <div className="w-full min-h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <h1 className="text-2xl font-bold">
+          Your Cart{" "}
+          <span className="text-sm font-normal text-muted-foreground">
+            {groups.length} recipe{groups.length !== 1 ? "s" : ""}, {data.total_items} item{data.total_items !== 1 ? "s" : ""}
           </span>
-        )}
+        </h1>
       </div>
 
-      {/* ── Instacart checkout buttons ── */}
-      {!isEmpty && uncheckedAll.length > 0 && (
-        <div className="space-y-1.5">
-          <div className="flex gap-2">
-            <a
-              href={buildInstacartUrl(uncheckedAll, "pickup")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 relative overflow-hidden flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-indigo-300 bg-indigo-50 text-indigo-700 font-semibold text-sm whitespace-nowrap before:absolute before:inset-0 before:rounded-[inherit] before:bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.6)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:transition-[background-position_0s_ease] before:duration-1000 hover:before:bg-[position:-100%_0,0_0] hover:bg-indigo-100 transition-colors"
-            >
-              🚗 Pickup · {uncheckedAll.length}
-            </a>
-            <a
-              href={buildInstacartUrl(uncheckedAll, "delivery")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-amber-300 bg-gradient-to-r from-amber-50 via-amber-100/80 to-amber-50 [background-size:200%_auto] text-amber-700 font-semibold text-sm hover:[background-position:99%_center] transition-[background-position] duration-500 hover:border-amber-400"
-            >
-              🏠 Delivery
-            </a>
+      {/* Two-column layout */}
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-6">
+        {/* Left: Recipe cards */}
+        <div className="space-y-4">
+          {groups.map(group => (
+            <RecipeCard
+              key={group.recipe_slug}
+              group={group}
+              brokenThumbs={brokenThumbs}
+              onBrokenThumb={handleBrokenThumb}
+              onUpdateMultiplier={updateMultiplier}
+              onRemoveRecipe={removeRecipe}
+              onDeleteItem={deleteItem}
+              onToggleItem={toggleItem}
+            />
+          ))}
+
+          {/* Clear all */}
+          <div className="flex justify-center py-2">
+            <Button onClick={clearList} disabled={clearing} variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
+              {clearing ? "Clearing…" : "🗑️ Start fresh"}
+            </Button>
           </div>
-          <p className="text-xs text-center text-muted-foreground">via Instacart</p>
         </div>
-      )}
 
-      <div className="flex-1 space-y-6">
-        {isEmpty ? (
-          <div className="text-center py-16">
-            <p className="text-4xl mb-4">🛒</p>
-            <p className="text-muted-foreground font-medium">Your list is empty</p>
-            <p className="text-sm text-muted-foreground mt-1">Open a recipe and tap "Add to List" to get started.</p>
-          </div>
-        ) : (
-          <>
-            <div className="flex gap-2 p-1 bg-muted rounded-lg w-fit">
-              <button type="button" onClick={() => setView("recipe")}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${view === "recipe" ? "bg-background shadow-sm" : "text-muted-foreground"}`}>
-                By Recipe
-              </button>
-              <button type="button" onClick={() => setView("all")}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${view === "all" ? "bg-background shadow-sm" : "text-muted-foreground"}`}>
-                All Items
-              </button>
-            </div>
-
-            {view === "recipe" ? (
-              <div className="space-y-6">
-                {groups.map((group, idx) => (
-                  <div key={group.recipe_slug} className="space-y-1">
-                    {/* Recipe group header — thumbnail + name pill + multiplier.
-                        The thumbnail shows the recipe's hero image (or a category
-                        emoji fallback) so you can visually identify each recipe. */}
-                    <div className="flex items-center justify-between gap-3 mb-3">
-                      <Link
-                        to={`/recipes/${group.recipe_slug}`}
-                        className="flex items-center gap-2 bg-muted rounded-full pr-3 hover:bg-muted/80 transition-colors"
-                      >
-                        {/* Small circular thumbnail — image or category fallback.
-                            If image_url exists and hasn't errored, show the photo.
-                            Otherwise fall back to category emoji on gradient. */}
-                        {group.recipe_image_url && !brokenThumbs.has(group.recipe_slug) ? (
-                          <img
-                            src={group.recipe_image_url}
-                            alt=""
-                            className="w-7 h-7 rounded-full object-cover shrink-0"
-                            onError={() => setBrokenThumbs(prev => new Set(prev).add(group.recipe_slug))}
-                          />
-                        ) : (() => {
-                          const fb = getCategoryFallback(group.recipe_category ?? "other");
-                          return (
-                            <span
-                              className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-sm bg-gradient-to-br ${fb.gradient}`}
-                            >
-                              {fb.emoji}
-                            </span>
-                          );
-                        })()}
-                        <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground py-1.5">
-                          {group.recipe_title}
-                        </span>
-                      </Link>
-                      <MultiplierWidget group={group} />
-                    </div>
-                    <div className="space-y-1">
-                      {group.items.map(item => <ItemRow key={item.id} item={item} multiplier={group.multiplier} />)}
-                    </div>
-                    {idx < groups.length - 1 && <Separator className="mt-4" />}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-1">
-                {allItems.map(item => <ItemRow key={item.id} item={item} />)}
-              </div>
-            )}
-          </>
-        )}
+        {/* Right: Receipt sidebar */}
+        <div className="md:sticky md:top-20 md:self-start">
+          <ReceiptSidebar
+            groups={groups}
+            fulfillment={fulfillment}
+            onFulfillmentChange={setFulfillment}
+            brokenThumbs={brokenThumbs}
+            onBrokenThumb={handleBrokenThumb}
+          />
+        </div>
       </div>
-
-      {data.total_items > 0 && (
-        <div className="flex justify-center py-2 mt-auto">
-          <Button onClick={clearList} disabled={clearing} variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
-            {clearing ? "Tossing…" : "🗑️ Start fresh"}
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
