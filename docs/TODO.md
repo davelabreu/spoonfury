@@ -104,6 +104,17 @@ through instructions so they can reference amounts without losing their place.
 
 ## 🛒 Integrations
 
+### Real Ingredient Pricing
+
+Replace mock pricing in `frontend/src/lib/pricing.ts` with real grocery data.
+Currently prices are generated from ingredient name hashing — believable but fake.
+
+- Research Instacart Catalog API, Kroger API, or Spoonacular for per-ingredient pricing
+- Could also scrape/aggregate from grocery sites and cache in our backend
+- Needs a backend endpoint (`GET /api/pricing/?ingredients=chicken,rice,...`)
+- Frontend swap: replace `getEstimatedPrice()` with API call + cache layer
+- Consider regional pricing differences
+
 ### Instacart Integration
 
 The "Buy it NOW!" button links to Instacart but the URL builder is not yet producing
