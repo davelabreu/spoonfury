@@ -20,7 +20,7 @@ export default function App() {
         <TooltipProvider delayDuration={300}>
           <BrowserRouter>
             <NavBar />
-            <main className="w-full max-w-5xl mx-auto px-4 py-6 flex-1">
+            <main className="w-full max-w-6xl mx-auto px-4 py-6 flex-1">
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/recipes/new" element={<CreateRecipePage />} />
