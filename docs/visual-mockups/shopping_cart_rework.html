@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spoonfury v0.5.2 — Shopping Cart Rework: Design Evolution</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e5e5e5; }
+
+  /* ── Timeline spine ── */
+  .timeline { max-width: 1200px; margin: 0 auto; padding: 40px 24px 80px; position: relative; }
+  .timeline::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, transparent 0%, #f59e0b33 5%, #f59e0b 20%, #f59e0b 80%, #16a34a 95%, transparent 100%); transform: translateX(-50%); }
+
+  .hero-header { text-align: center; padding: 60px 24px 48px; position: relative; z-index: 1; }
+  .hero-header h1 { font-size: 36px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+  .hero-header h1 span { background: linear-gradient(135deg, #f59e0b, #ea580c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero-header .tagline { font-size: 15px; color: #888; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+  .hero-header .version { display: inline-block; background: #f59e0b; color: #000; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 6px; margin-bottom: 12px; }
+
+  /* ── Stage card ── */
+  .stage { position: relative; margin-bottom: 64px; display: flex; align-items: flex-start; }
+  .stage:nth-child(odd) { flex-direction: row; }
+  .stage:nth-child(even) { flex-direction: row-reverse; }
+
+  .stage-dot { position: absolute; left: 50%; top: 32px; width: 20px; height: 20px; border-radius: 50%; transform: translateX(-50%); z-index: 2; border: 3px solid #0a0a0a; }
+  .stage-dot.amber { background: #f59e0b; }
+  .stage-dot.green { background: #16a34a; }
+  .stage-dot.purple { background: #8b5cf6; }
+
+  .stage-content { width: calc(50% - 40px); }
+  .stage:nth-child(odd) .stage-content { margin-right: auto; padding-right: 24px; }
+  .stage:nth-child(even) .stage-content { margin-left: auto; padding-left: 24px; }
+
+  .stage-label { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .stage-num { font-size: 12px; font-weight: 700; color: #000; width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+  .stage-num.amber { background: #f59e0b; }
+  .stage-num.green { background: #16a34a; }
+  .stage-num.purple { background: #8b5cf6; }
+  .stage-tag { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  .stage-tag.amber { color: #f59e0b; }
+  .stage-tag.green { color: #16a34a; }
+  .stage-tag.purple { color: #8b5cf6; }
+
+  .stage-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .stage-desc { font-size: 13px; color: #888; line-height: 1.6; margin-bottom: 16px; }
+  .stage-verdict { font-size: 12px; padding: 8px 12px; border-radius: 8px; margin-bottom: 16px; }
+  .verdict-kept { background: #16a34a1a; border: 1px solid #16a34a33; color: #4ade80; }
+  .verdict-evolved { background: #f59e0b1a; border: 1px solid #f59e0b33; color: #fbbf24; }
+  .verdict-merged { background: #8b5cf61a; border: 1px solid #8b5cf633; color: #a78bfa; }
+
+  /* ── Mockup frames ── */
+  .mockup-frame { background: #111; border-radius: 12px; overflow: hidden; border: 1px solid #222; }
+
+  /* Shared component styles */
+  .fulfill-toggle { display: flex; gap: 0; background: #1a1a1a; border-radius: 10px; padding: 3px; width: fit-content; }
+  .fulfill-btn { padding: 5px 12px; border-radius: 8px; font-size: 10px; font-weight: 600; border: none; cursor: default; }
+  .fulfill-btn.active { background: #f59e0b; color: #000; }
+  .fulfill-btn.inactive { background: transparent; color: #666; }
+  .fork-widget { display: flex; align-items: center; gap: 0; background: #333; border-radius: 7px; overflow: hidden; }
+  .fork-btn { width: 22px; height: 22px; border: none; background: #444; color: #ccc; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+  .fork-count { padding: 0 5px; font-size: 10px; font-weight: 700; color: #f59e0b; white-space: nowrap; }
+  .recipe-rating { font-size: 9px; color: #f59e0b; margin-top: 1px; }
+  .ing-row { display: flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 10px; border-bottom: 1px solid #151515; }
+  .ing-row:last-of-type { border-bottom: none; }
+  .ing-emoji { font-size: 12px; width: 18px; text-align: center; }
+  .ing-name { flex: 1; color: #ccc; }
+  .ing-qty { color: #777; font-size: 9px; min-width: 45px; }
+  .ing-price { color: #f59e0b; font-weight: 600; min-width: 40px; text-align: right; font-size: 10px; }
+  .receipt-subtotal { display: flex; justify-content: space-between; padding: 7px 12px; border-top: 1px dashed #2a2a2a; font-size: 10px; font-weight: 600; }
+  .receipt-subtotal .label { color: #777; }
+  .receipt-subtotal .val { color: #f59e0b; }
+  .summary-card { background: #1a1a1a; border-radius: 10px; padding: 14px; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 10px; padding: 3px 0; }
+  .summary-row .lbl { color: #777; }
+  .summary-row .amt { color: #ccc; }
+  .summary-divider { border-top: 1px solid #2a2a2a; margin: 4px 0; }
+  .summary-total { display: flex; justify-content: space-between; font-size: 14px; font-weight: 800; padding: 4px 0; }
+  .summary-total .lbl { color: #fff; }
+  .summary-total .amt { color: #f59e0b; }
+  .checkout-btn { width: 100%; padding: 10px; border: none; border-radius: 8px; background: linear-gradient(135deg, #f59e0b, #ea580c); color: #000; font-size: 11px; font-weight: 800; margin-top: 10px; font-family: sans-serif; }
+  .instacart-note { text-align: center; font-size: 8px; color: #555; margin-top: 4px; }
+
+  /* Receipt mono */
+  .receipt-dashes { text-align: center; color: #333; font-size: 9px; margin: 4px 0; letter-spacing: 2px; font-family: 'Courier New', monospace; }
+  .receipt-mono-row { display: flex; justify-content: space-between; font-size: 9px; padding: 2px 0; color: #bbb; font-family: 'Courier New', monospace; }
+
+  /* Splash images */
+  .splash-tikka { background: linear-gradient(135deg, #c2410c 0%, #f59e0b 50%, #92400e 100%); }
+  .splash-caesar { background: linear-gradient(135deg, #166534 0%, #22c55e 50%, #14532d 100%); }
+  .mini-preview { flex: 1; height: 44px; border-radius: 6px; overflow: hidden; position: relative; }
+  .mini-preview::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent 60%); }
+  .mini-preview-label { position: absolute; bottom: 3px; left: 5px; font-size: 7px; font-weight: 700; color: #fff; z-index: 1; }
+
+  /* ── Arrow annotation ── */
+  .annotation { font-size: 11px; color: #666; font-style: italic; margin-top: 10px; padding-left: 12px; border-left: 2px solid #333; }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .timeline::before { left: 20px; }
+    .stage, .stage:nth-child(even) { flex-direction: column; }
+    .stage-dot { left: 20px; }
+    .stage-content, .stage:nth-child(odd) .stage-content, .stage:nth-child(even) .stage-content { width: 100%; margin: 0; padding: 0 0 0 48px; }
+    .two-col-mock { grid-template-columns: 1fr !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════════════════════ -->
+<div class="hero-header">
+  <div class="version">v0.5.2</div>
+  <h1>Shopping Cart <span>Rework</span></h1>
+  <p class="tagline">From checklist to checkout — the design evolution of Spoonfury's shopping experience. Four stages, one final lockup.</p>
+</div>
+
+<div class="timeline">
+
+<!-- ═══════════════════════════════════════════════════════════
+     STAGE 1: OPTION A
+     ═══════════════════════════════════════════════════════════ -->
+<div class="stage">
+  <div class="stage-dot amber"></div>
+  <div class="stage-content">
+    <div class="stage-label">
+      <div class="stage-num amber">1</div>
+      <span class="stage-tag amber">Option A</span>
+    </div>
+    <div class="stage-title">Accordion Receipts + Sticky Sidebar</div>
+    <div class="stage-desc">REI-inspired two-column layout. Per-recipe ingredient cards on the left with prices and fork multipliers. Sticky summary sidebar on the right with fulfillment toggle and checkout CTA. Professional, familiar, immediately readable.</div>
+    <div class="stage-verdict verdict-kept">Left column kept for final design — clean ingredient cards with emoji, quantities, and per-item pricing.</div>
+
+    <div class="mockup-frame">
+      <div class="two-col-mock" style="display:grid;grid-template-columns:1fr 220px;min-height:340px;">
+        <div style="padding:14px;border-right:1px solid #1a1a1a;">
+          <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:10px;">Your Cart <span style="color:#666;font-size:11px;font-weight:400;">2 recipes, 11 items</span></div>
+          <div style="background:#1a1a1a;border-radius:8px;margin-bottom:10px;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px dashed #2a2a2a;">
+              <div style="width:32px;height:32px;border-radius:7px;background:linear-gradient(135deg,#f59e0b,#ea580c);display:flex;align-items:center;justify-content:center;font-size:16px;">🍛</div>
+              <div style="flex:1;"><div style="font-size:11px;font-weight:700;color:#fff;">Chicken Tikka Masala</div><div class="recipe-rating">🥄🥄🥄🥄🥄 4.8</div></div>
+              <div class="fork-widget"><div class="fork-btn">-</div><div class="fork-count">🍴2</div><div class="fork-btn">+</div></div>
+            </div>
+            <div class="ing-row"><span class="ing-emoji">🍗</span><span class="ing-name">Chicken thighs</span><span class="ing-qty">2 lbs</span><span class="ing-price">$8.99</span></div>
+            <div class="ing-row"><span class="ing-emoji">🥫</span><span class="ing-name">Tikka masala sauce</span><span class="ing-qty">15 oz</span><span class="ing-price">$4.49</span></div>
+            <div class="ing-row"><span class="ing-emoji">🍚</span><span class="ing-name">Basmati rice</span><span class="ing-qty">2 cups</span><span class="ing-price">$3.29</span></div>
+            <div class="receipt-subtotal"><span class="label">Subtotal</span><span class="val">$19.84</span></div>
+          </div>
+          <div style="background:#1a1a1a;border-radius:8px;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px dashed #2a2a2a;">
+              <div style="width:32px;height:32px;border-radius:7px;background:linear-gradient(135deg,#22c55e,#16a34a);display:flex;align-items:center;justify-content:center;font-size:16px;">🥗</div>
+              <div style="flex:1;"><div style="font-size:11px;font-weight:700;color:#fff;">Caesar Salad</div><div class="recipe-rating">🥄🥄🥄🥄 4.2</div></div>
+              <div class="fork-widget"><div class="fork-btn">-</div><div class="fork-count">🍴1</div><div class="fork-btn">+</div></div>
+            </div>
+            <div class="ing-row"><span class="ing-emoji">🥬</span><span class="ing-name">Romaine lettuce</span><span class="ing-qty">2 hearts</span><span class="ing-price">$3.99</span></div>
+            <div class="ing-row"><span class="ing-emoji">🧀</span><span class="ing-name">Parmesan</span><span class="ing-qty">1/2 cup</span><span class="ing-price">$4.49</span></div>
+            <div class="receipt-subtotal"><span class="label">Subtotal</span><span class="val">$13.45</span></div>
+          </div>
+        </div>
+        <div style="padding:14px;background:#0d0d0d;">
+          <div class="fulfill-toggle" style="margin-left:auto;margin-bottom:10px;"><button class="fulfill-btn active">🚗 Pickup</button><button class="fulfill-btn inactive">🏠 Delivery</button></div>
+          <div class="summary-card">
+            <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:8px;">Order Summary</div>
+            <div class="summary-row"><span class="lbl">Tikka Masala (x2)</span><span class="amt">$19.84</span></div>
+            <div class="summary-row"><span class="lbl">Caesar Salad</span><span class="amt">$13.45</span></div>
+            <div class="summary-divider"></div>
+            <div class="summary-row"><span class="lbl">Subtotal</span><span class="amt">$33.29</span></div>
+            <div class="summary-row"><span class="lbl">Tax</span><span class="amt">$2.83</span></div>
+            <div class="summary-row"><span class="lbl">Pickup fee</span><span class="amt">$1.99</span></div>
+            <div class="summary-divider"></div>
+            <div class="summary-total"><span class="lbl">Total</span><span class="amt">$38.11</span></div>
+            <button class="checkout-btn">Proceed to Instacart</button>
+            <div class="instacart-note">Prices are estimates</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="annotation">The left column's card structure — emoji + name + qty + price with recipe grouping — felt immediately right. Kept.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STAGE 2: OPTION C
+     ═══════════════════════════════════════════════════════════ -->
+<div class="stage">
+  <div class="stage-dot amber"></div>
+  <div class="stage-content">
+    <div class="stage-label">
+      <div class="stage-num amber">2</div>
+      <span class="stage-tag amber">Option C</span>
+    </div>
+    <div class="stage-title">Paper Receipt</div>
+    <div class="stage-desc">Single-column monospace receipt. The "SPOONFURY" brand header, dashed dividers, and Courier font gave it a charming, physical receipt feel. Unique identity that no other food app has.</div>
+    <div class="stage-verdict verdict-evolved">Receipt aesthetic evolved into the sidebar summary — monospace font, dashed borders, branded header survived.</div>
+
+    <div class="mockup-frame">
+      <div style="max-width:380px;margin:0 auto;padding:16px;">
+        <div style="background:#141414;border:1px dashed #333;border-radius:4px;padding:16px;font-family:'Courier New',monospace;">
+          <div style="text-align:center;font-size:14px;font-weight:700;color:#f59e0b;letter-spacing:2px;">SPOONFURY</div>
+          <div style="text-align:center;font-size:8px;color:#555;">Your Shopping Receipt</div>
+          <div class="receipt-dashes">- - - - - - - - - - - - - - -</div>
+          <div style="font-size:8px;color:#666;text-transform:uppercase;letter-spacing:1px;border-bottom:1px dotted #2a2a2a;padding-bottom:2px;margin-bottom:3px;">🍛 Chicken Tikka Masala &nbsp; 🥄🥄🥄🥄🥄 &nbsp; 🍴x2</div>
+          <div class="receipt-mono-row"><span>Chicken thighs (2 lbs)</span><span>$8.99</span></div>
+          <div class="receipt-mono-row"><span>Tikka masala sauce</span><span>$4.49</span></div>
+          <div class="receipt-mono-row"><span>Basmati rice (2 cups)</span><span>$3.29</span></div>
+          <div class="receipt-mono-row"><span>Yellow onion (1 lg)</span><span>$1.29</span></div>
+          <div class="receipt-mono-row" style="font-weight:700;border-top:1px dotted #333;padding-top:3px;margin-top:2px;"><span>Subtotal</span><span style="color:#f59e0b;">$19.84</span></div>
+          <div class="receipt-dashes">- - - - - - - - - - - - - - -</div>
+          <div style="font-size:8px;color:#666;text-transform:uppercase;letter-spacing:1px;border-bottom:1px dotted #2a2a2a;padding-bottom:2px;margin-bottom:3px;">🥗 Caesar Salad &nbsp; 🥄🥄🥄🥄 &nbsp; 🍴x1</div>
+          <div class="receipt-mono-row"><span>Romaine lettuce</span><span>$3.99</span></div>
+          <div class="receipt-mono-row"><span>Parmesan</span><span>$4.49</span></div>
+          <div class="receipt-mono-row"><span>Croutons</span><span>$2.99</span></div>
+          <div class="receipt-mono-row" style="font-weight:700;border-top:1px dotted #333;padding-top:3px;margin-top:2px;"><span>Subtotal</span><span style="color:#f59e0b;">$13.45</span></div>
+          <div style="text-align:center;color:#333;font-size:9px;margin:6px 0;letter-spacing:2px;">= = = = = = = = = = = = = = =</div>
+          <div class="receipt-mono-row"><span>Subtotal</span><span>$33.29</span></div>
+          <div class="receipt-mono-row"><span>Estimated tax</span><span>$2.83</span></div>
+          <div class="receipt-mono-row"><span>Pickup fee</span><span>$1.99</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;margin-top:6px;padding-top:6px;border-top:2px solid #444;">
+            <span style="color:#fff;">TOTAL</span><span style="color:#f59e0b;">$38.11</span>
+          </div>
+          <div style="text-align:center;margin-top:10px;"><button class="checkout-btn" style="max-width:200px;">Proceed to Instacart</button></div>
+          <div class="receipt-dashes">- - - - - - - - - - - - - - -</div>
+          <div style="text-align:center;font-size:8px;color:#444;">Thank you for cooking with Spoonfury!</div>
+        </div>
+      </div>
+    </div>
+    <div class="annotation">Loved the personality. Too narrow for desktop, but the monospace invoice aesthetic became the soul of the final sidebar.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STAGE 3: HYBRID H3
+     ═══════════════════════════════════════════════════════════ -->
+<div class="stage">
+  <div class="stage-dot purple"></div>
+  <div class="stage-content">
+    <div class="stage-label">
+      <div class="stage-num purple">3</div>
+      <span class="stage-tag purple">Hybrid H3</span>
+    </div>
+    <div class="stage-title">Magazine Cards + Receipt Totals</div>
+    <div class="stage-desc">First attempt at merging A and C. Introduced splash images on the recipe cards (magazine editorial style) with C's receipt monospace for the sidebar summary. Also added mini recipe preview thumbnails in the sidebar. The right column worked — the left was overdesigned.</div>
+    <div class="stage-verdict verdict-merged">Right sidebar (receipt invoice + mini previews) kept. Left column's splash images were too noisy — reverted to A's cleaner cards.</div>
+
+    <div class="mockup-frame">
+      <div class="two-col-mock" style="display:grid;grid-template-columns:1fr 220px;min-height:380px;">
+        <div style="padding:14px;border-right:1px solid #1a1a1a;">
+          <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:10px;">Your Cart</div>
+          <!-- Card with splash (the part that got cut) -->
+          <div style="background:#1a1a1a;border-radius:10px;margin-bottom:10px;overflow:hidden;">
+            <div class="splash-tikka" style="height:70px;position:relative;border-radius:10px 10px 0 0;">
+              <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent 60%);"></div>
+              <div style="position:absolute;bottom:6px;left:10px;font-size:12px;font-weight:700;color:#fff;z-index:1;">Chicken Tikka Masala</div>
+              <div style="position:absolute;bottom:6px;right:10px;font-size:9px;color:#f59e0b;z-index:1;">🥄🥄🥄🥄🥄 4.8</div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #222;">
+              <div style="font-size:9px;color:#888;">6 ingredients</div>
+              <div class="fork-widget"><div class="fork-btn">-</div><div class="fork-count">🍴2</div><div class="fork-btn">+</div></div>
+            </div>
+            <div class="ing-row"><span class="ing-emoji">🍗</span><span class="ing-name">Chicken thighs</span><span class="ing-qty">2 lbs</span><span class="ing-price">$8.99</span></div>
+            <div class="ing-row"><span class="ing-emoji">🥫</span><span class="ing-name">Tikka masala sauce</span><span class="ing-qty">15 oz</span><span class="ing-price">$4.49</span></div>
+            <div class="ing-row"><span class="ing-emoji">🍚</span><span class="ing-name">Basmati rice</span><span class="ing-qty">2 cups</span><span class="ing-price">$3.29</span></div>
+            <div class="receipt-subtotal"><span class="label">Subtotal</span><span class="val">$19.84</span></div>
+          </div>
+          <div style="background:#1a1a1a;border-radius:10px;overflow:hidden;">
+            <div class="splash-caesar" style="height:70px;position:relative;border-radius:10px 10px 0 0;">
+              <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent 60%);"></div>
+              <div style="position:absolute;bottom:6px;left:10px;font-size:12px;font-weight:700;color:#fff;z-index:1;">Caesar Salad</div>
+              <div style="position:absolute;bottom:6px;right:10px;font-size:9px;color:#f59e0b;z-index:1;">🥄🥄🥄🥄 4.2</div>
+            </div>
+            <div class="ing-row"><span class="ing-emoji">🥬</span><span class="ing-name">Romaine lettuce</span><span class="ing-qty">2 hearts</span><span class="ing-price">$3.99</span></div>
+            <div class="ing-row"><span class="ing-emoji">🧀</span><span class="ing-name">Parmesan</span><span class="ing-qty">1/2 cup</span><span class="ing-price">$4.49</span></div>
+            <div class="receipt-subtotal"><span class="label">Subtotal</span><span class="val">$13.45</span></div>
+          </div>
+          <!-- Annotation overlay -->
+          <div style="margin-top:8px;padding:6px 10px;background:#ef44441a;border:1px solid #ef444433;border-radius:6px;font-size:9px;color:#f87171;">Splash images on cards — too busy. Reverted to A's emoji thumbnails.</div>
+        </div>
+        <div style="padding:14px;background:#0d0d0d;">
+          <div class="fulfill-toggle" style="margin-left:auto;margin-bottom:10px;"><button class="fulfill-btn active">🚗 Pickup</button><button class="fulfill-btn inactive">🏠 Delivery</button></div>
+          <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <div class="mini-preview splash-tikka"><span class="mini-preview-label">Tikka</span></div>
+            <div class="mini-preview splash-caesar"><span class="mini-preview-label">Caesar</span></div>
+          </div>
+          <div style="background:#141414;border:1px dashed #2a2a2a;border-radius:6px;padding:12px;font-family:'Courier New',monospace;">
+            <div style="text-align:center;font-size:11px;font-weight:700;color:#f59e0b;letter-spacing:2px;">SPOONFURY</div>
+            <div style="text-align:center;font-size:7px;color:#555;margin-bottom:6px;">ORDER SUMMARY</div>
+            <div class="receipt-dashes">- - - - - - - - - -</div>
+            <div class="receipt-mono-row"><span>Tikka Masala (x2)</span><span>$19.84</span></div>
+            <div class="receipt-mono-row"><span>Caesar Salad</span><span>$13.45</span></div>
+            <div class="receipt-dashes">- - - - - - - - - -</div>
+            <div class="receipt-mono-row"><span>Subtotal</span><span>$33.29</span></div>
+            <div class="receipt-mono-row"><span>Tax</span><span>$2.83</span></div>
+            <div class="receipt-mono-row"><span>Pickup fee</span><span>$1.99</span></div>
+            <div style="border-top:2px solid #333;margin-top:6px;padding-top:6px;display:flex;justify-content:space-between;font-size:12px;font-weight:800;">
+              <span style="color:#fff;">TOTAL</span><span style="color:#f59e0b;">$38.11</span>
+            </div>
+            <button class="checkout-btn">Proceed to Instacart</button>
+            <div class="instacart-note">Prices are estimates</div>
+          </div>
+          <!-- Annotation overlay -->
+          <div style="margin-top:8px;padding:6px 10px;background:#16a34a1a;border:1px solid #16a34a33;border-radius:6px;font-size:9px;color:#4ade80;">Receipt sidebar + mini previews — this is the one. Kept.</div>
+        </div>
+      </div>
+    </div>
+    <div class="annotation">The bridge that revealed the final formula: A's cards are the workhorse, C's receipt is the brand moment.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STAGE 4: FINAL LOCKUP
+     ═══════════════════════════════════════════════════════════ -->
+<div class="stage">
+  <div class="stage-dot green"></div>
+  <div class="stage-content">
+    <div class="stage-label">
+      <div class="stage-num green">4</div>
+      <span class="stage-tag green">Final Lockup</span>
+    </div>
+    <div class="stage-title">A's Cards + H3's Receipt Sidebar</div>
+    <div class="stage-desc">The best of both worlds. Left column: A's clean accordion recipe cards with emoji thumbnails, spoon ratings, fork multipliers, and per-ingredient pricing. Right column: H3's receipt-styled invoice sidebar with mini recipe previews, SPOONFURY branded monospace summary, fulfillment toggle, and the Instacart checkout CTA.</div>
+    <div class="stage-verdict" style="background:#16a34a22;border:1px solid #16a34a55;color:#4ade80;font-weight:700;">APPROVED — This is the build target for v0.5.2</div>
+
+    <div class="mockup-frame" style="border-color:#16a34a44;">
+      <div class="two-col-mock" style="display:grid;grid-template-columns:1fr 220px;min-height:420px;">
+        <div style="padding:14px;border-right:1px solid #1a1a1a;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="font-size:14px;font-weight:800;color:#fff;">Your Cart <span style="color:#666;font-size:11px;font-weight:400;">2 recipes, 11 items</span></div>
+          </div>
+
+          <!-- Card 1 -->
+          <div style="background:#1a1a1a;border-radius:8px;margin-bottom:10px;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px dashed #2a2a2a;">
+              <div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#ea580c);display:flex;align-items:center;justify-content:center;font-size:17px;">🍛</div>
+              <div style="flex:1;"><div style="font-size:11px;font-weight:700;color:#fff;">Chicken Tikka Masala</div><div class="recipe-rating">🥄🥄🥄🥄🥄 4.8</div></div>
+              <div class="fork-widget"><div class="fork-btn">-</div><div class="fork-count">🍴 2</div><div class="fork-btn">+</div></div>
+            </div>
+            <div class="ing-row"><span class="ing-emoji">🍗</span><span class="ing-name">Chicken thighs</span><span class="ing-qty">2 lbs</span><span class="ing-price">$8.99</span></div>
+            <div class="ing-row"><span class="ing-emoji">🥫</span><span class="ing-name">Tikka masala sauce</span><span class="ing-qty">15 oz</span><span class="ing-price">$4.49</span></div>
+            <div class="ing-row"><span class="ing-emoji">🍚</span><span class="ing-name">Basmati rice</span><span class="ing-qty">2 cups</span><span class="ing-price">$3.29</span></div>
+            <div class="ing-row"><span class="ing-emoji">🧅</span><span class="ing-name">Yellow onion</span><span class="ing-qty">1 large</span><span class="ing-price">$1.29</span></div>
+            <div class="ing-row"><span class="ing-emoji">🧄</span><span class="ing-name">Garlic</span><span class="ing-qty">4 cloves</span><span class="ing-price">$0.79</span></div>
+            <div class="ing-row"><span class="ing-emoji">🫚</span><span class="ing-name">Fresh ginger</span><span class="ing-qty">1 inch</span><span class="ing-price">$0.99</span></div>
+            <div class="receipt-subtotal"><span class="label">Recipe subtotal</span><span class="val">$19.84</span></div>
+          </div>
+
+          <!-- Card 2 -->
+          <div style="background:#1a1a1a;border-radius:8px;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px dashed #2a2a2a;">
+              <div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#22c55e,#16a34a);display:flex;align-items:center;justify-content:center;font-size:17px;">🥗</div>
+              <div style="flex:1;"><div style="font-size:11px;font-weight:700;color:#fff;">Caesar Salad</div><div class="recipe-rating">🥄🥄🥄🥄 4.2</div></div>
+              <div class="fork-widget"><div class="fork-btn">-</div><div class="fork-count">🍴 1</div><div class="fork-btn">+</div></div>
+            </div>
+            <div class="ing-row"><span class="ing-emoji">🥬</span><span class="ing-name">Romaine lettuce</span><span class="ing-qty">2 hearts</span><span class="ing-price">$3.99</span></div>
+            <div class="ing-row"><span class="ing-emoji">🧀</span><span class="ing-name">Parmesan</span><span class="ing-qty">1/2 cup</span><span class="ing-price">$4.49</span></div>
+            <div class="ing-row"><span class="ing-emoji">🍞</span><span class="ing-name">Croutons</span><span class="ing-qty">1 cup</span><span class="ing-price">$2.99</span></div>
+            <div class="ing-row"><span class="ing-emoji">🍋</span><span class="ing-name">Lemon</span><span class="ing-qty">1</span><span class="ing-price">$0.69</span></div>
+            <div class="ing-row"><span class="ing-emoji">🥚</span><span class="ing-name">Egg yolks</span><span class="ing-qty">2</span><span class="ing-price">$1.29</span></div>
+            <div class="receipt-subtotal"><span class="label">Recipe subtotal</span><span class="val">$13.45</span></div>
+          </div>
+        </div>
+
+        <!-- Receipt sidebar -->
+        <div style="padding:14px;background:#0d0d0d;">
+          <div class="fulfill-toggle" style="margin-left:auto;margin-bottom:12px;"><button class="fulfill-btn active">🚗 Pickup</button><button class="fulfill-btn inactive">🏠 Delivery</button></div>
+          <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <div class="mini-preview splash-tikka"><span class="mini-preview-label">Tikka Masala</span></div>
+            <div class="mini-preview splash-caesar"><span class="mini-preview-label">Caesar Salad</span></div>
+          </div>
+          <div style="background:#141414;border:1px dashed #2a2a2a;border-radius:6px;padding:12px;font-family:'Courier New',monospace;">
+            <div style="text-align:center;font-size:11px;font-weight:700;color:#f59e0b;letter-spacing:2px;">SPOONFURY</div>
+            <div style="text-align:center;font-size:7px;color:#555;margin-bottom:6px;">ORDER SUMMARY</div>
+            <div class="receipt-dashes">- - - - - - - - - - -</div>
+            <div class="receipt-mono-row"><span>Tikka Masala (x2)</span><span>$19.84</span></div>
+            <div class="receipt-mono-row"><span>Caesar Salad</span><span>$13.45</span></div>
+            <div class="receipt-dashes">- - - - - - - - - - -</div>
+            <div class="receipt-mono-row"><span>Subtotal</span><span>$33.29</span></div>
+            <div class="receipt-mono-row"><span>Estimated tax</span><span>$2.83</span></div>
+            <div class="receipt-mono-row"><span>Pickup fee</span><span>$1.99</span></div>
+            <div style="border-top:2px solid #333;margin-top:6px;padding-top:6px;display:flex;justify-content:space-between;font-size:12px;font-weight:800;">
+              <span style="color:#fff;">TOTAL</span><span style="color:#f59e0b;">$38.11</span>
+            </div>
+            <button class="checkout-btn">Proceed to Instacart</button>
+            <div class="instacart-note">Prices are estimates. Final total on Instacart.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="annotation">The formula: professional structure from A, brand personality from C. Ship it.</div>
+  </div>
+</div>
+
+</div><!-- /timeline -->
+</body>
+</html>
