@@ -39,8 +39,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         Return recipes filtered by the viewer's access level.
 
         Visibility rules:
-          - Owner: sees all their own recipes (draft + published)
-          - Test kitchen invitee: sees the inviter's drafts
+          - Owner: sees all their own recipes (all statuses)
+          - Any logged-in user: sees in_review recipes (so shared links work for reviewers)
+          - Test kitchen invitee: also sees the inviter's drafts
           - Everyone else: published only
         """
         base = (
@@ -58,8 +59,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
             return base.filter(
                 Q(status="published")
-                | Q(author=user)  # own drafts
-                | Q(author_id__in=invited_owner_ids, status__in=["draft", "in_review"])  # invited kitchens
+                | Q(status="in_review")   # any logged-in user can reach a recipe under review via link
+                | Q(author=user)          # own recipes (all statuses)
+                | Q(author_id__in=invited_owner_ids, status="draft")  # invited kitchen drafts
             ).distinct()
 
         return base.filter(status="published")

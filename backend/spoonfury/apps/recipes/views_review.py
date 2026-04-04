@@ -112,17 +112,14 @@ def _check_threshold(recipe):
 @api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
 def review_vote(request, slug):
-    """Submit a vote on a recipe under review. Only kitchen invitees can vote."""
+    """Submit a vote on a recipe under review. Any logged-in user except the author can vote."""
     recipe = Recipe.objects.select_related("author").get(slug=slug)
 
     if recipe.status != "in_review":
         return Response({"detail": "Recipe is not in review."}, status=status.HTTP_400_BAD_REQUEST)
 
-    is_invitee = TestKitchenInvite.objects.filter(
-        owner=recipe.author, invitee=request.user
-    ).exists()
-    if not is_invitee or request.user == recipe.author:
-        raise PermissionDenied("You must be an invited kitchen member to review.")
+    if request.user == recipe.author:
+        raise PermissionDenied("You cannot review your own recipe.")
 
     if RecipeReview.objects.filter(
         recipe=recipe, reviewer=request.user, review_round=recipe.review_round
