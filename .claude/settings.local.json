@@ -19,7 +19,6 @@
       "Bash(npm run build:*)",
       "Bash(chmod:*)",
       "Bash(npm run lint:*)",
-      "Bash(\"G:/Projects/dev/1.work/Spoonfury/frontend/src/hooks/useMediaQuery.ts\":*)",
       "mcp__playwright__playwright_screenshot",
       "mcp__playwright__playwright_navigate",
       "mcp__playwright__playwright_fill",
@@ -30,11 +29,6 @@
       "Bash(npx tsc:*)",
       "Bash(printf:*)",
       "Bash(node:*)",
-      "Bash(/g/Projects/dev/1.work/Spoonfury/_test.js:*)",
-      "Bash(/g/Projects/dev/1.work/Spoonfury/_transform_navbar.js:*)",
-      "Bash(__NEW_LINE_099071e3b9d68f18__ cat)",
-      "Bash(/g/Projects/dev/1.work/Spoonfury/_fix_indent.js:*)",
-      "Bash(/g/Projects/dev/1.work/Spoonfury/_fix_indent2.js:*)",
       "Bash(git check-ignore:*)",
       "Bash(G:/Projects/dev/1.work/Spoonfury/.venv/Scripts/python:*)",
       "mcp__playwright__playwright_get",
@@ -42,13 +36,12 @@
       "mcp__playwright__playwright_get_visible_text",
       "Bash(git:*)",
       "mcp__playwright__playwright_resize",
-      "Bash(bash \"C:/Users/davel/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.2/skills/brainstorming/scripts/start-server.sh\" --project-dir \"G:/Projects/dev/1.work/Spoonfury\")",
       "Bash(curl:*)",
-      "Bash(bash \"C:/Users/davel/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.2/skills/brainstorming/scripts/start-server.sh\" --project-dir \"G:/Projects/dev/1.work/Spoonfury\" --foreground)",
       "Bash(cd:*)",
-      "Bash(bash \"C:/Users/davel/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.5/skills/brainstorming/scripts/start-server.sh\" --project-dir \"G:/Projects/dev/1.work/FTM-LLC\")",
       "Bash(/g/Projects/dev/1.work/Spoonfury/.venv/Scripts/python -m pytest spoonfury/apps/recipes/tests/test_kitchen.py -v)",
-      "Bash(/g/Projects/dev/1.work/Spoonfury/.venv/Scripts/python -m pytest spoonfury/ -v)"
+      "Bash(/g/Projects/dev/1.work/Spoonfury/.venv/Scripts/python -m pytest spoonfury/ -v)",
+      "Skill(update-config)",
+      "WebFetch(domain:shadcnstudio.com)"
     ]
   }
 }

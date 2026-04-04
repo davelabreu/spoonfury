@@ -93,6 +93,15 @@ through instructions so they can reference amounts without losing their place.
 - Step interactivity: border glow or slight scale-up on the active instruction step.
 - Activates when Cook Now is on — doesn't change layout in normal reading mode.
 
+### Shadcn UI Consistency Pass
+
+Uniform UI — replace remaining raw HTML elements with installed Shadcn components.
+Currently ~60% adopted. No functional changes, just consistency.
+
+- **Phase 1 (quick):** EditRecipePage raw inputs/textareas → Shadcn Input/Textarea (match CreateRecipePage), LoginPage + RegisterPage raw inputs → Shadcn Input, BooksPage input, IngredientRow raw checkbox → Shadcn Checkbox
+- **Phase 2 (medium):** 4 raw `<select>` elements → Shadcn Select (CreateRecipe, EditRecipe, RecipePage, ForkModal), simple raw buttons → Shadcn Button (ShareModal, BuyNowSheet, ReceiptSidebar)
+- **Phase 3 (larger):** Custom modals (ForkModal, ShareModal, BuyNowSheet) → Shadcn Dialog (needs Framer Motion animation preservation). NavBar buttons are fine as-is (justified by animation needs).
+
 ### Shopping List UX Polish
 
 - Ingredient count badge on the cart icon updates on navigation — consider real-time
@@ -103,6 +112,17 @@ through instructions so they can reference amounts without losing their place.
 ---
 
 ## 🛒 Integrations
+
+### Real Ingredient Pricing
+
+Replace mock pricing in `frontend/src/lib/pricing.ts` with real grocery data.
+Currently prices are generated from ingredient name hashing — believable but fake.
+
+- Research Instacart Catalog API, Kroger API, or Spoonacular for per-ingredient pricing
+- Could also scrape/aggregate from grocery sites and cache in our backend
+- Needs a backend endpoint (`GET /api/pricing/?ingredients=chicken,rice,...`)
+- Frontend swap: replace `getEstimatedPrice()` with API call + cache layer
+- Consider regional pricing differences
 
 ### Instacart Integration
 
