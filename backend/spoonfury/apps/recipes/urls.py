@@ -4,7 +4,7 @@ from .views import RecipeViewSet, TagListView
 from .views_fork import fork_recipe
 from .views_upload import upload_recipe_image
 from .views_kitchen import kitchen_detail, kitchen_invite, kitchen_revoke
-from .views_review import submit_for_review, withdraw_review
+from .views_review import submit_for_review, withdraw_review, review_vote, review_list
 
 router = DefaultRouter()
 router.register(r"recipes", RecipeViewSet, basename="recipe")
@@ -20,4 +20,6 @@ urlpatterns = [
     path("users/<str:username>/kitchen/", kitchen_detail, name="kitchen-detail"),
     path("users/<str:username>/kitchen/invite/", kitchen_invite, name="kitchen-invite"),
     path("users/<str:username>/kitchen/invite/<str:invitee_username>/", kitchen_revoke, name="kitchen-revoke"),
+    path("recipes/<slug:slug>/review/", review_vote, name="recipe-review-vote"),
+    path("recipes/<slug:slug>/reviews/", review_list, name="recipe-reviews-list"),
 ]
