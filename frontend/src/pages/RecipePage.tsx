@@ -17,6 +17,7 @@ import { BuyNowSheet } from "@/components/BuyNowSheet";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
 import { getIngredientEmoji } from "@/lib/ingredientEmoji";
+import { ReviewPanel } from "@/components/ReviewPanel";
 
 function getPublishGate(recipe: Recipe): PublishGate {
   const validIngredients = recipe.ingredients.filter((i) => i.name.trim() !== "");
@@ -222,16 +223,67 @@ export function RecipePage() {
                 {recipe.status === "draft" && (
                   <>
                     <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
-                      🧪 Test Kitchen
+                      🧪 Draft
                     </Badge>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setPublishModalOpen(true)}
+                      onClick={async () => {
+                        try {
+                          const updated = await api.post(`/recipes/${slug}/submit-for-review/`, {}, token!);
+                          setRecipe(updated as Recipe);
+                        } catch { /* ignore */ }
+                      }}
                       disabled={!Object.values(getPublishGate(recipe)).every(Boolean)}
-                      className="bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 gap-1.5"
+                      className="bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 gap-1.5"
                     >
-                      🎉 Perfect It
+                      Submit for Review
+                    </Button>
+                  </>
+                )}
+                {recipe.status === "in_review" && (
+                  <>
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                      🔍 In Review
+                    </Badge>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          const updated = await api.post(`/recipes/${slug}/withdraw-review/`, {}, token!);
+                          setRecipe(updated as Recipe);
+                        } catch { /* ignore */ }
+                      }}
+                      className="bg-white/50 border-gray-200 text-gray-500 hover:bg-gray-50"
+                    >
+                      Withdraw
+                    </Button>
+                  </>
+                )}
+                {recipe.status === "mod_queue" && (
+                  <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                    ⏳ Awaiting Moderation
+                  </Badge>
+                )}
+                {recipe.status === "revision_requested" && (
+                  <>
+                    <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                      📝 Revision Requested
+                    </Badge>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          const updated = await api.post(`/recipes/${slug}/submit-for-review/`, {}, token!);
+                          setRecipe(updated as Recipe);
+                        } catch { /* ignore */ }
+                      }}
+                      disabled={!Object.values(getPublishGate(recipe)).every(Boolean)}
+                      className="bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 gap-1.5"
+                    >
+                      Resubmit for Review
                     </Button>
                   </>
                 )}
@@ -242,7 +294,7 @@ export function RecipePage() {
                     onClick={async () => {
                       try {
                         const updated = await api.post(`/recipes/${slug}/unpublish/`, {}, token!);
-                        setRecipe(updated);
+                        setRecipe(updated as Recipe);
                       } catch { /* ignore */ }
                     }}
                     className="bg-white/50 border-gray-200 text-gray-500 hover:bg-gray-50"
@@ -359,6 +411,10 @@ export function RecipePage() {
         <p className="text-sm font-medium text-indigo-600 animate-in fade-in slide-in-from-bottom-1">{listMsg}</p>
       )}
       <Separator />
+
+      {!isOwner && recipe.status === "in_review" && token && (
+        <ReviewPanel recipeSlug={recipe.slug} token={token} />
+      )}
 
       <div>
         <h2 className="font-semibold text-lg mb-3">Instructions</h2>
