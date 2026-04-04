@@ -18,6 +18,7 @@ import { useWakeLock } from "@/hooks/useWakeLock";
 import { SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
 import { getIngredientEmoji } from "@/lib/ingredientEmoji";
 import { ReviewPanel } from "@/components/ReviewPanel";
+import { DraftBanner } from "@/components/DraftBanner";
 
 function getPublishGate(recipe: Recipe): PublishGate {
   const validIngredients = recipe.ingredients.filter((i) => i.name.trim() !== "");
@@ -138,6 +139,12 @@ export function RecipePage() {
           Back
         </Button>
       </div>
+
+      {/* Draft banner — shown to owner when recipe is in draft or revision_requested state.
+          Amber = criteria incomplete, green = all gates pass, orange = revision requested. */}
+      {isOwner && (recipe.status === "draft" || recipe.status === "revision_requested") && (
+        <DraftBanner recipe={recipe} gate={getPublishGate(recipe)} slug={slug!} />
+      )}
 
       {/* Header — title, author, and fork badge sit ABOVE the hero image
           so the recipe identity is visible before scrolling past the photo. */}
