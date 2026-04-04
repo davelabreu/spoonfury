@@ -9,13 +9,24 @@ import { Separator } from "@/components/ui/separator";
 import { IngredientChecklist } from "@/components/IngredientChecklist";
 import { ForkModal } from "@/components/ForkModal";
 import { ShareModal } from "@/components/ShareModal";
+import { PublishModal } from "@/components/PublishModal";
 import { ChevronLeft, Camera } from "lucide-react";
 import { getCategoryFallback } from "@/lib/categoryFallback";
-import type { Ingredient, Recipe, Book } from "@/types";
+import type { Ingredient, Recipe, Book, PublishGate } from "@/types";
 import { BuyNowSheet } from "@/components/BuyNowSheet";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
 import { getIngredientEmoji } from "@/lib/ingredientEmoji";
+
+function getPublishGate(recipe: Recipe): PublishGate {
+  const validIngredients = recipe.ingredients.filter((i) => i.name.trim() !== "");
+  return {
+    hasEnoughIngredients: validIngredients.length >= 2,
+    hasInstructions: recipe.instructions.trim().length >= 20,
+    hasDescription: recipe.description.trim().length > 0,
+    hasCategory: recipe.category.trim().length > 0,
+  };
+}
 
 export function RecipePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -28,6 +39,7 @@ export function RecipePage() {
   const [saveMsg, setSaveMsg] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
   const cookNow = useWakeLock();
   const [buyNowIngredients, setBuyNowIngredients] = useState<Ingredient[] | null>(null);
   const [listMsg, setListMsg] = useState("");
@@ -207,6 +219,38 @@ export function RecipePage() {
                   <Link to={`/recipes/${slug}/edit`}>Edit recipe</Link>
                 </Button>
 
+                {recipe.status === "draft" && (
+                  <>
+                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                      🧪 Test Kitchen
+                    </Badge>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPublishModalOpen(true)}
+                      disabled={!Object.values(getPublishGate(recipe)).every(Boolean)}
+                      className="bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 gap-1.5"
+                    >
+                      🎉 Perfect It
+                    </Button>
+                  </>
+                )}
+                {recipe.status === "published" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        const updated = await api.post(`/recipes/${slug}/unpublish/`, {}, token!);
+                        setRecipe(updated);
+                      } catch { /* ignore */ }
+                    }}
+                    className="bg-white/50 border-gray-200 text-gray-500 hover:bg-gray-50"
+                  >
+                    Unpublish
+                  </Button>
+                )}
+
                 <div className="h-4 w-px bg-indigo-200/50 mx-1" />
 
                 {books.length > 0 ? (
@@ -333,6 +377,18 @@ export function RecipePage() {
             </div>
           </div>
         </>
+      )}
+
+      {publishModalOpen && recipe && (
+        <PublishModal
+          recipe={recipe}
+          token={token!}
+          onClose={() => setPublishModalOpen(false)}
+          onPublished={(updated) => {
+            setRecipe(updated);
+            setPublishModalOpen(false);
+          }}
+        />
       )}
 
       {forking && (
