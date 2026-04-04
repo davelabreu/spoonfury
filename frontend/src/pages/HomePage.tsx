@@ -3,6 +3,12 @@ import { api } from "@/lib/api";
 import { RecipeCard } from "@/components/RecipeCard";
 import type { Recipe } from "@/types";
 
+/**
+ * HomePage — The public "Stir the Pot" feed.
+ *
+ * Shows only published recipes. Does NOT send an auth token,
+ * ensuring the view is always the public experience.
+ */
 export function HomePage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [error, setError] = useState("");
