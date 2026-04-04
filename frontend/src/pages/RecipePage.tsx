@@ -5,7 +5,6 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { IngredientChecklist } from "@/components/IngredientChecklist";
 import { ForkModal } from "@/components/ForkModal";
 import { ShareModal } from "@/components/ShareModal";
@@ -365,8 +364,20 @@ export function RecipePage() {
             </div>
           </div>
 
-          {/* Description */}
-          <p className="text-base leading-relaxed text-muted-foreground">{recipe.description}</p>
+          {/* Ingredients — below the image, in natural reading flow */}
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Ingredients</h2>
+            <IngredientChecklist
+              ingredients={recipe.ingredients}
+              inList={inList}
+              onAddToList={token ? addToList : undefined}
+              onBuyNow={setBuyNowIngredients}
+              addBtnRef={addBtnRef}
+            />
+            {listMsg && (
+              <p className="text-sm font-medium text-indigo-600 mt-2 animate-in fade-in slide-in-from-bottom-1">{listMsg}</p>
+            )}
+          </div>
 
           {/* Instructions */}
           <div>
@@ -389,28 +400,32 @@ export function RecipePage() {
           )}
         </div>
 
-        {/* ── RIGHT COLUMN: Utility (sticky) ───────────────────────────── */}
+        {/* ── RIGHT COLUMN: Context & metadata (sticky) ────────────────── */}
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-8 space-y-6">
 
-            {/* Ingredients card */}
-            <Card className="shadow-sm border-border/60">
-              <CardContent className="pt-5 pb-5">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Ingredients</h2>
-                <IngredientChecklist
-                  ingredients={recipe.ingredients}
-                  inList={inList}
-                  onAddToList={token ? addToList : undefined}
-                  onBuyNow={setBuyNowIngredients}
-                  addBtnRef={addBtnRef}
-                />
-                {listMsg && (
-                  <p className="text-sm font-medium text-indigo-600 mt-2 animate-in fade-in slide-in-from-bottom-1">{listMsg}</p>
-                )}
-              </CardContent>
-            </Card>
+            {/* About this recipe */}
+            <div className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
+              <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">About</h2>
+              <p className="text-sm leading-relaxed text-muted-foreground">{recipe.description}</p>
 
-            {/* Notes card */}
+              {/* Quick-stat pills */}
+              <div className="flex flex-wrap gap-2 pt-1">
+                {recipe.serves && (
+                  <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5 text-xs font-medium">
+                    <span>🍽️</span>
+                    <span>Serves {recipe.serves}</span>
+                  </div>
+                )}
+                {/* Cook time — placeholder for future field */}
+                <div className="flex items-center gap-1.5 rounded-full border border-dashed border-border/40 bg-muted/20 px-3 py-1.5 text-xs text-muted-foreground/50 italic">
+                  <span>⏱️</span>
+                  <span>Cook time TBD</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Notes */}
             {recipe.notes && (
               <div className="rounded-xl bg-accent/40 border border-accent p-5">
                 <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">Notes</h2>
