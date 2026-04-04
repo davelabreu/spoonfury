@@ -8,6 +8,7 @@ import { ChevronLeft } from "lucide-react";
 import type { Ingredient } from "@/types";
 import { IngredientEmojiPicker } from "@/components/IngredientEmojiPicker";
 import { ImageUploadField } from "@/components/ImageUploadField";
+import { DraftBanner } from "@/components/DraftBanner";
 
 export function EditRecipePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -16,6 +17,7 @@ export function EditRecipePage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [serves, setServes] = useState("");
@@ -33,6 +35,7 @@ export function EditRecipePage() {
           setError("You can only edit your own recipes.");
           return;
         }
+        setStatus(r.status || "draft");
         setTitle(r.title);
         setDescription(r.description);
         setServes(r.serves);
@@ -81,6 +84,13 @@ export function EditRecipePage() {
   if (loading) return <p className="text-muted-foreground">Loading…</p>;
   if (error) return <p className="text-destructive">{error}</p>;
 
+  const liveGate = {
+    hasEnoughIngredients: ingredients.filter(i => i.name.trim() !== "").length >= 2,
+    hasDescription: description.trim().length > 0,
+    hasInstructions: instructions.trim().length >= 20,
+    hasCategory: category.trim().length > 0,
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-4">
       {/* Navigation */}
@@ -90,6 +100,11 @@ export function EditRecipePage() {
           Back
         </Button>
       </div>
+
+      {/* Draft banner — reactive to live form state, pills flip green as you type */}
+      {(status === "draft" || status === "revision_requested") && slug && (
+        <DraftBanner status={status} gate={liveGate} slug={slug} />
+      )}
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Edit Recipe</h1>

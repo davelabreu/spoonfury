@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import type { Recipe, PublishGate } from "@/types";
+import type { PublishGate } from "@/types";
 
 interface DraftBannerProps {
-  recipe: Recipe;
+  status: string;
   gate: PublishGate;
   slug: string;
 }
@@ -14,12 +14,12 @@ const GATE_ITEMS: { label: string; key: keyof PublishGate }[] = [
   { label: "Category", key: "hasCategory" },
 ];
 
-export function DraftBanner({ recipe, gate, slug }: DraftBannerProps) {
+export function DraftBanner({ status, gate, slug }: DraftBannerProps) {
   const metCount = Object.values(gate).filter(Boolean).length;
   const total = GATE_ITEMS.length;
   const isReady = metCount === total;
 
-  const isRevision = recipe.status === "revision_requested";
+  const isRevision = status === "revision_requested";
 
   // Color scheme: amber = incomplete draft, green = ready to submit, orange = revision requested
   const scheme = isRevision

@@ -143,7 +143,7 @@ export function RecipePage() {
       {/* Draft banner — shown to owner when recipe is in draft or revision_requested state.
           Amber = criteria incomplete, green = all gates pass, orange = revision requested. */}
       {isOwner && (recipe.status === "draft" || recipe.status === "revision_requested") && (
-        <DraftBanner recipe={recipe} gate={getPublishGate(recipe)} slug={slug!} />
+        <DraftBanner status={recipe.status} gate={getPublishGate(recipe)} slug={slug!} />
       )}
 
       {/* Header — title, author, and fork badge sit ABOVE the hero image
