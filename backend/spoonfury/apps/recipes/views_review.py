@@ -154,12 +154,18 @@ def review_vote(request, slug):
 @api_view(["GET"])
 @permission_classes([permissions.IsAuthenticated])
 def review_list(request, slug):
-    """List reviews for current round. Blind until viewer has voted."""
+    """
+    List reviews for the current round. Blind until viewer has voted.
+    Also returns:
+      - all_rounds: historical reviews grouped by round (always visible to owner)
+      - moderation_feedback: all moderator revision-request notes (always visible to owner)
+    """
+    from .models import ModerationAction
     recipe = Recipe.objects.select_related("author").get(slug=slug)
-    reviews = RecipeReview.objects.filter(recipe=recipe, review_round=recipe.review_round)
-    total = reviews.count()
-    positive = reviews.filter(is_positive=True).count()
-    has_voted = reviews.filter(reviewer=request.user).exists()
+    current_reviews = RecipeReview.objects.filter(recipe=recipe, review_round=recipe.review_round)
+    total = current_reviews.count()
+    positive = current_reviews.filter(is_positive=True).count()
+    has_voted = current_reviews.filter(reviewer=request.user).exists()
 
     data = {
         "review_round": recipe.review_round,
@@ -168,14 +174,44 @@ def review_list(request, slug):
         "threshold_met": total >= 3 and positive >= ceil(0.8 * total),
         "has_voted": has_voted,
     }
+
+    # Current round reviews revealed after voting
     if has_voted:
         data["reviews"] = [
             {
                 "reviewer": r.reviewer.username,
                 "is_positive": r.is_positive,
                 "comment": r.comment,
+                "round": r.review_round,
                 "created_at": r.created_at.isoformat(),
             }
-            for r in reviews.select_related("reviewer")
+            for r in current_reviews.select_related("reviewer")
         ]
+
+    # Owner sees full history across all rounds
+    if request.user == recipe.author:
+        all_reviews = RecipeReview.objects.filter(recipe=recipe).select_related("reviewer").order_by("review_round", "created_at")
+        data["all_rounds"] = [
+            {
+                "reviewer": r.reviewer.username,
+                "is_positive": r.is_positive,
+                "comment": r.comment,
+                "round": r.review_round,
+                "created_at": r.created_at.isoformat(),
+            }
+            for r in all_reviews
+        ]
+        mod_actions = ModerationAction.objects.filter(
+            recipe=recipe, action="revision_requested"
+        ).select_related("moderator").order_by("-created_at")
+        data["moderation_feedback"] = [
+            {
+                "moderator": m.moderator.username,
+                "feedback": m.feedback,
+                "round": m.review_round,
+                "created_at": m.created_at.isoformat(),
+            }
+            for m in mod_actions
+        ]
+
     return Response(data)

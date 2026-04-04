@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft } from "lucide-react";
-import type { Ingredient } from "@/types";
+import type { Ingredient, ReviewsResponse } from "@/types";
 import { IngredientEmojiPicker } from "@/components/IngredientEmojiPicker";
 import { ImageUploadField } from "@/components/ImageUploadField";
 import { DraftBanner } from "@/components/DraftBanner";
@@ -18,6 +18,7 @@ export function EditRecipePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
+  const [reviewData, setReviewData] = useState<ReviewsResponse | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [serves, setServes] = useState("");
@@ -44,6 +45,11 @@ export function EditRecipePage() {
         setInstructions(r.instructions);
         setNotes(r.notes || "");
         setImageUrl(r.image_url || "");
+        if (r.status === "revision_requested" && token) {
+          api.get(`/recipes/${r.slug}/reviews/`, token)
+            .then((d: ReviewsResponse) => setReviewData(d))
+            .catch(() => {});
+        }
       })
       .catch(() => setError("Failed to load recipe."))
       .finally(() => setLoading(false));
@@ -103,7 +109,7 @@ export function EditRecipePage() {
 
       {/* Draft banner — reactive to live form state, pills flip green as you type */}
       {(status === "draft" || status === "revision_requested") && slug && (
-        <DraftBanner status={status} gate={liveGate} slug={slug} />
+        <DraftBanner status={status} gate={liveGate} slug={slug} moderationFeedback={reviewData?.moderation_feedback} />
       )}
 
       <div className="flex items-center justify-between">

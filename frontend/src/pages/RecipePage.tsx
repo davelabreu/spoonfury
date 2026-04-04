@@ -64,7 +64,8 @@ export function RecipePage() {
   }, [token]);
 
   useEffect(() => {
-    if (!token || !recipe || recipe.status !== "in_review") return;
+    if (!token || !recipe) return;
+    if (recipe.status !== "in_review" && recipe.status !== "revision_requested") return;
     api.get(`/recipes/${recipe.slug}/reviews/`, token)
       .then((data: ReviewsResponse) => setReviewData(data))
       .catch(() => {});
@@ -146,7 +147,12 @@ export function RecipePage() {
 
       {/* Status banners — full width */}
       {isOwner && (recipe.status === "draft" || recipe.status === "revision_requested") && (
-        <DraftBanner status={recipe.status} gate={getPublishGate(recipe)} slug={slug!} />
+        <DraftBanner
+          status={recipe.status}
+          gate={getPublishGate(recipe)}
+          slug={slug!}
+          moderationFeedback={reviewData?.moderation_feedback}
+        />
       )}
       {!isOwner && recipe.status === "in_review" && token && reviewData && (
         <ReviewBanner reviewData={reviewData} hasVoted={reviewData.has_voted} />

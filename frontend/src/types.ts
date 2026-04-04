@@ -98,6 +98,13 @@ export interface RecipeReviewItem {
 }
 
 /** Response from GET /recipes/:slug/reviews/ */
+export interface ModerationFeedbackItem {
+  moderator: string;
+  feedback: string;
+  round: number;
+  created_at: string;
+}
+
 export interface ReviewsResponse {
   review_round: number;
   total_votes: number;
@@ -105,6 +112,10 @@ export interface ReviewsResponse {
   threshold_met: boolean;
   has_voted: boolean;
   reviews?: RecipeReviewItem[];
+  /** All reviews across all rounds — only present for the recipe owner */
+  all_rounds?: RecipeReviewItem[];
+  /** Moderator revision-request feedback — only present for the recipe owner */
+  moderation_feedback?: ModerationFeedbackItem[];
 }
 
 /** An in-app notification. */
