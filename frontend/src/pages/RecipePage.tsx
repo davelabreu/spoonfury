@@ -136,16 +136,6 @@ export function RecipePage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-5">
-      {/* Cook Now banner */}
-      {cookNow.active && (
-        <div className="flex items-center justify-between px-4 py-2.5 bg-amber-400 rounded-lg text-amber-900 font-semibold text-sm">
-          <span>🍳 Screen will stay on while you cook</span>
-          <Button size="sm" variant="ghost" onClick={cookNow.release} className="text-amber-900 hover:bg-amber-500">
-            Done cooking
-          </Button>
-        </div>
-      )}
-
       {/* Back navigation */}
       <div className="flex items-center -ml-2">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground">
@@ -363,6 +353,16 @@ export function RecipePage() {
               )}
             </div>
           </div>
+
+          {/* Cook Now banner — between action strip and ingredients */}
+          {cookNow.active && (
+            <div className="flex items-center justify-between px-4 py-2.5 bg-amber-400 rounded-lg text-amber-900 font-semibold text-sm">
+              <span>🍳 Screen will stay on while you cook</span>
+              <Button size="sm" variant="ghost" onClick={cookNow.release} className="text-amber-900 hover:bg-amber-500">
+                Done cooking
+              </Button>
+            </div>
+          )}
 
           {/* Ingredients — below the image, in natural reading flow */}
           <div>
