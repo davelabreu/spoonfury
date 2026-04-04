@@ -39,6 +39,9 @@ export interface Recipe {
   status: RecipeStatus;
   published_at: string | null;
   review_round: number;
+  /** Live vote tally — only present when status is in_review or mod_queue */
+  total_votes?: number | null;
+  positive_votes?: number | null;
 }
 
 export interface Book {
@@ -94,6 +97,7 @@ export interface RecipeReviewItem {
   reviewer: string;
   is_positive: boolean;
   comment: string;
+  round: number;
   created_at: string;
 }
 

@@ -1,6 +1,6 @@
 from django.db import IntegrityError, transaction
 from rest_framework import serializers
-from .models import Recipe, Tag
+from .models import Recipe, Tag, RecipeReview
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -59,6 +59,18 @@ class RecipeSerializer(serializers.ModelSerializer):
                 continue
             ret[field_name] = field.to_representation(attribute) if attribute is not None else None
         ret["tags"] = TagSerializer(instance.tags.all(), many=True).data
+
+        # Attach live vote tally for recipes currently under review
+        if instance.status in ("in_review", "mod_queue"):
+            reviews = RecipeReview.objects.filter(
+                recipe=instance, review_round=instance.review_round
+            )
+            ret["total_votes"] = reviews.count()
+            ret["positive_votes"] = reviews.filter(is_positive=True).count()
+        else:
+            ret["total_votes"] = None
+            ret["positive_votes"] = None
+
         return ret
 
     def _resolve_tags(self, tag_names):

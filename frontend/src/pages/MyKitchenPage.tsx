@@ -105,6 +105,11 @@ function RecipeCard({ recipe, showGate }: { recipe: Recipe; showGate?: boolean }
         <div className="flex flex-col items-end gap-1 shrink-0">
           <StatusBadge status={recipe.status} />
           <Badge variant="secondary">{recipe.category}</Badge>
+          {recipe.status === "in_review" && recipe.total_votes != null && (
+            <span className="text-xs font-semibold text-blue-600">
+              👍 {recipe.positive_votes}/{recipe.total_votes} votes
+            </span>
+          )}
           {recipe.fork_count > 0 && (
             <span className="text-xs text-muted-foreground">🍴 {recipe.fork_count}</span>
           )}

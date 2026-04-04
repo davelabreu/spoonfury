@@ -393,7 +393,7 @@ export function RecipePage() {
             </div>
           </div>
 
-          {/* Community review panel — non-owners when recipe is in_review */}
+          {/* Community review panel — non-owners vote here */}
           {!isOwner && recipe.status === "in_review" && token && (
             <div id="review-panel">
               <ReviewPanel
@@ -402,6 +402,46 @@ export function RecipePage() {
                 reviewData={reviewData}
                 onReviewData={setReviewData}
               />
+            </div>
+          )}
+
+          {/* Owner review history — read-only, all rounds */}
+          {isOwner && reviewData && (reviewData.all_rounds?.length ?? 0) > 0 && (
+            <div className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Community Votes</h2>
+                <span className="text-xs text-muted-foreground">
+                  · {reviewData.total_votes} this round · {reviewData.all_rounds?.length} total
+                </span>
+              </div>
+
+              {/* Group by round */}
+              {(() => {
+                const byRound: Record<number, typeof reviewData.all_rounds> = {};
+                reviewData.all_rounds?.forEach(r => {
+                  if (!byRound[r.round]) byRound[r.round] = [];
+                  byRound[r.round]!.push(r);
+                });
+                return Object.entries(byRound).sort(([a], [b]) => Number(b) - Number(a)).map(([round, votes]) => {
+                  const pos = votes!.filter(v => v.is_positive).length;
+                  return (
+                    <div key={round} className="space-y-2">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+                        Round {round} — {pos}/{votes!.length} approved
+                      </p>
+                      {votes!.map((v, i) => (
+                        <div key={i} className="flex items-start gap-2 text-sm">
+                          <span>{v.is_positive ? "👍" : "👎"}</span>
+                          <div>
+                            <span className="font-medium">@{v.reviewer}</span>
+                            {v.comment && <p className="text-muted-foreground text-xs mt-0.5">{v.comment}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                });
+              })()}
             </div>
           )}
         </div>
