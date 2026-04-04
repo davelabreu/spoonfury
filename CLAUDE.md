@@ -56,6 +56,7 @@ Active plans live in `docs/plans/active/`. Shipped features are archived in `doc
 | Feature | Spec | Impl |
 |---------|------|------|
 | Test Kitchen & Privacy | `active/2026-03-08-test-kitchen.spec.md` | `active/2026-03-08-test-kitchen.impl.md` |
+| Community Review & Moderation Gate | `active/2026-04-03-community-review-gate.spec.md` | — |
 
 ### Completed
 
