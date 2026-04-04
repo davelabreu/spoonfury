@@ -135,10 +135,10 @@ export function RecipePage() {
   const heroFallback = getCategoryFallback(recipe.category);
 
   return (
-    <div className="max-w-6xl mx-auto">
-      {/* Cook Now banner — full width above the editorial grid */}
+    <div className="max-w-6xl mx-auto space-y-5">
+      {/* Cook Now banner */}
       {cookNow.active && (
-        <div className="flex items-center justify-between px-4 py-2.5 mb-6 bg-amber-400 rounded-lg text-amber-900 font-semibold text-sm">
+        <div className="flex items-center justify-between px-4 py-2.5 bg-amber-400 rounded-lg text-amber-900 font-semibold text-sm">
           <span>🍳 Screen will stay on while you cook</span>
           <Button size="sm" variant="ghost" onClick={cookNow.release} className="text-amber-900 hover:bg-amber-500">
             Done cooking
@@ -146,52 +146,52 @@ export function RecipePage() {
         </div>
       )}
 
-      {/* Editorial split grid */}
+      {/* Back navigation */}
+      <div className="flex items-center -ml-2">
+        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground">
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          Back
+        </Button>
+      </div>
+
+      {/* Status banners — full width */}
+      {isOwner && (recipe.status === "draft" || recipe.status === "revision_requested") && (
+        <DraftBanner status={recipe.status} gate={getPublishGate(recipe)} slug={slug!} />
+      )}
+      {!isOwner && recipe.status === "in_review" && token && reviewData && (
+        <ReviewBanner reviewData={reviewData} hasVoted={reviewData.has_voted} />
+      )}
+
+      {/* Editorial header — full width above the split grid */}
+      <div className="space-y-2">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
+          spoonfury / {recipe.category.replace(/_/g, " ")}
+        </p>
+        <h1 className="text-4xl font-bold leading-tight tracking-tight">{recipe.title}</h1>
+        <div className="flex items-center gap-3 flex-wrap text-sm text-muted-foreground">
+          <span>by @{recipe.author_username}</span>
+          {recipe.serves && <span>· Serves {recipe.serves}</span>}
+          {recipe.parent_recipe_slug && (
+            <span>
+              · Forked from{" "}
+              <Link to={`/recipes/${recipe.parent_recipe_slug}`} className="underline underline-offset-2 hover:text-foreground">
+                @{recipe.parent_recipe_author}'s {recipe.parent_recipe_title}
+              </Link>
+            </span>
+          )}
+          {recipe.fork_count > 0 && (
+            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+              🍴 {recipe.fork_count} FORK{recipe.fork_count !== 1 ? "S" : ""}
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      {/* Split grid — starts here so right column aligns with the image top */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-8">
 
-        {/* ── LEFT COLUMN: Story & Visuals ─────────────────────────────── */}
+        {/* ── LEFT COLUMN: Image + recipe content ──────────────────────── */}
         <div className="lg:col-span-7 space-y-6">
-
-          {/* Back navigation */}
-          <div className="flex items-center -ml-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground">
-              <ChevronLeft className="w-4 h-4 mr-1" />
-              Back
-            </Button>
-          </div>
-
-          {/* Status banners */}
-          {isOwner && (recipe.status === "draft" || recipe.status === "revision_requested") && (
-            <DraftBanner status={recipe.status} gate={getPublishGate(recipe)} slug={slug!} />
-          )}
-          {!isOwner && recipe.status === "in_review" && token && reviewData && (
-            <ReviewBanner reviewData={reviewData} hasVoted={reviewData.has_voted} />
-          )}
-
-          {/* Editorial header */}
-          <div className="space-y-2">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-              spoonfury / {recipe.category.replace(/_/g, " ")}
-            </p>
-            <h1 className="text-4xl font-bold leading-tight tracking-tight">{recipe.title}</h1>
-            <div className="flex items-center gap-3 flex-wrap text-sm text-muted-foreground">
-              <span>by @{recipe.author_username}</span>
-              {recipe.serves && <span>· Serves {recipe.serves}</span>}
-              {recipe.parent_recipe_slug && (
-                <span>
-                  · Forked from{" "}
-                  <Link to={`/recipes/${recipe.parent_recipe_slug}`} className="underline underline-offset-2 hover:text-foreground">
-                    @{recipe.parent_recipe_author}'s {recipe.parent_recipe_title}
-                  </Link>
-                </span>
-              )}
-              {recipe.fork_count > 0 && (
-                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
-                  🍴 {recipe.fork_count} FORK{recipe.fork_count !== 1 ? "S" : ""}
-                </Badge>
-              )}
-            </div>
-          </div>
 
           {/* Hero image fused with action strip (B1 layout) */}
           <div className="shadow-md rounded-2xl overflow-hidden">
