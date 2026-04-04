@@ -141,7 +141,7 @@ function NavSticker({ label, to, color, icon: Icon, isSpecial, isActive, onClick
   );
 }
 
-function UsernameBadge({ username, className, onSignOut, onSwitchTheme, switchThemeLabel, variant = "sticker" }: { username: string; className?: string; onSignOut?: () => void; onSwitchTheme?: () => void; switchThemeLabel?: string; variant?: "sticker" | "capsule" }) {
+function UsernameBadge({ username, className, onSignOut, onSwitchTheme, switchThemeLabel, variant = "sticker", isStaff = false }: { username: string; className?: string; onSignOut?: () => void; onSwitchTheme?: () => void; switchThemeLabel?: string; variant?: "sticker" | "capsule"; isStaff?: boolean }) {
   const navigate = useNavigate();
 
   const badge = variant === "capsule" ? (
@@ -193,6 +193,15 @@ function UsernameBadge({ username, className, onSignOut, onSwitchTheme, switchTh
           <BookOpen className="w-4 h-4" />
           My Books
         </DropdownMenuItem>
+        {isStaff && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => navigate("/moderation")} className="gap-2 cursor-pointer text-purple-700 focus:text-purple-700">
+              <span className="w-4 h-4 flex items-center justify-center text-xs">⚖️</span>
+              Moderation Queue
+            </DropdownMenuItem>
+          </>
+        )}
         {onSwitchTheme && (
           <>
             <DropdownMenuSeparator />
@@ -646,7 +655,7 @@ function MinimalNav({
               {username && token && <NotificationBell token={token} />}
               {username && <CartCapsule count={cartCount} items={cartItems} />}
               {username ? (
-                <UsernameBadge username={username} onSignOut={onSignOut} onSwitchTheme={onSwitchTheme} switchThemeLabel="Fridge Sticker theme" variant="capsule" />
+                <UsernameBadge username={username} onSignOut={onSignOut} onSwitchTheme={onSwitchTheme} switchThemeLabel="Fridge Sticker theme" variant="capsule" isStaff={isStaff} />
               ) : (
                 <>
                   <Link to="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -750,7 +759,7 @@ function MinimalNav({
 }
 
 export function NavBar() {
-  const { username, token, logout } = useAuth();
+  const { username, token, isStaff, logout } = useAuth();
   const { count: cartCount, items: cartItems } = useShopping();
   const navigate = useNavigate();
   const location = useLocation();
@@ -931,7 +940,7 @@ export function NavBar() {
               {username ? (
                 <div className="flex items-end gap-3 h-full">
                   <div className="mb-3.5">
-                    <UsernameBadge username={username} onSignOut={handleSignOut} onSwitchTheme={() => setTheme("minimal")} switchThemeLabel="Minimal theme" />
+                    <UsernameBadge username={username} onSignOut={handleSignOut} onSwitchTheme={() => setTheme("minimal")} switchThemeLabel="Minimal theme" isStaff={isStaff} />
                   </div>
                 </div>
               ) : (
