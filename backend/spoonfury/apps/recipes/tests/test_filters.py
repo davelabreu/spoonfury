@@ -4,7 +4,8 @@ from spoonfury.apps.recipes.models import Recipe, Tag
 
 
 def make_recipe(user, title, category="other", ingredients=None, **kwargs):
-    """Helper to create recipes with unique slugs."""
+    """Helper to create recipes with unique slugs. Published by default so they appear in public filters."""
+    kwargs.setdefault("status", "published")
     return Recipe.objects.create(
         title=title,
         description=f"Desc for {title}",
