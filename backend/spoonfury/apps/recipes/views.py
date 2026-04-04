@@ -59,7 +59,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return base.filter(
                 Q(status="published")
                 | Q(author=user)  # own drafts
-                | Q(author_id__in=invited_owner_ids, status="draft")  # invited kitchens
+                | Q(author_id__in=invited_owner_ids, status__in=["draft", "in_review"])  # invited kitchens
             ).distinct()
 
         return base.filter(status="published")
@@ -72,6 +72,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         if serializer.instance.author != self.request.user:
             raise PermissionDenied("You can only edit your own recipes.")
+        if serializer.instance.status in ("in_review", "mod_queue"):
+            raise PermissionDenied("Recipe is locked during review/moderation. Withdraw or wait for a decision.")
         serializer.save()
 
     def perform_destroy(self, instance):

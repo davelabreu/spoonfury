@@ -142,3 +142,46 @@ def test_delete_recipe_forbidden_for_non_owner(other_auth_client, recipe):
     url = reverse("recipe-detail", kwargs={"slug": recipe.slug})
     response = other_auth_client.delete(url)
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_cannot_edit_recipe_in_review(auth_client, user):
+    """Recipes in in_review state are locked for editing."""
+    recipe = Recipe.objects.create(
+        title="Locked Recipe", description="Locked", serves="4",
+        ingredients=[],
+        instructions="Cook it well enough to pass the gate and more",
+        category="soup", author=user, status="in_review", review_round=1,
+    )
+    url = reverse("recipe-detail", kwargs={"slug": recipe.slug})
+    response = auth_client.patch(url, {"title": "New Title"}, format="json")
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_cannot_edit_recipe_in_mod_queue(auth_client, user):
+    """Recipes in mod_queue state are locked for editing."""
+    recipe = Recipe.objects.create(
+        title="Mod Queue Recipe", description="Queued", serves="4",
+        ingredients=[],
+        instructions="Cook it well enough to pass the gate and more",
+        category="soup", author=user, status="mod_queue", review_round=1,
+    )
+    url = reverse("recipe-detail", kwargs={"slug": recipe.slug})
+    response = auth_client.patch(url, {"title": "New Title"}, format="json")
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_can_edit_recipe_in_revision_requested(auth_client, user):
+    """Recipes in revision_requested state ARE editable."""
+    recipe = Recipe.objects.create(
+        title="Revision Recipe", description="Needs revision", serves="4",
+        ingredients=[],
+        instructions="Cook it well enough to pass the gate and more",
+        category="soup", author=user, status="revision_requested", review_round=1,
+    )
+    url = reverse("recipe-detail", kwargs={"slug": recipe.slug})
+    response = auth_client.patch(url, {"title": "Revised Title"}, format="json")
+    assert response.status_code == 200
+    assert response.data["title"] == "Revised Title"
