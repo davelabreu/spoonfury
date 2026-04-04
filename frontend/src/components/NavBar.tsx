@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
 import { Menu, X, Utensils, ShoppingCart, BookOpen, LogOut, Palette } from "lucide-react";
+import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/contexts/AuthContext";
 import { useShopping, SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -510,6 +511,7 @@ type StickerDef = typeof STICKERS[number];
 function MinimalNav({
   visibleStickers,
   username,
+  token,
   cartCount,
   cartItems,
   onSignOut,
@@ -517,6 +519,7 @@ function MinimalNav({
 }: {
   visibleStickers: StickerDef[];
   username: string | null | undefined;
+  token: string | null;
   cartCount: number;
   cartItems: Ingredient[];
   onSignOut: () => void;
@@ -557,6 +560,7 @@ function MinimalNav({
             {username && cartCount > 0 && (
               <CartCapsule count={cartCount} items={cartItems} compact />
             )}
+            {username && token && <NotificationBell token={token} />}
             {username ? (
               /* Logged-in: combined badge + hamburger capsule */
               <div className="relative badge-wrap">
@@ -639,6 +643,7 @@ function MinimalNav({
             </div>
 
             <div className="flex items-center gap-3 shrink-0">
+              {username && token && <NotificationBell token={token} />}
               {username && <CartCapsule count={cartCount} items={cartItems} />}
               {username ? (
                 <UsernameBadge username={username} onSignOut={onSignOut} onSwitchTheme={onSwitchTheme} switchThemeLabel="Fridge Sticker theme" variant="capsule" />
@@ -745,7 +750,7 @@ function MinimalNav({
 }
 
 export function NavBar() {
-  const { username, logout } = useAuth();
+  const { username, token, logout } = useAuth();
   const { count: cartCount, items: cartItems } = useShopping();
   const navigate = useNavigate();
   const location = useLocation();
@@ -789,6 +794,7 @@ export function NavBar() {
       <MinimalNav
         visibleStickers={visibleStickers}
         username={username}
+        token={token}
         cartCount={cartCount}
         cartItems={cartItems}
         onSignOut={handleSignOut}
@@ -887,6 +893,7 @@ export function NavBar() {
 
         {isMobile ? (
           <div className="ml-auto flex items-center gap-2 mb-2.5 z-30">
+            {username && token && <NotificationBell token={token} />}
             {username && <CartButton count={cartCount} onClick={() => setMobileOpen(false)} />}
             {username && <UsernameBadge username={username} />}
             <button
@@ -911,6 +918,11 @@ export function NavBar() {
             </div>
 
             <div className="flex-shrink-0 flex items-end gap-2 h-full z-30">
+              {username && token && (
+                <div className="mb-3.5">
+                  <NotificationBell token={token} />
+                </div>
+              )}
               {username && cartCount > 0 && (
                 <div className="mb-3.5">
                   <CartCapsule count={cartCount} items={cartItems} />
