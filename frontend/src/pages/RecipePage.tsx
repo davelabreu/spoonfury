@@ -5,7 +5,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
 import { IngredientChecklist } from "@/components/IngredientChecklist";
 import { ForkModal } from "@/components/ForkModal";
 import { ShareModal } from "@/components/ShareModal";
@@ -48,14 +48,13 @@ export function RecipePage() {
   const [buyNowIngredients, setBuyNowIngredients] = useState<Ingredient[] | null>(null);
   const [listMsg, setListMsg] = useState("");
   const [inList, setInList] = useState(false);
-  // Tracks broken hero image URLs — falls back to category placeholder on error
   const [heroImgError, setHeroImgError] = useState(false);
   const [reviewData, setReviewData] = useState<ReviewsResponse | null>(null);
   const addBtnRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (!slug) return;
-    setHeroImgError(false); // Reset broken-image state when navigating to a new recipe
+    setHeroImgError(false);
     api.get(`/recipes/${slug}/`, token ?? undefined).then((data: Recipe) => setRecipe(data)).catch(() => setError("Recipe not found."));
   }, [slug]);
 
@@ -96,7 +95,6 @@ export function RecipePage() {
   const deleteRecipe = async () => {
     if (!token || !slug || !isOwner) return;
     if (!window.confirm("Are you sure you want to delete this recipe? This cannot be undone.")) return;
-
     setDeleting(true);
     try {
       await api.delete(`/recipes/${slug}/`, token);
@@ -127,14 +125,21 @@ export function RecipePage() {
     }
   };
 
-  if (error) return <div className="max-w-2xl mx-auto py-12"><p className="text-destructive font-medium">{error}</p><Button variant="link" onClick={() => navigate("/")} className="mt-4 p-0">← Back to home</Button></div>;
+  if (error) return (
+    <div className="max-w-2xl mx-auto py-12">
+      <p className="text-destructive font-medium">{error}</p>
+      <Button variant="link" onClick={() => navigate("/")} className="mt-4 p-0">← Back to home</Button>
+    </div>
+  );
   if (!recipe) return <p className="text-muted-foreground">Loading…</p>;
 
+  const heroFallback = getCategoryFallback(recipe.category);
+
   return (
-    <article className="max-w-2xl mx-auto space-y-6">
-      {/* Cook Now banner */}
+    <div className="max-w-6xl mx-auto">
+      {/* Cook Now banner — full width above the editorial grid */}
       {cookNow.active && (
-        <div className="flex items-center justify-between px-4 py-2.5 bg-amber-400 rounded-lg text-amber-900 font-semibold text-sm">
+        <div className="flex items-center justify-between px-4 py-2.5 mb-6 bg-amber-400 rounded-lg text-amber-900 font-semibold text-sm">
           <span>🍳 Screen will stay on while you cook</span>
           <Button size="sm" variant="ghost" onClick={cookNow.release} className="text-amber-900 hover:bg-amber-500">
             Done cooking
@@ -142,339 +147,292 @@ export function RecipePage() {
         </div>
       )}
 
-      {/* Navigation */}
-      <div className="flex items-center -ml-2 mb-2">
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground">
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          Back
-        </Button>
-      </div>
+      {/* Editorial split grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-8">
 
-      {/* Draft banner — shown to owner when recipe is in draft or revision_requested state. */}
-      {isOwner && (recipe.status === "draft" || recipe.status === "revision_requested") && (
-        <DraftBanner status={recipe.status} gate={getPublishGate(recipe)} slug={slug!} />
-      )}
+        {/* ── LEFT COLUMN: Story & Visuals ─────────────────────────────── */}
+        <div className="lg:col-span-7 space-y-6">
 
-      {/* Review banner — shown to non-owners when recipe is under community review. */}
-      {!isOwner && recipe.status === "in_review" && token && reviewData && (
-        <ReviewBanner reviewData={reviewData} hasVoted={reviewData.has_voted} />
-      )}
-
-      {/* Header — title, author, and fork badge sit ABOVE the hero image
-          so the recipe identity is visible before scrolling past the photo. */}
-      <div>
-        <div className="flex items-start justify-between gap-4">
-          <h1 className="text-3xl font-bold leading-tight">{recipe.title}</h1>
-          <Badge variant="secondary" className="shrink-0 mt-1">{recipe.category}</Badge>
-        </div>
-        {recipe.parent_recipe_slug && (
-          <p className="text-sm text-muted-foreground mt-1">
-            Forked from{" "}
-            <Link to={`/recipes/${recipe.parent_recipe_slug}`} className="underline">
-              @{recipe.parent_recipe_author}'s {recipe.parent_recipe_title}
-            </Link>
-          </p>
-        )}
-        <p className="text-sm text-muted-foreground mt-1">
-          by @{recipe.author_username}
-        </p>
-
-        {recipe.fork_count > 0 && (
-          <div className="mt-2">
-            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
-              🍴 {recipe.fork_count} FORK{recipe.fork_count !== 1 ? "S" : ""}
-            </Badge>
+          {/* Back navigation */}
+          <div className="flex items-center -ml-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground">
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Back
+            </Button>
           </div>
-        )}
-      </div>
 
-      {/* Hero image + attached action strip (B1 layout).
-          The image gets top border-radius, the action strip gets bottom border-radius,
-          forming one fused visual unit. Shadow wraps the whole group. */}
-      <div className="shadow-md rounded-2xl overflow-hidden">
-        {/* Hero image — top half of the fused unit */}
-        <div className="aspect-video w-full relative">
-          {recipe.image_url && !heroImgError ? (
-            <img
-              src={recipe.image_url}
-              alt={recipe.title}
-              className="w-full h-full object-cover"
-              onError={() => setHeroImgError(true)}
-            />
-          ) : (
-            /* Category placeholder — emoji on gradient background when no image exists */
-            (() => {
-              const heroFallback = getCategoryFallback(recipe.category);
-              return (
-                <div
-                  className={`w-full h-full bg-gradient-to-br ${heroFallback.gradient} flex items-center justify-center`}
-                >
-                  <span className="text-6xl sm:text-7xl drop-shadow-md">
-                    {heroFallback.emoji}
-                  </span>
+          {/* Status banners */}
+          {isOwner && (recipe.status === "draft" || recipe.status === "revision_requested") && (
+            <DraftBanner status={recipe.status} gate={getPublishGate(recipe)} slug={slug!} />
+          )}
+          {!isOwner && recipe.status === "in_review" && token && reviewData && (
+            <ReviewBanner reviewData={reviewData} hasVoted={reviewData.has_voted} />
+          )}
+
+          {/* Editorial header */}
+          <div className="space-y-2">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
+              spoonfury / {recipe.category.replace(/_/g, " ")}
+            </p>
+            <h1 className="text-4xl font-bold leading-tight tracking-tight">{recipe.title}</h1>
+            <div className="flex items-center gap-3 flex-wrap text-sm text-muted-foreground">
+              <span>by @{recipe.author_username}</span>
+              {recipe.serves && <span>· Serves {recipe.serves}</span>}
+              {recipe.parent_recipe_slug && (
+                <span>
+                  · Forked from{" "}
+                  <Link to={`/recipes/${recipe.parent_recipe_slug}`} className="underline underline-offset-2 hover:text-foreground">
+                    @{recipe.parent_recipe_author}'s {recipe.parent_recipe_title}
+                  </Link>
+                </span>
+              )}
+              {recipe.fork_count > 0 && (
+                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                  🍴 {recipe.fork_count} FORK{recipe.fork_count !== 1 ? "S" : ""}
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          {/* Hero image fused with action strip (B1 layout) */}
+          <div className="shadow-md rounded-2xl overflow-hidden">
+            <div className="aspect-video w-full relative">
+              {recipe.image_url && !heroImgError ? (
+                <img
+                  src={recipe.image_url}
+                  alt={recipe.title}
+                  className="w-full h-full object-cover"
+                  onError={() => setHeroImgError(true)}
+                />
+              ) : (
+                <div className={`w-full h-full bg-gradient-to-br ${heroFallback.gradient} flex items-center justify-center`}>
+                  <span className="text-6xl sm:text-7xl drop-shadow-md">{heroFallback.emoji}</span>
                 </div>
-              );
-            })()
-          )}
+              )}
+              {isOwner && (!recipe.image_url || heroImgError) && (
+                <Link
+                  to={`/recipes/${slug}/edit`}
+                  className="absolute bottom-0 inset-x-0 bg-black/40 backdrop-blur-sm text-white px-4 py-2.5 flex items-center gap-2 text-sm font-medium hover:bg-black/50 transition-colors"
+                >
+                  <Camera className="w-4 h-4" />
+                  Add a photo to your recipe
+                </Link>
+              )}
+            </div>
 
-          {/* Owner prompt: "Add a photo" overlay — only shown on the placeholder */}
-          {isOwner && (!recipe.image_url || heroImgError) && (
-            <Link
-              to={`/recipes/${slug}/edit`}
-              className="absolute bottom-0 inset-x-0 bg-black/40 backdrop-blur-sm text-white px-4 py-2.5 flex items-center gap-2 text-sm font-medium hover:bg-black/50 transition-colors"
-            >
-              <Camera className="w-4 h-4" />
-              Add a photo to your recipe
-            </Link>
-          )}
-        </div>
-
-        {/* Action strip — bottom half of the fused unit, visually attached to image.
-            Uses indigo tint to match Spoonfury's action bar style.
-            Contents change based on whether the viewer is the recipe owner. */}
-        <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 bg-indigo-50 border-t border-indigo-100/50">
-          {isOwner ? (
-            <div className="flex flex-col gap-1 w-full">
-              <span className="text-[10px] uppercase font-bold text-indigo-400/80 tracking-wider">Owner Actions</span>
-              <div className="flex items-center gap-2 w-full">
-                <Button variant="outline" size="sm" asChild className="bg-white/50 border-indigo-100">
-                  <Link to={`/recipes/${slug}/edit`}>Edit recipe</Link>
-                </Button>
-
-                {recipe.status === "draft" && (
-                  <>
-                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
-                      🧪 Draft
-                    </Badge>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={async () => {
-                        try {
-                          const updated = await api.post(`/recipes/${slug}/submit-for-review/`, {}, token!);
-                          setRecipe(updated as Recipe);
-                        } catch { /* ignore */ }
-                      }}
-                      disabled={!Object.values(getPublishGate(recipe)).every(Boolean)}
-                      className="bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 gap-1.5"
-                    >
-                      Submit for Review
+            {/* Action strip */}
+            <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 bg-indigo-50 border-t border-indigo-100/50">
+              {isOwner ? (
+                <div className="flex flex-col gap-1 w-full">
+                  <span className="text-[10px] uppercase font-bold text-indigo-400/80 tracking-wider">Owner Actions</span>
+                  <div className="flex items-center gap-2 w-full flex-wrap">
+                    <Button variant="outline" size="sm" asChild className="bg-white/50 border-indigo-100">
+                      <Link to={`/recipes/${slug}/edit`}>Edit recipe</Link>
                     </Button>
-                  </>
-                )}
-                {recipe.status === "in_review" && (
-                  <>
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
-                      🔍 In Review
-                    </Badge>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={async () => {
-                        try {
-                          const updated = await api.post(`/recipes/${slug}/withdraw-review/`, {}, token!);
-                          setRecipe(updated as Recipe);
-                        } catch { /* ignore */ }
-                      }}
-                      className="bg-white/50 border-gray-200 text-gray-500 hover:bg-gray-50"
-                    >
-                      Withdraw
-                    </Button>
-                  </>
-                )}
-                {recipe.status === "mod_queue" && (
-                  <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
-                    ⏳ Awaiting Moderation
-                  </Badge>
-                )}
-                {recipe.status === "revision_requested" && (
-                  <>
-                    <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
-                      📝 Revision Requested
-                    </Badge>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={async () => {
-                        try {
-                          const updated = await api.post(`/recipes/${slug}/submit-for-review/`, {}, token!);
-                          setRecipe(updated as Recipe);
-                        } catch { /* ignore */ }
-                      }}
-                      disabled={!Object.values(getPublishGate(recipe)).every(Boolean)}
-                      className="bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 gap-1.5"
-                    >
-                      Resubmit for Review
-                    </Button>
-                  </>
-                )}
-                {recipe.status === "published" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={async () => {
-                      try {
-                        const updated = await api.post(`/recipes/${slug}/unpublish/`, {}, token!);
-                        setRecipe(updated as Recipe);
-                      } catch { /* ignore */ }
-                    }}
-                    className="bg-white/50 border-gray-200 text-gray-500 hover:bg-gray-50"
-                  >
-                    Unpublish
-                  </Button>
-                )}
 
-                <div className="h-4 w-px bg-indigo-200/50 mx-1" />
+                    {recipe.status === "draft" && (
+                      <>
+                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                          🧪 Draft
+                        </Badge>
+                        <Button
+                          variant="outline" size="sm"
+                          onClick={async () => {
+                            try { const u = await api.post(`/recipes/${slug}/submit-for-review/`, {}, token!); setRecipe(u as Recipe); } catch { /* ignore */ }
+                          }}
+                          disabled={!Object.values(getPublishGate(recipe)).every(Boolean)}
+                          className="bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 gap-1.5"
+                        >
+                          Submit for Review
+                        </Button>
+                      </>
+                    )}
+                    {recipe.status === "in_review" && (
+                      <>
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                          🔍 In Review
+                        </Badge>
+                        <Button
+                          variant="outline" size="sm"
+                          onClick={async () => {
+                            try { const u = await api.post(`/recipes/${slug}/withdraw-review/`, {}, token!); setRecipe(u as Recipe); } catch { /* ignore */ }
+                          }}
+                          className="bg-white/50 border-gray-200 text-gray-500 hover:bg-gray-50"
+                        >
+                          Withdraw
+                        </Button>
+                      </>
+                    )}
+                    {recipe.status === "mod_queue" && (
+                      <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                        ⏳ Awaiting Moderation
+                      </Badge>
+                    )}
+                    {recipe.status === "revision_requested" && (
+                      <>
+                        <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                          📝 Revision Requested
+                        </Badge>
+                        <Button
+                          variant="outline" size="sm"
+                          onClick={async () => {
+                            try { const u = await api.post(`/recipes/${slug}/submit-for-review/`, {}, token!); setRecipe(u as Recipe); } catch { /* ignore */ }
+                          }}
+                          disabled={!Object.values(getPublishGate(recipe)).every(Boolean)}
+                          className="bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 gap-1.5"
+                        >
+                          Resubmit for Review
+                        </Button>
+                      </>
+                    )}
+                    {recipe.status === "published" && (
+                      <Button
+                        variant="outline" size="sm"
+                        onClick={async () => {
+                          try { const u = await api.post(`/recipes/${slug}/unpublish/`, {}, token!); setRecipe(u as Recipe); } catch { /* ignore */ }
+                        }}
+                        className="bg-white/50 border-gray-200 text-gray-500 hover:bg-gray-50"
+                      >
+                        Unpublish
+                      </Button>
+                    )}
 
-                {books.length > 0 ? (
-                  <div className="flex items-center gap-2">
-                    <select
-                      className="border border-indigo-100 rounded px-2 py-1 text-sm bg-white/50 text-indigo-900 focus:outline-none"
-                      defaultValue=""
-                      onChange={e => { if (e.target.value) addToBook(Number(e.target.value)); e.target.value = ""; }}
+                    <div className="h-4 w-px bg-indigo-200/50 mx-1" />
+
+                    {books.length > 0 ? (
+                      <div className="flex items-center gap-2">
+                        <select
+                          className="border border-indigo-100 rounded px-2 py-1 text-sm bg-white/50 text-indigo-900 focus:outline-none"
+                          defaultValue=""
+                          onChange={e => { if (e.target.value) addToBook(Number(e.target.value)); e.target.value = ""; }}
+                        >
+                          <option value="" disabled>Add to book…</option>
+                          {books.map(b => <option key={b.id} value={b.id}>{b.title}</option>)}
+                        </select>
+                        {saveMsg && <span className="text-sm font-medium text-indigo-600 animate-in fade-in slide-in-from-left-1">{saveMsg}</span>}
+                      </div>
+                    ) : (
+                      <Button variant="ghost" size="sm" asChild className="text-indigo-400">
+                        <Link to="/books" className="underline underline-offset-4">Create a book first</Link>
+                      </Button>
+                    )}
+
+                    <div className="flex-1" />
+
+                    <Button type="button" variant="outline" size="sm" onClick={() => setSharing(true)} className="bg-white/50 border-indigo-100 gap-1.5">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+                        <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      Share
+                    </Button>
+                    <Button
+                      type="button" variant={cookNow.active ? "default" : "outline"} size="sm"
+                      onClick={cookNow.active ? cookNow.release : cookNow.acquire}
+                      className={cookNow.active ? "bg-amber-400 text-amber-900 hover:bg-amber-500 border-0" : "bg-white/50 border-indigo-100"}
                     >
-                      <option value="" disabled>Add to book…</option>
-                      {books.map(b => <option key={b.id} value={b.id}>{b.title}</option>)}
-                    </select>
-                    {saveMsg && <span className="text-sm font-medium text-indigo-600 animate-in fade-in slide-in-from-left-1">{saveMsg}</span>}
+                      🍳 {cookNow.active ? "Stop" : "Cook Now"}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={deleteRecipe} disabled={deleting} className="bg-white/50 border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600">
+                      {deleting ? "Deleting..." : "Delete"}
+                    </Button>
                   </div>
-                ) : (
-                  <Button variant="ghost" size="sm" asChild className="text-indigo-400">
-                    <Link to="/books" className="underline underline-offset-4">Create a book first</Link>
-                  </Button>
-                )}
-
-                <div className="flex-1" />
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSharing(true)}
-                  className="bg-white/50 border-indigo-100 gap-1.5"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
-                    <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  Share
-                </Button>
-
-                <Button
-                  type="button"
-                  variant={cookNow.active ? "default" : "outline"}
-                  size="sm"
-                  onClick={cookNow.active ? cookNow.release : cookNow.acquire}
-                  className={cookNow.active ? "bg-amber-400 text-amber-900 hover:bg-amber-500 border-0" : "bg-white/50 border-indigo-100"}
-                >
-                  🍳 {cookNow.active ? "Stop" : "Cook Now"}
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={deleteRecipe}
-                  disabled={deleting}
-                  className="bg-white/50 border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600"
-                >
-                  {deleting ? "Deleting..." : "Delete"}
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-1 w-full sm:w-auto">
-              <span className="text-[10px] uppercase font-bold text-indigo-400/80 tracking-wider">Actions</span>
-              <div className="flex items-center gap-2">
-                {token && (
-                  <Button variant="outline" size="sm" onClick={() => setForking(true)} className="w-full sm:w-auto border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50">
-                    🍴 Make it mine
-                  </Button>
-                )}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSharing(true)}
-                  className="border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50 gap-1.5"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
-                    <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  Share
-                </Button>
-
-                <Button
-                  type="button"
-                  variant={cookNow.active ? "default" : "outline"}
-                  size="sm"
-                  onClick={cookNow.active ? cookNow.release : cookNow.acquire}
-                  className={cookNow.active ? "bg-amber-400 text-amber-900 hover:bg-amber-500 border-0" : "border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50"}
-                >
-                  🍳 {cookNow.active ? "Stop" : "Cook Now"}
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <p className="text-base leading-relaxed">{recipe.description}</p>
-      <p className="text-sm text-muted-foreground">Serves: {recipe.serves}</p>
-
-      <Separator />
-      <IngredientChecklist
-        ingredients={recipe.ingredients}
-        inList={inList}
-        onAddToList={token ? addToList : undefined}
-        onBuyNow={setBuyNowIngredients}
-        addBtnRef={addBtnRef}
-      />
-      {listMsg && (
-        <p className="text-sm font-medium text-indigo-600 animate-in fade-in slide-in-from-bottom-1">{listMsg}</p>
-      )}
-      <Separator />
-
-      {!isOwner && recipe.status === "in_review" && token && (
-        <div id="review-panel">
-          <ReviewPanel
-            recipeSlug={recipe.slug}
-            token={token}
-            reviewData={reviewData}
-            onReviewData={setReviewData}
-          />
-        </div>
-      )}
-
-      <div>
-        <h2 className="font-semibold text-lg mb-3">Instructions</h2>
-        <div className="prose prose-sm max-w-none dark:prose-invert">
-          <ReactMarkdown>{recipe.instructions}</ReactMarkdown>
-        </div>
-      </div>
-
-      {recipe.notes && (
-        <>
-          <Separator />
-          <div>
-            <h2 className="font-semibold text-lg mb-3">Notes</h2>
-            <div className="prose prose-sm max-w-none dark:prose-invert">
-              <ReactMarkdown>{recipe.notes}</ReactMarkdown>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-1 w-full sm:w-auto">
+                  <span className="text-[10px] uppercase font-bold text-indigo-400/80 tracking-wider">Actions</span>
+                  <div className="flex items-center gap-2">
+                    {token && (
+                      <Button variant="outline" size="sm" onClick={() => setForking(true)} className="border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50">
+                        🍴 Make it mine
+                      </Button>
+                    )}
+                    <Button type="button" variant="outline" size="sm" onClick={() => setSharing(true)} className="border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50 gap-1.5">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+                        <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      Share
+                    </Button>
+                    <Button
+                      type="button" variant={cookNow.active ? "default" : "outline"} size="sm"
+                      onClick={cookNow.active ? cookNow.release : cookNow.acquire}
+                      className={cookNow.active ? "bg-amber-400 text-amber-900 hover:bg-amber-500 border-0" : "border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50"}
+                    >
+                      🍳 {cookNow.active ? "Stop" : "Cook Now"}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        </>
-      )}
 
+          {/* Description */}
+          <p className="text-base leading-relaxed text-muted-foreground">{recipe.description}</p>
+
+          {/* Instructions */}
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Instructions</h2>
+            <div className="prose prose-stone max-w-none dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-p:leading-relaxed">
+              <ReactMarkdown>{recipe.instructions}</ReactMarkdown>
+            </div>
+          </div>
+
+          {/* Community review panel — non-owners when recipe is in_review */}
+          {!isOwner && recipe.status === "in_review" && token && (
+            <div id="review-panel">
+              <ReviewPanel
+                recipeSlug={recipe.slug}
+                token={token}
+                reviewData={reviewData}
+                onReviewData={setReviewData}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* ── RIGHT COLUMN: Utility (sticky) ───────────────────────────── */}
+        <div className="lg:col-span-5">
+          <div className="lg:sticky lg:top-8 space-y-6">
+
+            {/* Ingredients card */}
+            <Card className="shadow-sm border-border/60">
+              <CardContent className="pt-5 pb-5">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Ingredients</h2>
+                <IngredientChecklist
+                  ingredients={recipe.ingredients}
+                  inList={inList}
+                  onAddToList={token ? addToList : undefined}
+                  onBuyNow={setBuyNowIngredients}
+                  addBtnRef={addBtnRef}
+                />
+                {listMsg && (
+                  <p className="text-sm font-medium text-indigo-600 mt-2 animate-in fade-in slide-in-from-bottom-1">{listMsg}</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Notes card */}
+            {recipe.notes && (
+              <div className="rounded-xl bg-accent/40 border border-accent p-5">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">Notes</h2>
+                <div className="prose prose-sm prose-stone max-w-none dark:prose-invert prose-p:leading-relaxed">
+                  <ReactMarkdown>{recipe.notes}</ReactMarkdown>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      </div>
+
+      {/* Modals */}
       {publishModalOpen && recipe && (
         <PublishModal
           recipe={recipe}
           token={token!}
           onClose={() => setPublishModalOpen(false)}
-          onPublished={(updated) => {
-            setRecipe(updated);
-            setPublishModalOpen(false);
-          }}
+          onPublished={(updated) => { setRecipe(updated); setPublishModalOpen(false); }}
         />
       )}
-
       {forking && (
         <ForkModal
           recipe={recipe}
@@ -483,7 +441,6 @@ export function RecipePage() {
           onSuccess={() => navigate("/kitchen")}
         />
       )}
-
       {sharing && (
         <ShareModal
           url={window.location.href}
@@ -491,13 +448,12 @@ export function RecipePage() {
           onClose={() => setSharing(false)}
         />
       )}
-
       {buyNowIngredients && (
         <BuyNowSheet
           ingredients={buyNowIngredients}
           onClose={() => setBuyNowIngredients(null)}
         />
       )}
-    </article>
+    </div>
   );
 }

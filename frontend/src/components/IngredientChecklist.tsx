@@ -135,7 +135,7 @@ export function IngredientChecklist({ ingredients, inList, onAddToList, onBuyNow
               size="sm"
               disabled={needed.length === 0}
               onClick={() => onBuyNow(needed)}
-              className="flex-1 bg-gradient-to-r from-amber-600 via-amber-500/80 to-amber-600 [background-size:200%_auto] text-white hover:[background-position:99%_center] transition-[background-position] duration-500 border-0 font-semibold focus-visible:ring-amber-600/20"
+              className="flex-1 bg-[#1e4b33] hover:bg-[#153624] text-white border-0 font-semibold focus-visible:ring-[#1e4b33]/20 transition-colors"
             >
               <Zap className="w-3.5 h-3.5" />
               Buy it NOW!
