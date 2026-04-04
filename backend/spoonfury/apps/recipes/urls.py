@@ -5,6 +5,7 @@ from .views_fork import fork_recipe
 from .views_upload import upload_recipe_image
 from .views_kitchen import kitchen_detail, kitchen_invite, kitchen_revoke
 from .views_review import submit_for_review, withdraw_review, review_vote, review_list
+from .views_moderation import moderation_queue, moderation_approve, moderation_request_revision
 
 router = DefaultRouter()
 router.register(r"recipes", RecipeViewSet, basename="recipe")
@@ -22,4 +23,7 @@ urlpatterns = [
     path("users/<str:username>/kitchen/invite/<str:invitee_username>/", kitchen_revoke, name="kitchen-revoke"),
     path("recipes/<slug:slug>/review/", review_vote, name="recipe-review-vote"),
     path("recipes/<slug:slug>/reviews/", review_list, name="recipe-reviews-list"),
+    path("moderation/queue/", moderation_queue, name="moderation-queue"),
+    path("moderation/<slug:slug>/approve/", moderation_approve, name="moderation-approve"),
+    path("moderation/<slug:slug>/request-revision/", moderation_request_revision, name="moderation-request-revision"),
 ]
