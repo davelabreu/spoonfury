@@ -4,6 +4,26 @@ Dev log for Spoonfury. **Focus** statements are top-level human summaries of dev
 
 ---
 
+## 2026-04-04 — v0.6 Test Kitchen & Recipe Privacy
+
+**Focus:** I wanted to get the test kitchen workflow from draft recipes to published kicked off. Will need more work, but at least now it flows nicely. Will need peer review and other functions added later. Added WYSIWYG markdown editor Tiptap.
+
+- `status` field on Recipe (`draft` / `published`) with `published_at` timestamp — all existing recipes auto-migrated to published
+- Privacy-aware queryset: drafts visible only to their author (or invited users via `TestKitchenInvite`)
+- My Kitchen page (`/kitchen`): lists all your drafts with per-recipe publish gate progress bars
+- Publish gate: 4 criteria must pass before a recipe can go public — 2+ ingredients, description, 20+ char instructions, category
+- Draft banner on RecipePage: amber (incomplete) → green (ready) with live gate pill checklist and score; shown only to the owner
+- Reactive draft banner on EditRecipePage: same gate checklist updates in real time as you type — you see criteria flip green without saving
+- "🎉 Perfect It" publish button: greyed until all gates pass, triggers confetti (`canvas-confetti`) on publish
+- Unpublish action returns a published recipe to draft status
+- `TestKitchenInvite` model: owner can invite specific users to preview a draft before publishing
+- EditRecipePage fully redesigned to match CreateRecipePage layout: 4-section Card with Shadcn components, pre-filled from API, tags loaded and editable
+- **Tiptap WYSIWYG editor** for instructions and notes on both Create and Edit pages — users see formatted text (bold is bold, headings are big) and edit directly in the preview; stores clean markdown; toolbar: B, I, H1, H2, H3, bullet list, numbered list, undo/redo; zero raw markdown syntax exposed
+- Branch rebased onto master to incorporate v0.5 recipe filtering, cart rework, and image features before merging
+- 89 tests passing across all apps
+
+---
+
 ## 2026-03-22 — v0.5.2 Shopping Cart Rework
 
 **Focus:** Wanted the shopping cart to feel like a real checkout — not a checklist. Took inspiration from REI and Uber Eats cart pages to build something that respects the user with real data: per-ingredient prices, recipe subtotals, a receipt-style summary. The kind of page that makes you feel like you're actually about to go shopping.
