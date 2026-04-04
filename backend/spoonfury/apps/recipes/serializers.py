@@ -42,9 +42,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             "image_url", "tags",
             "author_username", "author_display_name",
             "parent_recipe_slug", "parent_recipe_title", "parent_recipe_author",
-            "fork_count", "created_at", "status", "published_at",
+            "fork_count", "created_at", "status", "published_at", "review_round",
         ]
-        read_only_fields = ["slug", "fork_count", "created_at", "author_username", "status", "published_at"]
+        read_only_fields = ["slug", "fork_count", "created_at", "author_username", "status", "published_at", "review_round"]
 
     def to_representation(self, instance):
         # Build representation field-by-field, skipping the write-only tags ListField

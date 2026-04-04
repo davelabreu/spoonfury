@@ -5,6 +5,9 @@ from django.utils.text import slugify
 
 STATUS_CHOICES = [
     ("draft", "Draft"),
+    ("in_review", "In Review"),
+    ("mod_queue", "Moderation Queue"),
+    ("revision_requested", "Revision Requested"),
     ("published", "Published"),
 ]
 
@@ -85,12 +88,16 @@ class Recipe(models.Model):
     # When the author "perfects" a recipe, status flips to "published"
     # and published_at is set by the publish endpoint.
     status = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=STATUS_CHOICES,
         default="draft",
         db_index=True,
     )
     published_at = models.DateTimeField(null=True, blank=True)
+    review_round = models.PositiveIntegerField(
+        default=0,
+        help_text="0 = never submitted. Incremented on each submit-for-review.",
+    )
 
     class Meta:
         ordering = ["-created_at"]

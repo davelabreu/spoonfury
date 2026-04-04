@@ -87,3 +87,35 @@ def test_fork_count_starts_at_zero(user):
         author=user,
     )
     assert recipe.fork_count == 0
+
+
+@pytest.mark.django_db
+def test_recipe_default_review_round(user):
+    """New recipes have review_round=0 (never submitted)."""
+    recipe = Recipe.objects.create(
+        title="Test Soup",
+        description="Desc",
+        serves="4",
+        ingredients=[{"quantity": "1", "unit": "cup", "name": "water", "note": ""}],
+        instructions="Cook it",
+        category="soup",
+        author=user,
+    )
+    assert recipe.review_round == 0
+
+
+@pytest.mark.django_db
+def test_recipe_status_choices_include_review_states(user):
+    """Recipe status field accepts all 5 pipeline states."""
+    recipe = Recipe.objects.create(
+        title="Status Test",
+        description="Desc",
+        serves="4",
+        ingredients=[],
+        instructions="Cook it",
+        category="soup",
+        author=user,
+    )
+    for status_val in ["draft", "in_review", "mod_queue", "revision_requested", "published"]:
+        recipe.status = status_val
+        recipe.full_clean(exclude=["ingredients"])  # validates against choices
