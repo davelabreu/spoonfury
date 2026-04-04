@@ -22,6 +22,22 @@ def _count_ingredient_changes(original: list, forked: list) -> int:
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def fork_recipe(request, slug):
+    """
+    Fork (copy) a recipe into the current user's test kitchen.
+
+    The forked recipe:
+      - Defaults to 'draft' status (private, in the forker's test kitchen)
+      - Preserves the parent_recipe reference for fork lineage
+      - Allows up to 3 ingredient name changes from the original
+
+    Request body (all optional, defaults to parent's values):
+      - title: str
+      - description: str
+      - serves: str
+      - ingredients: list[Ingredient]
+      - instructions: str
+      - notes: str
+    """
     parent = get_object_or_404(Recipe, slug=slug)
 
     new_ingredients = request.data.get("ingredients", parent.ingredients)

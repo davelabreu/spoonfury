@@ -2,6 +2,46 @@ import pytest
 from spoonfury.apps.recipes.models import Recipe
 
 
+SAMPLE_INGREDIENTS = [
+    {"quantity": "2", "unit": "Tbsp", "name": "olive oil", "note": ""},
+    {"quantity": "1", "unit": "cup", "name": "flour", "note": ""},
+]
+
+
+@pytest.mark.django_db
+def test_recipe_defaults_to_draft(user):
+    """New recipes should default to 'draft' status with no published_at."""
+    recipe = Recipe.objects.create(
+        title="Draft Soup",
+        description="A soup in progress.",
+        serves="4",
+        ingredients=SAMPLE_INGREDIENTS,
+        instructions="Step 1: boil water. Step 2: add stuff.",
+        category="soup",
+        author=user,
+    )
+    assert recipe.status == "draft"
+    assert recipe.published_at is None
+
+
+@pytest.mark.django_db
+def test_published_at_not_set_automatically(user):
+    """published_at should remain None until explicitly set."""
+    recipe = Recipe.objects.create(
+        title="Another Draft",
+        description="Testing.",
+        serves="2",
+        ingredients=SAMPLE_INGREDIENTS,
+        instructions="Mix things together nicely.",
+        category="other",
+        author=user,
+    )
+    recipe.status = "published"
+    recipe.save()
+    # published_at is NOT auto-set by the model — the publish endpoint handles it
+    assert recipe.published_at is None
+
+
 @pytest.mark.django_db
 def test_recipe_creation(user):
     recipe = Recipe.objects.create(

@@ -97,6 +97,29 @@ def test_fork_rejects_too_many_ingredient_changes(auth_client, parent_recipe):
 
 
 @pytest.mark.django_db
+def test_fork_creates_draft(auth_client, parent_recipe):
+    """Forking a recipe should create a draft (test kitchen) copy."""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    forker = User.objects.create_user(username="forker5", email="f5@f.com", password="pass")
+    auth_client.force_authenticate(user=forker)
+
+    url = reverse("recipe-fork", kwargs={"slug": parent_recipe.slug})
+    response = auth_client.post(url, {
+        "title": "Carbonara (my version)",
+        "description": "My take on it.",
+        "serves": "2",
+        "ingredients": BASE_INGREDIENTS,
+        "instructions": "Cook.",
+        "notes": "",
+    }, format="json")
+
+    assert response.status_code == 201
+    assert response.data["status"] == "draft"
+    assert response.data["published_at"] is None
+
+
+@pytest.mark.django_db
 def test_fork_locks_category(auth_client, parent_recipe):
     from django.contrib.auth import get_user_model
     User = get_user_model()

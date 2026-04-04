@@ -58,7 +58,7 @@ export function ForkModal({ recipe, token, onClose, onSuccess }: ForkModalProps)
         <CardHeader>
           <CardTitle className="text-black">Fork "{recipe.title}"</CardTitle>
           <p className="text-sm text-muted-foreground">
-            A copy will be saved to your book. Edit it from there.
+            This will go to your test kitchen — you can perfect and publish it later.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">

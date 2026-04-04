@@ -59,8 +59,8 @@ export function CreateRecipePage() {
         ingredients: ingredients.filter(i => i.name.trim() !== ""),
       };
       if (!payload.image_url) delete payload.image_url;
-      const data = await api.post("/recipes/", payload, token);
-      navigate(`/recipes/${data.slug}`);
+      await api.post("/recipes/", payload, token);
+      navigate("/kitchen");
     } catch (err: unknown) {
       const e = err as { status?: number; data?: unknown };
       setError(`Error ${e.status ?? "?"}: ${JSON.stringify(e.data) || "Failed to create recipe."}`);
@@ -213,7 +213,7 @@ export function CreateRecipePage() {
           </section>
 
           {error && <p className="text-sm text-red-500">{error}</p>}
-          <Button type="submit" className="w-full" size="lg">Publish Recipe</Button>
+          <Button type="submit" className="w-full" size="lg">Save to Test Kitchen 🧪</Button>
         </form>
       </CardContent>
     </Card>

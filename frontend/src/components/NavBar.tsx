@@ -21,6 +21,7 @@ const STICKERS = [
   { label: "Stir the Pot", to: "/", color: "bg-[#FF6B6B]", icon: Utensils, isSpecial: true },
   { label: "My Books", to: "/books", color: "bg-[#4ECDC4]", authRequired: true },
   { label: "+ Recipe", to: "/recipes/new", color: "bg-[#FFE66D]", authRequired: true },
+  { label: "My Kitchen", to: "/kitchen", color: "bg-[#FFB347]", authRequired: true },
 ];
 
 interface NavStickerProps {

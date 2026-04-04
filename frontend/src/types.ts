@@ -1,3 +1,6 @@
+/** Possible recipe statuses in the privacy/publish flow. */
+export type RecipeStatus = "draft" | "published";
+
 export interface Ingredient {
   quantity: string;
   unit: string;
@@ -12,6 +15,7 @@ export interface Tag {
   kind: "cuisine" | "dietary" | "ingredient" | "vibe";
 }
 
+/** Full recipe object returned by the API. */
 export interface Recipe {
   id: number;
   slug: string;
@@ -22,15 +26,18 @@ export interface Recipe {
   tags?: Tag[];
   ingredients: Ingredient[];
   instructions: string;
-  notes?: string;
+  notes: string;
   image_url?: string;
   author_username: string;
+  author_display_name: string;
+  parent_recipe_slug: string | null;
+  parent_recipe_title: string | null;
+  parent_recipe_author: string | null;
   fork_count: number;
-  parent_recipe_slug?: string;
-  parent_recipe_title?: string;
-  parent_recipe_author?: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
+  status: RecipeStatus;
+  published_at: string | null;
 }
 
 export interface Book {
@@ -64,4 +71,19 @@ export interface RecipeGroup {
 export interface ShoppingListData {
   total_items: number;
   items_by_recipe: RecipeGroup[];
+}
+
+/** Checklist gate criteria for publishing a recipe. */
+export interface PublishGate {
+  hasEnoughIngredients: boolean;
+  hasInstructions: boolean;
+  hasDescription: boolean;
+  hasCategory: boolean;
+}
+
+/** Response from the kitchen endpoint. */
+export interface KitchenResponse {
+  owner: string;
+  count: number;
+  recipes: Recipe[];
 }
