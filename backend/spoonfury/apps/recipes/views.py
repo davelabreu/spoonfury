@@ -57,12 +57,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 invitee=user
             ).values_list("owner_id", flat=True)
 
-            return base.filter(
+            visibility = (
                 Q(status="published")
-                | Q(status="in_review")   # any logged-in user can reach a recipe under review via link
+                | Q(status="in_review")   # any logged-in user can reach via shared link
                 | Q(author=user)          # own recipes (all statuses)
                 | Q(author_id__in=invited_owner_ids, status="draft")  # invited kitchen drafts
-            ).distinct()
+            )
+            if user.is_staff:
+                visibility |= Q(status="mod_queue")  # staff see all recipes awaiting moderation
+            return base.filter(visibility).distinct()
 
         return base.filter(status="published")
 

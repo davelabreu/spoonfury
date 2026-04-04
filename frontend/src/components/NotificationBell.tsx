@@ -62,7 +62,11 @@ export function NotificationBell({ token }: NotificationBellProps) {
       } catch { /* ignore */ }
     }
     setOpen(false);
-    navigate(`/recipes/${n.recipe_slug}`);
+    if (n.notification_type === "recipe_in_mod_queue") {
+      navigate("/moderation");
+    } else {
+      navigate(`/recipes/${n.recipe_slug}`);
+    }
   };
 
   const handleMarkAllRead = async () => {
