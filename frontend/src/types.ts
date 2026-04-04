@@ -1,5 +1,5 @@
 /** Possible recipe statuses in the privacy/publish flow. */
-export type RecipeStatus = "draft" | "published";
+export type RecipeStatus = "draft" | "in_review" | "mod_queue" | "revision_requested" | "published";
 
 export interface Ingredient {
   quantity: string;
@@ -38,6 +38,7 @@ export interface Recipe {
   updated_at?: string;
   status: RecipeStatus;
   published_at: string | null;
+  review_round: number;
 }
 
 export interface Book {
@@ -86,4 +87,41 @@ export interface KitchenResponse {
   owner: string;
   count: number;
   recipes: Recipe[];
+}
+
+/** A single review vote on a recipe. */
+export interface RecipeReviewItem {
+  reviewer: string;
+  is_positive: boolean;
+  comment: string;
+  created_at: string;
+}
+
+/** Response from GET /recipes/:slug/reviews/ */
+export interface ReviewsResponse {
+  review_round: number;
+  total_votes: number;
+  positive_votes: number;
+  threshold_met: boolean;
+  has_voted: boolean;
+  reviews?: RecipeReviewItem[];
+}
+
+/** An in-app notification. */
+export interface AppNotification {
+  id: number;
+  notification_type: string;
+  message: string;
+  is_read: boolean;
+  actor_username: string | null;
+  recipe_slug: string;
+  recipe_title: string;
+  created_at: string;
+}
+
+/** A recipe in the moderation queue with extra metadata. */
+export interface ModerationQueueEntry extends Recipe {
+  total_votes: number;
+  positive_votes: number;
+  author_strike_count: number;
 }
