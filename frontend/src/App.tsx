@@ -11,6 +11,7 @@ import { BookDetailPage } from "@/pages/BookDetailPage";
 import { CreateRecipePage } from "@/pages/CreateRecipePage";
 import { HomePage } from "@/pages/HomePage";
 import { ShoppingListPage } from "@/pages/ShoppingListPage";
+import { MyKitchenPage } from "@/pages/MyKitchenPage";
 import { NavBar } from "@/components/NavBar";
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
                 <Route path="/books/share/:token" element={<BookDetailPage shared />} />
                 <Route path="/books/:id" element={<BookDetailPage />} />
                 <Route path="/shopping-list" element={<ShoppingListPage />} />
+                <Route path="/kitchen" element={<MyKitchenPage />} />
               </Routes>
             </main>
           </BrowserRouter>
