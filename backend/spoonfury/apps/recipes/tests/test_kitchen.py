@@ -108,6 +108,18 @@ def test_cannot_invite_to_others_kitchen(other_auth_client, user, other_user):
     assert response.status_code == 403
 
 
+# --- Queryset: invitee can view draft recipe detail ---
+
+@pytest.mark.django_db
+def test_invitee_can_view_draft_recipe_detail(auth_client, user, other_user, other_auth_client, draft_recipe):
+    """An invited user can view a draft recipe's detail page."""
+    TestKitchenInvite.objects.create(owner=user, invitee=other_user)
+    url = reverse("recipe-detail", kwargs={"slug": draft_recipe.slug})
+    response = other_auth_client.get(url)
+    assert response.status_code == 200
+    assert response.data["title"] == "Secret Sauce"
+
+
 # --- Revoke API tests ---
 
 @pytest.mark.django_db

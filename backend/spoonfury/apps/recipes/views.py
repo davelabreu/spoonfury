@@ -8,7 +8,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status as http_status
 from django.db.models import Q
-from .models import Recipe, Tag
+from .models import Recipe, Tag, TestKitchenInvite
 from .serializers import RecipeSerializer, TagSerializer
 from .filters import RecipeFilter
 
@@ -38,7 +38,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """
         Return recipes filtered by the viewer's access level.
 
-        Owners see all their own recipes. Everyone else sees only published.
+        Visibility rules:
+          - Owner: sees all their own recipes (draft + published)
+          - Test kitchen invitee: sees the inviter's drafts
+          - Everyone else: published only
         """
         base = (
             Recipe.objects
@@ -48,7 +51,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = self.request.user
 
         if user.is_authenticated:
-            return base.filter(Q(status="published") | Q(author=user))
+            # Users whose kitchens this user has been invited to
+            invited_owner_ids = TestKitchenInvite.objects.filter(
+                invitee=user
+            ).values_list("owner_id", flat=True)
+
+            return base.filter(
+                Q(status="published")
+                | Q(author=user)  # own drafts
+                | Q(author_id__in=invited_owner_ids, status="draft")  # invited kitchens
+            ).distinct()
+
         return base.filter(status="published")
 
     def get_permissions(self):
