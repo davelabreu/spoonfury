@@ -65,7 +65,7 @@ export function RecipePage() {
 
   useEffect(() => {
     if (!token || !recipe) return;
-    if (recipe.status !== "in_review" && recipe.status !== "revision_requested") return;
+    if (!["in_review", "revision_requested", "mod_queue"].includes(recipe.status)) return;
     api.get(`/recipes/${recipe.slug}/reviews/`, token)
       .then((data: ReviewsResponse) => setReviewData(data))
       .catch(() => {});

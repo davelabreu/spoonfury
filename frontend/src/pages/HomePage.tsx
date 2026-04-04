@@ -114,7 +114,7 @@ function GridCard({ recipe }: { recipe: Recipe }) {
 
 // ─── Community Kitchen sidebar ────────────────────────────────────────────────
 
-function CommunityKitchenSidebar({ recipes }: { recipes: Recipe[] }) {
+function CommunityKitchenSidebar({ recipes, isLoggedIn }: { recipes: Recipe[]; isLoggedIn: boolean }) {
   return (
     <aside className="w-72 shrink-0 hidden lg:block">
       <div className="sticky top-4 rounded-2xl border border-indigo-200/60 bg-gradient-to-b from-indigo-50 to-white overflow-hidden shadow-sm">
@@ -162,11 +162,33 @@ function CommunityKitchenSidebar({ recipes }: { recipes: Recipe[] }) {
                     {r.title}
                   </p>
                   <p className="text-[10px] text-slate-400">by @{r.author_username}</p>
-                  {/* Voting progress bar — placeholder width until vote data available */}
-                  <div className="mt-1.5 h-1 bg-indigo-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-indigo-400 rounded-full" style={{ width: "30%" }} />
-                  </div>
-                  <p className="text-[9px] text-indigo-400 mt-0.5">Needs votes</p>
+                  {/* Voting progress bar — fills toward 3-vote minimum */}
+                  {(() => {
+                    const total = r.total_votes ?? 0;
+                    const positive = r.positive_votes ?? 0;
+                    const pct = Math.min(100, Math.round((total / 3) * 100));
+                    const approvalPct = total > 0 ? Math.round((positive / total) * 100) : 0;
+                    return (
+                      <>
+                        <div className="mt-1.5 h-1 bg-indigo-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${pct}%`,
+                              background: pct >= 100 && approvalPct >= 80
+                                ? "linear-gradient(90deg, #10b981, #34d399)"
+                                : "linear-gradient(90deg, #6366f1, #818cf8)",
+                            }}
+                          />
+                        </div>
+                        <p className="text-[9px] text-indigo-400 mt-0.5">
+                          {total === 0
+                            ? "Needs votes"
+                            : `${total}/3 vote${total !== 1 ? "s" : ""} · ${approvalPct}% positive`}
+                        </p>
+                      </>
+                    );
+                  })()}
                 </div>
               </Link>
             );
@@ -176,7 +198,7 @@ function CommunityKitchenSidebar({ recipes }: { recipes: Recipe[] }) {
         {/* Footer CTA */}
         <div className="px-4 py-3 border-t border-indigo-100 text-center">
           <p className="text-[11px] text-indigo-400">
-            Log in to cast your vote
+            {isLoggedIn ? "Click a recipe to cast your vote" : "Log in to cast your vote"}
           </p>
         </div>
       </div>
@@ -244,7 +266,7 @@ export function HomePage() {
       </div>
 
       {/* Sidebar */}
-      {showSidebar && <CommunityKitchenSidebar recipes={inReviewRecipes} />}
+      {showSidebar && <CommunityKitchenSidebar recipes={inReviewRecipes} isLoggedIn={!!token} />}
     </div>
   );
 }
