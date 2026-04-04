@@ -3,12 +3,13 @@
 Canonical project context for Spoonfury. AI agents: Read this first.
 
 ## 🚀 Quick Start
-1. **Context**: Recursively load system references below.
+1. **Orientation**: Read `@HEARTBEAT.md` first — last session summary, current state, what's next.
+2. **Context**: Recursively load system references below.
    - Flow & Data Model: @docs/context-scopes/core-flow.md
    - Backend Architecture: @docs/context-scopes/backend.md
    - Frontend Architecture: @docs/context-scopes/frontend.md
    - REST API: @docs/context-scopes/api-reference.md
-2. **Current Work**: Read `@docs/plans/active/` to understand the current objective.
+3. **Current Work**: Read `@docs/plans/active/` to understand the current objective.
 3. **Commands**: See `backend/README.md` and `frontend/README.md` for local dev/test commands.
 4. **Build**: Django 5 + DRF + PostgreSQL | React 19 + Vite + Tailwind 4 + Shadcn UI.
 
@@ -67,12 +68,14 @@ Active plans live in `docs/plans/active/`. Shipped features are archived in `doc
 ### Active
 | Feature | Spec | Impl |
 |---------|------|------|
-| Test Kitchen & Privacy | `active/2026-03-08-test-kitchen.spec.md` | `active/2026-03-08-test-kitchen.impl.md` |
-| Community Review & Moderation Gate | `active/2026-04-03-community-review-gate.spec.md` | — |
+| *(none)* | — | — |
 
 ### Completed
 | Feature | Spec | Impl |
 |---------|------|------|
+| v0.7 Community Review Gate | `completed/2026-04-03-community-review-gate.spec.md` | `completed/2026-04-03-community-review-gate.impl.md` |
+| v0.6 Test Kitchen & Privacy | `completed/2026-03-08-test-kitchen.spec.md` | `completed/2026-03-08-test-kitchen.impl.md` |
+| v0.5.2 Shopping Cart Rework | `completed/2026-03-22-shopping-cart-rework.spec.md` | `completed/2026-03-22-shopping-cart-rework.impl.md` |
 | v0.5 Recipe Filtering | `completed/2026-03-21-recipe-filtering.spec.md` | `completed/2026-03-21-recipe-filtering.impl.md` |
 | v0.1 Spoonfury | `completed/2026-02-15-v0.1-spoonfury.spec.md` | `completed/2026-02-15-v0.1-spoonfury.impl.md` |
 | v0.2 Animated Header | `completed/2026-02-16-v0.2-animated-header.spec.md` | `completed/2026-02-16-v0.2-animated-header.impl.md` |

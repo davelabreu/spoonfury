@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #e7e5e4; padding: 32px; display: flex; flex-direction: column; gap: 32px; }
+
+    .card { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,.1); }
+    .back { font-size: 14px; color: #78716c; padding: 14px 22px 10px; border-bottom: 1px solid #f5f5f4; }
+
+    /* ── INCOMPLETE STATE ── */
+    .banner-incomplete {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      border-bottom: 1px solid #fde68a;
+      padding: 12px 22px;
+    }
+    .row1 { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .title-inc { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: #92400e; }
+    .pill-inc { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; background: #fde68a; color: #78350f; padding: 3px 10px; border-radius: 999px; }
+    .edit-inc { font-size: 13px; font-weight: 600; color: #b45309; text-decoration: underline; }
+    .gates { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+    .g { font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+    .g.met   { background: #d1fae5; color: #065f46; }
+    .g.unmet { background: #f3f4f6; color: #9ca3af; }
+    .score-inc { font-size: 11px; font-weight: 800; color: #b45309; margin-left: auto; }
+
+    /* action strip */
+    .strip { display: flex; align-items: center; gap: 8px; padding: 10px 22px; background: #eef2ff; border-top: none; flex-wrap: wrap; }
+    .strip-label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: #818cf8; letter-spacing: .08em; margin-right: 4px; }
+    .btn { font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 7px; border: 1.5px solid; cursor: pointer; }
+    .btn-pub  { border-color: #fde68a; background: #fef3c7; color: #92400e; }
+    .btn-pub.ready { border-color: #6ee7b7; background: #d1fae5; color: #065f46; font-weight: 800; }
+    .btn-std  { border-color: #c7d2fe; background: rgba(255,255,255,.8); color: #3730a3; }
+    .btn-del  { border-color: #fecaca; background: rgba(255,255,255,.8); color: #ef4444; }
+
+    /* ── COMPLETE STATE ── */
+    .banner-complete {
+      background: #f0fdf4;
+      border-left: 4px solid #10b981;
+      border-bottom: 1px solid #bbf7d0;
+      padding: 12px 22px;
+    }
+    .title-com { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: #065f46; }
+    .pill-com { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; background: #bbf7d0; color: #065f46; padding: 3px 10px; border-radius: 999px; }
+    .edit-com { font-size: 13px; font-weight: 600; color: #059669; text-decoration: underline; }
+    .score-com { font-size: 11px; font-weight: 800; color: #059669; margin-left: auto; }
+
+    .state-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #78716c; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+  <p class="state-label">State 1 — Draft, criteria incomplete</p>
+  <div class="card">
+    <div class="back">‹ Back</div>
+    <div class="banner-incomplete">
+      <div class="row1">
+        <div class="title-inc">
+          🧪 Test Kitchen Draft
+          <span class="pill-inc">Only you can see this</span>
+        </div>
+        <span class="edit-inc">Edit recipe →</span>
+      </div>
+      <div class="gates">
+        <span class="g met">✓ 2+ ingredients</span>
+        <span class="g met">✓ Description</span>
+        <span class="g unmet">○ Instructions (20+ chars)</span>
+        <span class="g unmet">○ Category</span>
+        <span class="score-inc">2 / 4</span>
+      </div>
+    </div>
+    <div class="strip">
+      <span class="strip-label">Owner Actions</span>
+      <span class="btn btn-pub" style="opacity:.45;cursor:not-allowed;">🎉 Perfect It</span>
+      <span class="btn btn-std">Add to book…</span>
+      <span class="btn btn-std">Share</span>
+      <span class="btn btn-del">Delete</span>
+    </div>
+  </div>
+
+  <p class="state-label">State 2 — Draft, all criteria met (ready!)</p>
+  <div class="card">
+    <div class="back">‹ Back</div>
+    <div class="banner-complete">
+      <div class="row1">
+        <div class="title-com">
+          🧪 Test Kitchen Draft
+          <span class="pill-com">✓ Ready to publish!</span>
+        </div>
+        <span class="edit-com">Edit recipe →</span>
+      </div>
+      <div class="gates">
+        <span class="g met">✓ 2+ ingredients</span>
+        <span class="g met">✓ Description</span>
+        <span class="g met">✓ Instructions (20+ chars)</span>
+        <span class="g met">✓ Category</span>
+        <span class="score-com">4 / 4</span>
+      </div>
+    </div>
+    <div class="strip">
+      <span class="strip-label">Owner Actions</span>
+      <span class="btn btn-pub ready">🎉 Perfect It</span>
+      <span class="btn btn-std">Add to book…</span>
+      <span class="btn btn-std">Share</span>
+      <span class="btn btn-del">Delete</span>
+    </div>
+  </div>
+
+</body>
+</html>
