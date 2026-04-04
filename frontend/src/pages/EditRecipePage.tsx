@@ -27,7 +27,7 @@ export function EditRecipePage() {
 
   useEffect(() => {
     if (!slug) return;
-    api.get(`/recipes/${slug}/`)
+    api.get(`/recipes/${slug}/`, token ?? undefined)
       .then((r: any) => {
         if (r.author_username !== username) {
           setError("You can only edit your own recipes.");
