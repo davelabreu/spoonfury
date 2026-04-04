@@ -1,6 +1,6 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path
-from .views import RecipeViewSet, TagListView
+from .views import RecipeViewSet, TagListView, force_publish
 from .views_fork import fork_recipe
 from .views_upload import upload_recipe_image
 from .views_kitchen import kitchen_detail, kitchen_invite, kitchen_revoke
@@ -26,4 +26,5 @@ urlpatterns = [
     path("moderation/queue/", moderation_queue, name="moderation-queue"),
     path("moderation/<slug:slug>/approve/", moderation_approve, name="moderation-approve"),
     path("moderation/<slug:slug>/request-revision/", moderation_request_revision, name="moderation-request-revision"),
+    path("recipes/<slug:slug>/force-publish/", force_publish, name="recipe-force-publish"),
 ]

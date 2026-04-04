@@ -2,7 +2,7 @@
 import pytest
 from django.urls import reverse
 from django.utils import timezone
-from spoonfury.apps.recipes.models import Recipe
+from spoonfury.apps.recipes.models import Recipe, ModerationAction
 
 
 VALID_INGREDIENTS = [
@@ -106,3 +106,52 @@ def test_unpublish_forbidden_for_non_owner(other_auth_client, publishable_recipe
     url = reverse("recipe-unpublish", kwargs={"slug": publishable_recipe.slug})
     response = other_auth_client.post(url)
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_force_publish_superuser(publishable_recipe):
+    """Superuser can force-publish from any state; gate still enforced."""
+    from django.contrib.auth import get_user_model
+    from rest_framework.test import APIClient
+    User = get_user_model()
+    superuser = User.objects.create_superuser(
+        username="admin", email="admin@test.com", password="testpass123"
+    )
+    client = APIClient()
+    client.force_authenticate(user=superuser)
+
+    publishable_recipe.status = "in_review"
+    publishable_recipe.review_round = 1
+    publishable_recipe.save()
+
+    url = reverse("recipe-force-publish", kwargs={"slug": publishable_recipe.slug})
+    response = client.post(url)
+    assert response.status_code == 200
+    assert response.data["status"] == "published"
+    assert ModerationAction.objects.filter(action="force_published").count() == 1
+
+
+@pytest.mark.django_db
+def test_force_publish_non_superuser_forbidden(auth_client, publishable_recipe):
+    """Non-superusers cannot force-publish (even staff)."""
+    url = reverse("recipe-force-publish", kwargs={"slug": publishable_recipe.slug})
+    response = auth_client.post(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_force_publish_gate_still_enforced(incomplete_recipe):
+    """Force-publish still enforces the 4-point checklist."""
+    from django.contrib.auth import get_user_model
+    from rest_framework.test import APIClient
+    User = get_user_model()
+    superuser = User.objects.create_superuser(
+        username="admin2", email="admin2@test.com", password="testpass123"
+    )
+    client = APIClient()
+    client.force_authenticate(user=superuser)
+
+    url = reverse("recipe-force-publish", kwargs={"slug": incomplete_recipe.slug})
+    response = client.post(url)
+    assert response.status_code == 400
+    assert "errors" in response.data
