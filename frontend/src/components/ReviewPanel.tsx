@@ -10,18 +10,29 @@ import type { ReviewsResponse } from "@/types";
 interface ReviewPanelProps {
   recipeSlug: string;
   token: string;
+  /** Shared review data from parent — if provided, panel won't fetch its own. */
+  reviewData?: ReviewsResponse | null;
+  /** Called after voting so the parent (and ReviewBanner) can update. */
+  onReviewData?: (data: ReviewsResponse) => void;
 }
 
-export function ReviewPanel({ recipeSlug, token }: ReviewPanelProps) {
-  const [reviewData, setReviewData] = useState<ReviewsResponse | null>(null);
+export function ReviewPanel({ recipeSlug, token, reviewData: externalData, onReviewData }: ReviewPanelProps) {
+  const [localData, setLocalData] = useState<ReviewsResponse | null>(null);
+  const reviewData = externalData !== undefined ? externalData : localData;
   const [vote, setVote] = useState<boolean | null>(null);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  const updateReviewData = (data: ReviewsResponse) => {
+    setLocalData(data);
+    onReviewData?.(data);
+  };
+
   useEffect(() => {
+    if (externalData !== undefined) return; // parent is managing this data
     api.get(`/recipes/${recipeSlug}/reviews/`, token)
-      .then((data: ReviewsResponse) => setReviewData(data))
+      .then((data: ReviewsResponse) => setLocalData(data))
       .catch(() => {});
   }, [recipeSlug, token]);
 
@@ -35,9 +46,8 @@ export function ReviewPanel({ recipeSlug, token }: ReviewPanelProps) {
         { is_positive: vote, comment },
         token
       );
-      // Refresh review data to show results
       const updated = await api.get(`/recipes/${recipeSlug}/reviews/`, token) as ReviewsResponse;
-      setReviewData(updated);
+      updateReviewData(updated);
     } catch (err: unknown) {
       const e = err as { data?: { detail?: string } };
       setError(e.data?.detail || "Failed to submit review.");

@@ -71,6 +71,7 @@ class LenientTagFilter(django_filters.ModelMultipleChoiceFilter):  # noqa: F811 
 
 class RecipeFilter(django_filters.FilterSet):
     category = django_filters.CharFilter(field_name="category", lookup_expr="exact")
+    status = django_filters.CharFilter(field_name="status", lookup_expr="exact")
     tags = LenientTagFilter(
         field_name="tags__name",
         to_field_name="name",
@@ -81,7 +82,7 @@ class RecipeFilter(django_filters.FilterSet):
 
     class Meta:
         model = Recipe
-        fields = ["category", "tags", "ingredient"]
+        fields = ["category", "status", "tags", "ingredient"]
 
     def filter_by_ingredient(self, queryset, name, value):
         if not value:

@@ -18,7 +18,9 @@ import { useWakeLock } from "@/hooks/useWakeLock";
 import { SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
 import { getIngredientEmoji } from "@/lib/ingredientEmoji";
 import { ReviewPanel } from "@/components/ReviewPanel";
+import { ReviewBanner } from "@/components/ReviewBanner";
 import { DraftBanner } from "@/components/DraftBanner";
+import type { ReviewsResponse } from "@/types";
 
 function getPublishGate(recipe: Recipe): PublishGate {
   const validIngredients = recipe.ingredients.filter((i) => i.name.trim() !== "");
@@ -48,6 +50,7 @@ export function RecipePage() {
   const [inList, setInList] = useState(false);
   // Tracks broken hero image URLs — falls back to category placeholder on error
   const [heroImgError, setHeroImgError] = useState(false);
+  const [reviewData, setReviewData] = useState<ReviewsResponse | null>(null);
   const addBtnRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
@@ -61,6 +64,13 @@ export function RecipePage() {
       api.get("/books/", token).then((data: any) => setBooks(data.results ?? data));
     }
   }, [token]);
+
+  useEffect(() => {
+    if (!token || !recipe || recipe.status !== "in_review") return;
+    api.get(`/recipes/${recipe.slug}/reviews/`, token)
+      .then((data: ReviewsResponse) => setReviewData(data))
+      .catch(() => {});
+  }, [token, recipe?.slug, recipe?.status]);
 
   useEffect(() => {
     if (!token || !recipe) return;
@@ -140,10 +150,14 @@ export function RecipePage() {
         </Button>
       </div>
 
-      {/* Draft banner — shown to owner when recipe is in draft or revision_requested state.
-          Amber = criteria incomplete, green = all gates pass, orange = revision requested. */}
+      {/* Draft banner — shown to owner when recipe is in draft or revision_requested state. */}
       {isOwner && (recipe.status === "draft" || recipe.status === "revision_requested") && (
         <DraftBanner status={recipe.status} gate={getPublishGate(recipe)} slug={slug!} />
+      )}
+
+      {/* Review banner — shown to non-owners when recipe is under community review. */}
+      {!isOwner && recipe.status === "in_review" && token && reviewData && (
+        <ReviewBanner reviewData={reviewData} hasVoted={reviewData.has_voted} />
       )}
 
       {/* Header — title, author, and fork badge sit ABOVE the hero image
@@ -420,7 +434,14 @@ export function RecipePage() {
       <Separator />
 
       {!isOwner && recipe.status === "in_review" && token && (
-        <ReviewPanel recipeSlug={recipe.slug} token={token} />
+        <div id="review-panel">
+          <ReviewPanel
+            recipeSlug={recipe.slug}
+            token={token}
+            reviewData={reviewData}
+            onReviewData={setReviewData}
+          />
+        </div>
       )}
 
       <div>
