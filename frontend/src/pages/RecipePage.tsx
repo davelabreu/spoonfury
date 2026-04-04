@@ -33,7 +33,7 @@ function getPublishGate(recipe: Recipe): PublishGate {
 
 export function RecipePage() {
   const { slug } = useParams<{ slug: string }>();
-  const { token, username } = useAuth();
+  const { token, username, isStaff } = useAuth();
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [error, setError] = useState("");
@@ -138,11 +138,17 @@ export function RecipePage() {
   return (
     <div className="max-w-6xl mx-auto space-y-5">
       {/* Back navigation */}
-      <div className="flex items-center -ml-2">
+      <div className="flex items-center justify-between -ml-2">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground">
           <ChevronLeft className="w-4 h-4 mr-1" />
           Back
         </Button>
+        {/* Staff shortcut back to queue when viewing a recipe awaiting moderation */}
+        {isStaff && recipe.status === "mod_queue" && (
+          <Button variant="outline" size="sm" asChild className="border-purple-200 text-purple-700 hover:bg-purple-50">
+            <Link to="/moderation">⚖️ Back to Moderation Queue</Link>
+          </Button>
+        )}
       </div>
 
       {/* Status banners — full width */}
@@ -154,7 +160,8 @@ export function RecipePage() {
           moderationFeedback={reviewData?.moderation_feedback}
         />
       )}
-      {!isOwner && recipe.status === "in_review" && token && reviewData && (
+      {/* Review/moderation status banner — shown to non-owners for in_review and mod_queue */}
+      {!isOwner && (recipe.status === "in_review" || recipe.status === "mod_queue") && token && reviewData && (
         <ReviewBanner reviewData={reviewData} hasVoted={reviewData.has_voted} />
       )}
 
@@ -406,7 +413,7 @@ export function RecipePage() {
           )}
 
           {/* Owner review history — read-only, all rounds */}
-          {isOwner && reviewData && (reviewData.all_rounds?.length ?? 0) > 0 && (
+          {(isOwner || (isStaff && recipe.status === "mod_queue")) && reviewData && (reviewData.all_rounds?.length ?? 0) > 0 && (
             <div className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Community Votes</h2>

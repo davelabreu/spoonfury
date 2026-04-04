@@ -208,8 +208,8 @@ def review_list(request, slug):
             for r in current_reviews.select_related("reviewer")
         ]
 
-    # Owner sees full history across all rounds
-    if request.user == recipe.author:
+    # Owner and staff see full history across all rounds
+    if request.user == recipe.author or request.user.is_staff:
         all_reviews = RecipeReview.objects.filter(recipe=recipe).select_related("reviewer").order_by("review_round", "created_at")
         data["all_rounds"] = [
             {
