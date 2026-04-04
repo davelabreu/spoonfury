@@ -4,6 +4,26 @@ Dev log for Spoonfury. **Focus** statements are top-level human summaries of dev
 
 ---
 
+## 2026-04-04 — v0.7 UI Polish & Review Pipeline Hardening
+
+**Focus:** Wrapping up the community review system, how it flows and feels including comments review and addition to main page Stir the Pot, and moderation system scaffold for Spoonfury.
+
+- **Magazine-style homepage** (Stir the Pot): hero card (`aspect-[16/7]`, gradient overlay, "Recipe of the Day" label), 2-column responsive recipe grid, "Rising Stars" sidebar with rank numbers, live vote progress bars (`total_votes/3`), approval percentage — sidebar only appears when recipes are under community review
+- **RecipePage editorial split layout**: 12-column grid — story/image left (7 cols), sticky context right (5 cols). About card with serves + cook time placeholder, notes card. Ingredients below image in left column, natural reading flow. Header (title, author, breadcrumb) hoisted above grid so right column aligns with image top. Cook Now banner sits between action strip and ingredients
+- **BooksPage library grid**: portrait `aspect-[3/4]` book cards, deterministic gradient covers (8-palette cycle by ID), monogram watermark letter, spine strip, hover-lift effect
+- **`is_staff` exposed** via `/api/auth/user/` endpoint (custom `SpoonfuryUserSerializer`); `AuthContext` stores `isStaff`; Moderation Queue link appears in username dropdown for staff only; `MinimalNav` wired through
+- **Staff recipe visibility**: `mod_queue` recipes included in staff queryset so navigating from notifications doesn't 404
+- **Notification routing**: `recipe_in_mod_queue` notification type navigates to `/moderation` instead of the recipe page
+- **Moderator feedback surfaced to author**: `ModerationAction.feedback` returned in `review_list` response as `moderation_feedback[]`; DraftBanner displays it in an orange callout block with moderator username, round, and date when status is `revision_requested`
+- **Full vote history preserved**: `review_list` returns `all_rounds` (all votes across every round) to recipe owner and staff; `RecipeReviewItem` extended with `round` field; owner sees "Community Votes" panel on RecipePage grouped by round
+- **Vote tally in RecipeSerializer**: `total_votes` and `positive_votes` injected for `in_review`/`mod_queue` recipes — no extra requests needed; shown on MyKitchenPage in-review cards as `👍 2/3 votes`
+- **Revision resubmit shortcut**: resubmitting from `revision_requested` skips community voting entirely → goes straight to `mod_queue`; previous votes retained; staff notified; button label reads "Send to Moderation"
+- **Staff recipe page**: ReviewBanner shown for `mod_queue` recipes, full vote history panel visible, "⚖️ Back to Moderation Queue" button in nav bar
+- `review_list` returns `all_rounds` and `moderation_feedback` to staff as well as owner
+- Rising Stars sidebar footer CTA context-aware: "Click a recipe to cast your vote" when logged in vs "Log in to cast your vote" when not
+
+---
+
 ## 2026-04-04 — v0.6 Test Kitchen & Recipe Privacy
 
 **Focus:** I wanted to get the test kitchen workflow from draft recipes to published kicked off. Will need more work, but at least now it flows nicely. Will need peer review and other functions added later. Added WYSIWYG markdown editor Tiptap.
