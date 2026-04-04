@@ -10,4 +10,5 @@ urlpatterns = [
     path("api/", include("spoonfury.apps.recipes.urls")),
     path("api/", include("spoonfury.apps.books.urls")),
     path("api/", include("spoonfury.apps.shopping.urls")),
+    path("api/", include("spoonfury.apps.notifications.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
