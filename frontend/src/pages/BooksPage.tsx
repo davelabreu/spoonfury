@@ -6,16 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-// Curated cover palette — each book gets a deterministic gradient by id
+// Curated cover palette — CSS gradient strings, used as inline styles
+// (avoids Tailwind's static scan missing dynamically-chosen class names)
 const COVER_GRADIENTS = [
-  "from-indigo-500 via-indigo-600 to-violet-700",
-  "from-rose-400 via-rose-500 to-pink-600",
-  "from-amber-400 via-amber-500 to-orange-600",
-  "from-teal-400 via-teal-500 to-emerald-600",
-  "from-slate-500 via-slate-600 to-slate-700",
-  "from-sky-400 via-sky-500 to-blue-600",
-  "from-lime-400 via-lime-500 to-green-600",
-  "from-fuchsia-400 via-fuchsia-500 to-purple-600",
+  "linear-gradient(135deg, #6366f1, #4f46e5, #7c3aed)",
+  "linear-gradient(135deg, #f87171, #f43f5e, #ec4899)",
+  "linear-gradient(135deg, #fbbf24, #f59e0b, #ea580c)",
+  "linear-gradient(135deg, #2dd4bf, #14b8a6, #059669)",
+  "linear-gradient(135deg, #64748b, #475569, #334155)",
+  "linear-gradient(135deg, #38bdf8, #0ea5e9, #2563eb)",
+  "linear-gradient(135deg, #a3e635, #84cc16, #16a34a)",
+  "linear-gradient(135deg, #e879f9, #d946ef, #a855f7)",
 ];
 
 function coverGradient(id: number) {
@@ -85,7 +86,10 @@ export function BooksPage() {
             <Card className="overflow-hidden border-border/50 shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1.5">
 
               {/* Book cover — gradient with monogram */}
-              <div className={`aspect-[3/4] w-full bg-gradient-to-br ${coverGradient(book.id)} flex flex-col items-center justify-center relative`}>
+              <div
+                className="aspect-[3/4] w-full flex flex-col items-center justify-center relative"
+                style={{ background: coverGradient(book.id) }}
+              >
                 {/* Spine accent — left edge strip */}
                 <div className="absolute inset-y-0 left-0 w-2.5 bg-black/20 rounded-l" />
 
