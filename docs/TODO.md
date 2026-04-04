@@ -11,6 +11,15 @@ Organized by category — add new items under the right heading.
 
 ## 🔍 Search & Discovery
 
+### Filter Bar on Stir the Pot (HIGH PRIORITY — READY TO BUILD)
+
+Backend filtering already works (`?category=`, `?tags=`, `?search=`, `?ingredient=`). Just needs UI.
+
+- Horizontal category chip row above the hero card (15 categories + "All")
+- Debounced text search input
+- Active filters reflected in URL params so links are shareable
+- Re-fetches recipe list when filters change, clears hero/grid accordingly
+
 ### Recipe Search & Filtering (HIGH PRIORITY — NEEDS BRAINSTORM)
 
 The Stir the Pot explore feed needs real search and filtering. This is central to making the platform useful and discoverable. **No decisions are final yet — this needs a full brainstorm session.**
@@ -54,6 +63,25 @@ friction and improves security (no password to leak).
 
 ### Community ratings for recipes
 - Recipes should include a voting, and recipe comment system (Use spoons instead of stars?)
+
+### Recipe Ratings & Comments
+
+Published recipes should have a community rating system and comment threads.
+
+- Use spoons (🥄) instead of stars — fits the Spoonfury brand
+- 1–5 spoon rating, average displayed on recipe cards and recipe page
+- Comment threads on published recipes — top-level comments + replies
+- Needs backend models: `RecipeRating`, `RecipeComment`
+- Comment attribution by username, timestamp, optional edit/delete by author
+
+### User Profile & Account Hub
+
+Clicking a username anywhere should go to a public profile page (`/@username`).
+
+- Public page: bio, avatar, their published recipes, fork count, member since
+- Owner view: also shows drafts, in-review, forked recipes
+- Edit profile: display name, bio, avatar upload, social links
+- Account hub replaces the current minimal username badge dropdown
 
 ### User Menu & Account Hub
 
@@ -134,3 +162,34 @@ results that match their product catalogue. This requires dedicated integration 
   a fallback but doesn't reliably match products
 - Consider whether Instacart requires an API key / affiliate agreement for deep-linking
 - File: `frontend/src/lib/instacart.ts`
+
+
+---
+
+## 🛡️ Security & Stability (Technical Debt)
+
+Items identified during v0.5 security audit to move from prototype to production-ready.
+
+### Authentication & Sessions
+- **Risk:** Token stored in `localStorage` is vulnerable to XSS.
+- **Fix:** Transition to `HttpOnly` cookies for session management in production.
+
+### Rate Limiting
+- **Risk:** No protection against brute-force or spamming (Fork/Register/Login).
+- **Fix:** Implement `django-ratelimit` or DRF Throttling on all mutation endpoints.
+
+### File Upload Safety
+- **Risk:** No file size limit on image uploads (`views_upload.py`).
+- **Fix:** Enforce a maximum file size (e.g., 5MB) in the backend and frontend.
+
+### Data Integrity (JSON Ingredients)
+- **Risk:** `JSONField` ingredients lack schema validation.
+- **Fix:** Implement JSON Schema validation in the backend to ensure data structure consistency.
+
+### Concurrency (Slug Generation)
+- **Risk:** Non-atomic slug generation in `Recipe.save()` could lead to race conditions.
+- **Fix:** Use a database-level unique constraint with a retry loop or switch to UUID-suffixed slugs.
+
+### Account Spam
+- **Risk:** `ACCOUNT_EMAIL_VERIFICATION = "none"` allows fake account bloat.
+- **Fix:** Enable email verification and add CAPTCHA to registration before public launch.

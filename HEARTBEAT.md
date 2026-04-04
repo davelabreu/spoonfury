@@ -7,72 +7,43 @@ Quick orientation file. Update at the end of each session.
 ## Last Session
 
 **Date:** 2026-04-04  
-**Feature:** v0.7 Community Review & Moderation Gate  
-**Branch:** `master` (merged from `feature/community-review-gate`)  
+**Focus:** UI polish + review pipeline fixes  
+**Branch:** `master`  
 **Status:** Shipped ✅
 
 ### What was built
-- Recipe status expanded to 5 states: `draft → in_review → mod_queue → published` (or `revision_requested`)
-- `review_round` field on Recipe — increments on each submit-for-review
-- `RecipeReview` model — per-invitee votes with blind-until-threshold reveal
-- `ModerationAction` model — tracks moderator approve/request-revision decisions
-- `AuthorStrike` model — issued when moderator requests revision
-- `notifications` Django app — Notification model, `notify()` helper, full CRUD API
-- Submit-for-review + withdraw-review endpoints (gate-enforced, invitees notified)
-- Vote endpoint — blind aggregate until user votes, auto-promotes to `mod_queue` at 80%/3+ threshold
-- Moderation queue (`/api/moderation/queue/`), approve, request-revision endpoints
-- Force-publish endpoint (superuser only)
-- Edit-locking: recipes in `in_review` or `mod_queue` cannot be edited
-- NotificationBell in NavBar — polls unread count, dropdown with mark-read
-- ReviewPanel component — thumbs up/down + comment for invitees on RecipePage
-- RecipePage status-aware action strip for all 5 states
-- ModerationPage (`/moderation`) — staff queue with approve + revision request
-- MyKitchenPage updated — In Review and In Moderation sections, StatusBadge on all cards
-- 134 backend tests passing
-- DraftBanner component — amber/green/orange above recipe, gate pills reactive to recipe state
+- Magazine-style homepage: hero card, 2-col recipe grid, Rising Stars sidebar with live vote bars
+- RecipePage editorial split layout: story left (image → ingredients → instructions), context right (about + notes, sticky)
+- BooksPage library grid: portrait book cards, deterministic gradient covers, monogram letters
+- Cook Now banner repositioned to between action strip and ingredients
+- `is_staff` exposed via `/api/auth/user/` endpoint; AuthContext stores `isStaff`; Moderation Queue nav link shown to staff
+- Staff visibility fix: `mod_queue` recipes visible to staff in queryset
+- Notification routing: `recipe_in_mod_queue` notifications navigate to `/moderation`
+- Review pipeline hardening:
+  - Moderator feedback stored and displayed in DraftBanner on `revision_requested`
+  - `all_rounds` vote history preserved across rounds, visible to owner and staff
+  - `revision_requested` resubmit skips community vote → goes straight to `mod_queue`
+  - `total_votes` / `positive_votes` added to RecipeSerializer for `in_review` recipes
+  - Vote tally shown on MyKitchenPage in-review cards
+  - Staff see full vote history, ReviewBanner, and back-to-queue link on `mod_queue` recipe page
 
 ---
 
 ## Current State
 
 **Branch:** `master`  
-**Version:** v0.7  
-**Worktrees:** `.worktrees/community-review` kept for QA — run servers from there to test the full draft → review → approve → publish workflow
+**Version:** v0.7 (polish pass complete)
 
 ---
 
-## Up Next
+## Up Next (priority order)
 
-### QA: Test the full review pipeline
-Use `.worktrees/community-review` dev servers (already migrated):
-1. Create a draft recipe, check DraftBanner gate pills
-2. Complete all criteria, submit for review
-3. Log in as invitee, cast votes until threshold
-4. Log in as staff, approve from `/moderation`
-5. Verify recipe goes live + notifications fire
+1. **Filter bar on Stir the Pot** — category chips + search input. Backend ready, just needs UI.
+2. **Cook Mode sticky ingredients** — when Cook Now active, ingredients pin to right column on desktop, FAB bottom sheet on mobile.
+3. **Shadcn UI consistency pass** — EditRecipePage, LoginPage, RegisterPage still use raw inputs.
+4. **User profile / account hub** — public `/@username` pages, edit profile, avatar.
+5. **Recipe ratings & comments** — spoon ratings + comment threads on published recipes.
+6. **Search & discovery brainstorm** — tags, cultural filters, vibe/effort, similar recipes.
+7. **Social login** — Google/Apple OAuth via django-allauth.
 
-### Next Features (backlog)
-- Filter bar UI on Stir the Pot page (backend filtering done, UI not yet)
-- Cook Mode sticky ingredient sidebar
-- Social login (Google/Apple)
-
----
-
-## Active Plans
-
-| Feature | Spec | Impl | Status |
-|---------|------|------|--------|
-| Community Review Gate | `docs/plans/completed/2026-04-03-community-review-gate.spec.md` | `docs/plans/completed/2026-04-03-community-review-gate.impl.md` | ✅ Shipped v0.7 |
-| Test Kitchen & Privacy | `docs/plans/completed/2026-03-08-test-kitchen.spec.md` | `completed/` | ✅ Shipped v0.6 |
-
----
-
-## Deferred / Backlog
-
-See `docs/TODO.md` for full list. Highlights:
-
-- Filter bar UI on Stir the Pot page (backend filtering done, UI not yet)
-- Cook Mode sticky ingredient sidebar (desktop) / bottom sheet (mobile)
-- Ingredient info personality scrub (`ingredientInfo.ts` is too encyclopedic)
-- Social login (Google/Apple)
-- User-contributed ingredient tips (social feature)
+See `docs/TODO.md` for full detail on each.
