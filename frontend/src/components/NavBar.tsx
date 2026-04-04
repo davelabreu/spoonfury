@@ -7,7 +7,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useShopping, SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useNavTheme } from "@/hooks/useNavTheme";
-import { api } from "@/lib/api";
 import { buildInstacartUrl } from "@/lib/instacart";
 import {
   DropdownMenu,
@@ -525,6 +524,7 @@ function MinimalNav({
   cartItems,
   onSignOut,
   onSwitchTheme,
+  isStaff = false,
 }: {
   visibleStickers: StickerDef[];
   username: string | null | undefined;
@@ -533,6 +533,7 @@ function MinimalNav({
   cartItems: Ingredient[];
   onSignOut: () => void;
   onSwitchTheme: () => void;
+  isStaff?: boolean;
 }) {
   const location = useLocation();
   const [hovered, setHovered] = useState<string | null>(null);
@@ -808,6 +809,7 @@ export function NavBar() {
         cartItems={cartItems}
         onSignOut={handleSignOut}
         onSwitchTheme={() => setTheme("sticker")}
+        isStaff={isStaff}
       />
     );
   }
