@@ -3,6 +3,12 @@ from django.conf import settings
 from django.utils.text import slugify
 
 
+STATUS_CHOICES = [
+    ("draft", "Draft"),
+    ("published", "Published"),
+]
+
+
 CATEGORY_CHOICES = [
     ("sandwich_burger", "Sandwiches & Burgers"),
     ("pizza", "Pizza & Flatbreads"),
@@ -74,6 +80,17 @@ class Recipe(models.Model):
     slug = models.SlugField(unique=True, max_length=120)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    # --- Privacy / publish flow ---
+    # Recipes start as "draft" (private, in the author's test kitchen).
+    # When the author "perfects" a recipe, status flips to "published"
+    # and published_at is set by the publish endpoint.
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default="draft",
+        db_index=True,
+    )
+    published_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["-created_at"]

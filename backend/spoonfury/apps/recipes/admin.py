@@ -12,8 +12,9 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ["title", "author", "category", "fork_count", "created_at"]
-    list_filter = ["category", "tags"]
+    """Admin view for recipes with status filtering and read-only audit fields."""
+    list_display = ["title", "author", "category", "status", "fork_count", "created_at"]
+    list_filter = ["category", "status", "tags"]
     search_fields = ["title", "author__username"]
-    readonly_fields = ["slug", "fork_count", "created_at", "updated_at"]
+    readonly_fields = ["slug", "fork_count", "created_at", "updated_at", "published_at"]
     filter_horizontal = ["tags"]
