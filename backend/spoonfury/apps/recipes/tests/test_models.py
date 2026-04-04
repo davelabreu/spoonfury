@@ -1,5 +1,5 @@
 import pytest
-from spoonfury.apps.recipes.models import Recipe
+from spoonfury.apps.recipes.models import Recipe, RecipeReview, ModerationAction, AuthorStrike
 
 
 SAMPLE_INGREDIENTS = [
@@ -119,3 +119,71 @@ def test_recipe_status_choices_include_review_states(user):
     for status_val in ["draft", "in_review", "mod_queue", "revision_requested", "published"]:
         recipe.status = status_val
         recipe.full_clean(exclude=["ingredients"])  # validates against choices
+
+
+@pytest.mark.django_db
+def test_create_recipe_review(user, other_user):
+    """A reviewer can submit a review for a recipe."""
+    recipe = Recipe.objects.create(
+        title="Review Me", description="Desc", serves="4", ingredients=[],
+        instructions="Cook it", category="soup", author=user,
+        status="in_review", review_round=1,
+    )
+    review = RecipeReview.objects.create(
+        recipe=recipe, reviewer=other_user, review_round=1,
+        is_positive=True, comment="Looks great!",
+    )
+    assert review.is_positive is True
+    assert review.review_round == 1
+    assert review.recipe == recipe
+
+
+@pytest.mark.django_db
+def test_recipe_review_unique_per_round(user, other_user):
+    """Same reviewer cannot vote twice in the same round."""
+    recipe = Recipe.objects.create(
+        title="Dupe Test", description="Desc", serves="4", ingredients=[],
+        instructions="Cook it", category="soup", author=user,
+        status="in_review", review_round=1,
+    )
+    RecipeReview.objects.create(
+        recipe=recipe, reviewer=other_user, review_round=1, is_positive=True,
+    )
+    with pytest.raises(Exception):
+        RecipeReview.objects.create(
+            recipe=recipe, reviewer=other_user, review_round=1, is_positive=False,
+        )
+
+
+@pytest.mark.django_db
+def test_create_moderation_action(user, other_user):
+    """A moderator can record an action on a recipe."""
+    recipe = Recipe.objects.create(
+        title="Mod Test", description="Desc", serves="4", ingredients=[],
+        instructions="Cook it", category="soup", author=user,
+        status="mod_queue", review_round=1,
+    )
+    action = ModerationAction.objects.create(
+        recipe=recipe, moderator=other_user, action="approved", review_round=1,
+    )
+    assert action.action == "approved"
+    assert action.moderator == other_user
+
+
+@pytest.mark.django_db
+def test_create_author_strike(user, other_user):
+    """A strike is created when a mod sends back a recipe."""
+    recipe = Recipe.objects.create(
+        title="Strike Test", description="Desc", serves="4", ingredients=[],
+        instructions="Cook it", category="soup", author=user,
+        status="mod_queue", review_round=1,
+    )
+    mod_action = ModerationAction.objects.create(
+        recipe=recipe, moderator=other_user, action="revision_requested",
+        feedback="Needs work", review_round=1,
+    )
+    strike = AuthorStrike.objects.create(
+        author=user, recipe=recipe, moderation_action=mod_action,
+    )
+    assert strike.author == user
+    assert user.strikes.count() == 1

@@ -145,3 +145,94 @@ class TestKitchenInvite(models.Model):
 
     def __str__(self):
         return f"{self.owner.username} → {self.invitee.username}"
+
+
+class RecipeReview(models.Model):
+    """
+    Records a community member's vote on a recipe that is currently in_review.
+    One vote per reviewer per review_round — the unique_together constraint
+    enforces this at the database level. Positive votes move the recipe toward
+    the moderation queue; negative votes push it back to the author.
+    """
+
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+    )
+    reviewer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    review_round = models.PositiveIntegerField()
+    is_positive = models.BooleanField()
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = [("recipe", "reviewer", "review_round")]
+
+    def __str__(self):
+        verdict = "+" if self.is_positive else "-"
+        return f"{verdict} {self.reviewer.username} → {self.recipe.title} (round {self.review_round})"
+
+
+MODERATION_ACTION_CHOICES = [
+    ("approved", "Approved"),
+    ("revision_requested", "Revision Requested"),
+    ("force_published", "Force Published"),
+]
+
+
+class ModerationAction(models.Model):
+    """
+    Immutable audit log entry recording a moderator's decision on a recipe.
+    Each action is tied to a specific review_round so the full history of
+    moderation decisions is preserved even across multiple revision cycles.
+    """
+
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name="moderation_actions",
+    )
+    moderator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    action = models.CharField(
+        max_length=20,
+        choices=MODERATION_ACTION_CHOICES,
+    )
+    feedback = models.TextField(blank=True)
+    review_round = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.moderator.username} {self.action} → {self.recipe.title} (round {self.review_round})"
+
+
+class AuthorStrike(models.Model):
+    """
+    Issued to a recipe author when a moderator sends their recipe back for
+    revision. Strikes accumulate on the author's profile and can be used to
+    gate publishing privileges. One strike per ModerationAction (OneToOne).
+    """
+
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="strikes",
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+    )
+    moderation_action = models.OneToOneField(
+        ModerationAction,
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Strike: {self.author.username} ← {self.recipe.title}"
