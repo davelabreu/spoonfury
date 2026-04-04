@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UsernameBadge Options — Minimal Theme</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #1e293b; }
+
+  h1 { font-size: 1.5rem; font-weight: 800; text-align: center; padding: 2rem 1rem 0.5rem; }
+  .subtitle { text-align: center; color: #64748b; font-size: 0.875rem; margin-bottom: 2rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem 3rem;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+
+  .card-label {
+    padding: 1rem 1.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+  }
+  .card-label span {
+    display: inline-block;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-left: 6px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* Each card has a mini nav bar preview */
+  .nav-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    min-height: 56px;
+  }
+  .nav-logo { font-size: 1.1rem; font-weight: 900; letter-spacing: -0.03em; display: flex; align-items: center; gap: 4px; }
+  .nav-spacer { flex: 1; }
+  .nav-links { display: flex; gap: 8px; font-size: 0.8rem; font-weight: 500; color: #64748b; }
+  .nav-links a { text-decoration: none; color: inherit; padding: 4px 10px; border-radius: 6px; }
+  .nav-links a.active { background: #f1f5f9; color: #1e293b; }
+
+  /* Cart capsule mini */
+  .mini-cart {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: #fff;
+  }
+  .mini-cart > span { padding: 4px 10px; }
+
+  .description {
+    padding: 0.75rem 1.25rem 1.25rem;
+    font-size: 0.8rem;
+    color: #64748b;
+    line-height: 1.5;
+  }
+  .description code {
+    background: #f1f5f9;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: #475569;
+  }
+
+  /* ===== BADGE VARIANTS ===== */
+
+  /* A: Gradient Fill */
+  .badge-a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #8b5cf6, #d946ef);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .badge-a:hover { opacity: 0.9; }
+  .badge-a .emoji { font-size: 0.9rem; }
+
+  /* B: Gradient Outline */
+  .badge-b-wrap {
+    display: inline-flex;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    padding: 1.5px;
+    cursor: pointer;
+    transition: box-shadow 0.15s;
+  }
+  .badge-b-wrap:hover { box-shadow: 0 2px 12px rgba(139,92,246,0.3); }
+  .badge-b {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 13px;
+    border-radius: 9999px;
+    background: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #374151;
+  }
+  .badge-b .emoji { font-size: 0.9rem; }
+
+  /* C: Glass Frost */
+  .badge-c {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 9999px;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(148,163,184,0.25);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .badge-c:hover { background: rgba(255,255,255,0.9); border-color: rgba(148,163,184,0.4); }
+  .badge-c .emoji { font-size: 0.9rem; }
+
+  /* D: Dot Status */
+  .badge-d {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 13px;
+    border-radius: 9999px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .badge-d:hover { background: #f8fafc; }
+  .badge-d .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34,197,94,0.2);
+    animation: pulse-dot 2s ease infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(34,197,94,0.2); }
+    50% { box-shadow: 0 0 0 5px rgba(34,197,94,0.1); }
+  }
+  .badge-d .emoji { font-size: 0.9rem; }
+
+  /* E: Avatar Chip */
+  .badge-e {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 12px 3px 3px;
+    border-radius: 9999px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .badge-e:hover { background: #faf5ff; border-color: #d8b4fe; }
+  .badge-e .avatar-circle {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ede9fe, #fae8ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+
+  /* F: Soft Muted */
+  .badge-f {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 9999px;
+    background: #f1f5f9;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+  }
+  .badge-f:hover { background: #e2e8f0; box-shadow: 0 0 0 2px rgba(139,92,246,0.15); }
+  .badge-f .emoji { font-size: 0.9rem; }
+
+  /* Shimmer for reference (current) */
+  @keyframes shimmer { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  .current-badge-wrap {
+    display: inline-flex;
+    border-radius: 9999px;
+    background-image: linear-gradient(270deg, #c4b5fd, #93c5fd, #86efac, #fda4af, #c4b5fd);
+    background-size: 300% 300%;
+    animation: shimmer 8s ease infinite;
+    padding: 2px;
+    box-shadow: 0 2px 8px rgba(147,197,253,0.3);
+  }
+  .current-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 9999px;
+    background: #fff;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #374151;
+  }
+  .current-badge .emoji { font-size: 0.9rem; }
+
+  .current-ref {
+    text-align: center;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .current-ref .label { font-size: 0.7rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+
+  .chevron { font-size: 0.6rem; color: #94a3b8; margin-left: 2px; }
+</style>
+</head>
+<body>
+
+<h1>UsernameBadge Options</h1>
+<p class="subtitle">Minimal theme only. Pick your favorite &mdash; the fridge-sticker theme stays untouched.</p>
+
+<div class="current-ref">
+  <div class="label">Current (shimmer capsule) &mdash; replacing this</div>
+  <div class="current-badge-wrap">
+    <div class="current-badge">
+      <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+      <span>@dave</span>
+      <span class="chevron">&#x25BE;</span>
+    </div>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- A: Gradient Fill -->
+  <div class="card">
+    <div class="card-label">Option A <span>Gradient Fill</span></div>
+    <div class="nav-preview">
+      <div class="nav-logo"><span>&#x1F944;</span> Spoonfury</div>
+      <div class="nav-spacer"></div>
+      <div class="nav-links">
+        <a href="#" class="active">Stir the Pot</a>
+        <a href="#">My Books</a>
+        <a href="#">+ Recipe</a>
+      </div>
+      <div class="mini-cart"><span>&#x1F6D2;</span></div>
+      <div class="badge-a">
+        <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+        <span>@dave</span>
+        <span class="chevron">&#x25BE;</span>
+      </div>
+    </div>
+    <div class="description">
+      Solid <code>violet-500 &rarr; fuchsia-500</code> gradient, white text. Bold, stands out. Feels "pro" but might compete with CartCapsule for attention.
+    </div>
+  </div>
+
+  <!-- B: Gradient Outline -->
+  <div class="card">
+    <div class="card-label">Option B <span>Gradient Outline</span></div>
+    <div class="nav-preview">
+      <div class="nav-logo"><span>&#x1F944;</span> Spoonfury</div>
+      <div class="nav-spacer"></div>
+      <div class="nav-links">
+        <a href="#" class="active">Stir the Pot</a>
+        <a href="#">My Books</a>
+        <a href="#">+ Recipe</a>
+      </div>
+      <div class="mini-cart"><span>&#x1F6D2;</span></div>
+      <div class="badge-b-wrap">
+        <div class="badge-b">
+          <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+          <span>@dave</span>
+          <span class="chevron">&#x25BE;</span>
+        </div>
+      </div>
+    </div>
+    <div class="description">
+      <code>violet &rarr; pink</code> gradient border, white interior. Elegant without being loud. Own identity &mdash; no shimmer animation competing with cart.
+    </div>
+  </div>
+
+  <!-- C: Glass Frost -->
+  <div class="card">
+    <div class="card-label">Option C <span>Glass Frost</span></div>
+    <div class="nav-preview" style="background: linear-gradient(135deg, #f8fafc, #f1f5f9);">
+      <div class="nav-logo"><span>&#x1F944;</span> Spoonfury</div>
+      <div class="nav-spacer"></div>
+      <div class="nav-links">
+        <a href="#" class="active">Stir the Pot</a>
+        <a href="#">My Books</a>
+        <a href="#">+ Recipe</a>
+      </div>
+      <div class="mini-cart"><span>&#x1F6D2;</span></div>
+      <div class="badge-c">
+        <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+        <span>@dave</span>
+        <span class="chevron">&#x25BE;</span>
+      </div>
+    </div>
+    <div class="description">
+      <code>backdrop-blur</code> frosted glass with subtle border. Modern, minimal. Disappears into the nav but feels premium on hover.
+    </div>
+  </div>
+
+  <!-- D: Dot Status -->
+  <div class="card">
+    <div class="card-label">Option D <span>Dot Status</span></div>
+    <div class="nav-preview">
+      <div class="nav-logo"><span>&#x1F944;</span> Spoonfury</div>
+      <div class="nav-spacer"></div>
+      <div class="nav-links">
+        <a href="#" class="active">Stir the Pot</a>
+        <a href="#">My Books</a>
+        <a href="#">+ Recipe</a>
+      </div>
+      <div class="mini-cart"><span>&#x1F6D2;</span></div>
+      <div class="badge-d">
+        <span class="dot"></span>
+        <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+        <span>@dave</span>
+        <span class="chevron">&#x25BE;</span>
+      </div>
+    </div>
+    <div class="description">
+      Clean outline with a pulsing green <code>online</code> dot. SaaS-y, feels alive. Communicates "logged in" at a glance. Inspired by shadcn <code>badge-05</code>.
+    </div>
+  </div>
+
+  <!-- E: Avatar Chip -->
+  <div class="card">
+    <div class="card-label">Option E <span>Avatar Chip</span></div>
+    <div class="nav-preview">
+      <div class="nav-logo"><span>&#x1F944;</span> Spoonfury</div>
+      <div class="nav-spacer"></div>
+      <div class="nav-links">
+        <a href="#" class="active">Stir the Pot</a>
+        <a href="#">My Books</a>
+        <a href="#">+ Recipe</a>
+      </div>
+      <div class="mini-cart"><span>&#x1F6D2;</span></div>
+      <div class="badge-e">
+        <div class="avatar-circle">&#x1F9D1;&#x200D;&#x1F373;</div>
+        <span>@dave</span>
+        <span class="chevron">&#x25BE;</span>
+      </div>
+    </div>
+    <div class="description">
+      Chef emoji in a soft <code>violet-100 &rarr; fuchsia-100</code> circle, name beside it. Gmail/Slack chip feel. Inspired by shadcn <code>badge-22</code>. Hover tints purple.
+    </div>
+  </div>
+
+  <!-- F: Soft Muted -->
+  <div class="card">
+    <div class="card-label">Option F <span>Soft Muted</span></div>
+    <div class="nav-preview">
+      <div class="nav-logo"><span>&#x1F944;</span> Spoonfury</div>
+      <div class="nav-spacer"></div>
+      <div class="nav-links">
+        <a href="#" class="active">Stir the Pot</a>
+        <a href="#">My Books</a>
+        <a href="#">+ Recipe</a>
+      </div>
+      <div class="mini-cart"><span>&#x1F6D2;</span></div>
+      <div class="badge-f">
+        <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+        <span>@dave</span>
+        <span class="chevron">&#x25BE;</span>
+      </div>
+    </div>
+    <div class="description">
+      Shadcn native <code>secondary</code> style. Gray fill, no border drama. Invisible until hover adds a violet ring. Maximum restraint.
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

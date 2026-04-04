@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Badge — Hybrid with Hover Shimmer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #1e293b; }
+
+  h1 { font-size: 1.3rem; font-weight: 800; text-align: center; padding: 2rem 1rem 0.25rem; }
+  .subtitle { text-align: center; color: #64748b; font-size: 0.85rem; margin-bottom: 2.5rem; }
+
+  .section { max-width: 900px; margin: 0 auto 2.5rem; padding: 0 1.5rem; }
+  .section-title {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    color: #94a3b8; margin-bottom: 1rem;
+  }
+  .section-title .tag {
+    background: #f5f3ff; padding: 3px 10px; border-radius: 6px;
+    font-size: 0.65rem; font-weight: 600; color: #7c3aed; text-transform: none; letter-spacing: 0;
+    margin-left: 8px;
+  }
+
+  .nav-preview {
+    display: flex; align-items: center; gap: 14px; padding: 14px 24px;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; min-height: 60px; margin-bottom: 1rem;
+  }
+  .nav-logo { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.03em; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .nav-spacer { flex: 1; }
+  .nav-links { display: flex; gap: 4px; font-size: 0.8rem; font-weight: 500; color: #64748b; }
+  .nav-links a { text-decoration: none; color: inherit; padding: 5px 12px; border-radius: 6px; }
+  .nav-links a.active { background: #f1f5f9; color: #1e293b; }
+
+  .mini-cart {
+    display: inline-flex; align-items: center; border-radius: 9999px; overflow: hidden;
+    background: linear-gradient(270deg, #86efac, #93c5fd, #c4b5fd, #fda4af, #86efac);
+    background-size: 300% 300%; animation: shimmer 8s ease infinite; padding: 1.5px;
+  }
+  .mini-cart-inner {
+    display: flex; align-items: center; border-radius: 9999px; overflow: hidden; background: #fff;
+  }
+  .mini-cart-inner > span { padding: 4px 11px; font-size: 0.7rem; font-weight: 600; color: #374151; white-space: nowrap; }
+  .mini-cart-inner > .divider { width: 1px; height: 16px; background: #e5e7eb; flex-shrink: 0; }
+  .mini-cart-inner > .cart-icon { padding: 4px 10px; color: #15803d; font-size: 0.8rem; }
+  @keyframes shimmer { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+  .chevron { font-size: 0.55rem; color: #94a3b8; margin-left: 1px; }
+
+  /* ===== THE BADGE ===== */
+  .badge-wrap {
+    position: relative;
+    display: inline-flex;
+    border-radius: 9999px;
+    /* Toned-down gradient: softer violet/lavender/mauve */
+    background: linear-gradient(135deg, #a78bfa, #c4b5fd, #d8b4fe, #f0abfc, #c4b5fd);
+    padding: 1.5px;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  /* Shimmer overlay — hidden by default, sweeps on hover */
+  .badge-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.6) 50%, transparent 60%);
+    background-size: 200% 100%;
+    background-position: 200% 0;
+    pointer-events: none;
+    transition: none;
+  }
+  .badge-wrap:hover::after {
+    animation: badge-shimmer 1.2s ease forwards;
+  }
+
+  @keyframes badge-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .badge-inner {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 13px;
+    border-radius: 9999px;
+    /* Frosted glass interior */
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #374151;
+  }
+  .badge-inner .emoji { font-size: 0.9rem; }
+
+  /* States row */
+  .states-row {
+    display: flex; align-items: center; gap: 32px; padding: 16px 24px;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 1rem;
+  }
+  .state-label { font-size: 0.65rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
+  .state-group { display: flex; align-items: center; gap: 10px; }
+
+  .note {
+    font-size: 0.8rem; color: #64748b; line-height: 1.6; padding: 0 4px;
+  }
+  .note code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: 0.75rem; color: #475569; }
+
+  .comparison {
+    max-width: 900px; margin: 0 auto 2rem; padding: 0 1.5rem;
+  }
+  .comparison-title {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    color: #94a3b8; margin-bottom: 1rem;
+  }
+  .comparison-row {
+    display: flex; align-items: center; gap: 40px; padding: 16px 24px;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+  }
+  .comp-group { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .comp-label { font-size: 0.6rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
+
+  /* Old shimmer badge for comparison */
+  .old-badge-wrap {
+    display: inline-flex; border-radius: 9999px;
+    background-image: linear-gradient(270deg, #c4b5fd, #93c5fd, #86efac, #fda4af, #c4b5fd);
+    background-size: 300% 300%; animation: shimmer 8s ease infinite;
+    padding: 2px; box-shadow: 0 2px 8px rgba(147,197,253,0.3);
+  }
+  .old-badge-inner {
+    display: inline-flex; align-items: center; gap: 6px; border-radius: 9999px;
+    background: #fff; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; color: #374151;
+  }
+  .old-badge-inner .emoji { font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<h1>Final: Hybrid Badge with Hover Shimmer</h1>
+<p class="subtitle">Toned-down gradient border + glass interior + shimmer sweep on hover (no shadow)</p>
+
+<!-- Full nav context -->
+<div class="section">
+  <div class="section-title">In context <span class="tag">hover over the badge!</span></div>
+  <div class="nav-preview">
+    <div class="nav-logo"><span>&#x1F944;</span> Spoonfury</div>
+    <div class="nav-links">
+      <a href="#" class="active">Stir the Pot</a>
+      <a href="#">My Books</a>
+      <a href="#">+ Recipe</a>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="mini-cart"><div class="mini-cart-inner"><span>&#x1F697; Pickup</span><div class="divider"></div><span>&#x1F3E0; Delivery</span><div class="divider"></div><span class="cart-icon">&#x1F6D2;</span></div></div>
+    <div class="badge-wrap">
+      <div class="badge-inner">
+        <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+        <span>@dave</span>
+        <span class="chevron">&#x25BE;</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Normal vs Hover -->
+<div class="section">
+  <div class="section-title">Hover states</div>
+  <div class="states-row">
+    <div class="state-group">
+      <span class="state-label">Normal</span>
+      <div class="badge-wrap" style="pointer-events: none;">
+        <div class="badge-inner">
+          <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+          <span>@dave</span>
+          <span class="chevron">&#x25BE;</span>
+        </div>
+      </div>
+    </div>
+    <div class="state-group">
+      <span class="state-label">Hover &rarr; shimmer sweeps across</span>
+      <div class="badge-wrap">
+        <div class="badge-inner">
+          <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+          <span>@dave</span>
+          <span class="chevron">&#x25BE;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note">
+    No shadow at all. Hover triggers a single light streak that sweeps left-to-right across the gradient border &mdash;
+    same family as the CartCapsule's shimmer DNA, but distinct (one-shot sweep vs continuous loop).
+  </div>
+</div>
+
+<!-- Before / After -->
+<div class="comparison">
+  <div class="comparison-title">Before vs After</div>
+  <div class="comparison-row">
+    <div class="comp-group">
+      <span class="comp-label">Before (shimmer capsule)</span>
+      <div class="old-badge-wrap">
+        <div class="old-badge-inner">
+          <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+          <span>@dave</span>
+          <span class="chevron">&#x25BE;</span>
+        </div>
+      </div>
+    </div>
+    <div style="font-size: 1.2rem; color: #94a3b8;">&#x2192;</div>
+    <div class="comp-group">
+      <span class="comp-label">After (hybrid + hover shimmer)</span>
+      <div class="badge-wrap">
+        <div class="badge-inner">
+          <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+          <span>@dave</span>
+          <span class="chevron">&#x25BE;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="height: 2rem;"></div>
+</body>
+</html>

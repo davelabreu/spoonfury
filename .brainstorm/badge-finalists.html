@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Badge Finalists — B vs C vs Hybrid</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #1e293b; }
+
+  h1 { font-size: 1.4rem; font-weight: 800; text-align: center; padding: 2rem 1rem 0.25rem; }
+  .subtitle { text-align: center; color: #64748b; font-size: 0.85rem; margin-bottom: 2.5rem; }
+
+  .section { max-width: 900px; margin: 0 auto 3rem; padding: 0 1.5rem; }
+  .section-title {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    color: #94a3b8; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title .tag {
+    background: #f1f5f9; padding: 2px 8px; border-radius: 6px;
+    font-size: 0.65rem; font-weight: 600; color: #64748b; text-transform: none; letter-spacing: 0;
+  }
+
+  /* Full-width nav preview */
+  .nav-preview {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 24px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    min-height: 60px;
+    margin-bottom: 0.75rem;
+  }
+  .nav-logo { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.03em; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .nav-spacer { flex: 1; }
+  .nav-links { display: flex; gap: 4px; font-size: 0.8rem; font-weight: 500; color: #64748b; }
+  .nav-links a { text-decoration: none; color: inherit; padding: 5px 12px; border-radius: 6px; transition: background 0.15s; }
+  .nav-links a:hover { background: #f1f5f9; }
+  .nav-links a.active { background: #f1f5f9; color: #1e293b; }
+
+  /* Mini cart capsule */
+  .mini-cart {
+    display: inline-flex; align-items: center; border-radius: 9999px; overflow: hidden;
+    background: linear-gradient(270deg, #86efac, #93c5fd, #c4b5fd, #fda4af, #86efac);
+    background-size: 300% 300%; animation: shimmer 8s ease infinite; padding: 1.5px;
+  }
+  .mini-cart-inner {
+    display: flex; align-items: center; border-radius: 9999px; overflow: hidden; background: #fff;
+  }
+  .mini-cart-inner > span { padding: 4px 11px; font-size: 0.7rem; font-weight: 600; color: #374151; white-space: nowrap; }
+  .mini-cart-inner > .divider { width: 1px; height: 16px; background: #e5e7eb; flex-shrink: 0; }
+  .mini-cart-inner > .cart-icon { padding: 4px 10px; color: #15803d; font-size: 0.8rem; }
+  @keyframes shimmer { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+  .description {
+    font-size: 0.8rem; color: #64748b; line-height: 1.6; padding: 0 4px;
+  }
+  .description code {
+    background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: 0.75rem; color: #475569;
+  }
+  .pros { color: #16a34a; }
+  .cons { color: #dc2626; }
+
+  .chevron { font-size: 0.55rem; color: #94a3b8; margin-left: 1px; }
+
+  /* ===== B: Gradient Outline ===== */
+  .badge-b-wrap {
+    display: inline-flex; border-radius: 9999px;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    padding: 1.5px; cursor: pointer; transition: box-shadow 0.2s;
+  }
+  .badge-b-wrap:hover { box-shadow: 0 3px 16px rgba(139,92,246,0.3); }
+  .badge-b {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 9999px; background: #fff;
+    font-size: 0.75rem; font-weight: 600; color: #374151;
+  }
+  .badge-b .emoji { font-size: 0.9rem; }
+
+  /* ===== C: Glass Frost ===== */
+  .badge-c {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 9999px;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(148,163,184,0.25);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    font-size: 0.75rem; font-weight: 600; color: #374151;
+    cursor: pointer; transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+  .badge-c:hover { background: rgba(255,255,255,0.95); border-color: rgba(148,163,184,0.4); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .badge-c .emoji { font-size: 0.9rem; }
+
+  /* ===== HYBRID B+C: Gradient Outline + Glass Interior ===== */
+  .badge-hybrid-wrap {
+    display: inline-flex; border-radius: 9999px;
+    background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 40%, #c084fc 70%, #ec4899 100%);
+    padding: 1.5px; cursor: pointer; transition: box-shadow 0.2s;
+  }
+  .badge-hybrid-wrap:hover { box-shadow: 0 3px 16px rgba(139,92,246,0.25); }
+  .badge-hybrid {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 9999px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    font-size: 0.75rem; font-weight: 600; color: #374151;
+  }
+  .badge-hybrid .emoji { font-size: 0.9rem; }
+
+  /* Hover states demo row */
+  .states-row {
+    display: flex; align-items: center; gap: 24px; padding: 12px 24px;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 0.75rem;
+  }
+  .state-label { font-size: 0.65rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; min-width: 50px; }
+
+  /* Simulated hover for B */
+  .badge-b-wrap.hovered { box-shadow: 0 3px 16px rgba(139,92,246,0.3); }
+  /* Simulated hover for C */
+  .badge-c.hovered { background: rgba(255,255,255,0.95); border-color: rgba(148,163,184,0.4); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  /* Simulated hover for hybrid */
+  .badge-hybrid-wrap.hovered { box-shadow: 0 3px 16px rgba(139,92,246,0.25); }
+
+  .winner-banner {
+    text-align: center; padding: 1.5rem; margin: 0 auto; max-width: 600px;
+    background: linear-gradient(135deg, #faf5ff, #fdf2f8);
+    border: 1px solid #e9d5ff;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: #6b21a8;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<h1>Finalists: B vs C vs Hybrid</h1>
+<p class="subtitle">Side-by-side in a full nav context, with hover states</p>
+
+<!-- B: Gradient Outline -->
+<div class="section">
+  <div class="section-title">Option B <span class="tag">Gradient Outline</span></div>
+  <div class="nav-preview">
+    <div class="nav-logo"><span>&#x1F944;</span> Spoonfury</div>
+    <div class="nav-links">
+      <a href="#" class="active">Stir the Pot</a>
+      <a href="#">My Books</a>
+      <a href="#">+ Recipe</a>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="mini-cart"><div class="mini-cart-inner"><span>&#x1F697; Pickup</span><div class="divider"></div><span>&#x1F3E0; Delivery</span><div class="divider"></div><span class="cart-icon">&#x1F6D2;</span></div></div>
+    <div class="badge-b-wrap">
+      <div class="badge-b">
+        <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+        <span>@dave</span>
+        <span class="chevron">&#x25BE;</span>
+      </div>
+    </div>
+  </div>
+  <div class="states-row">
+    <span class="state-label">Normal</span>
+    <div class="badge-b-wrap"><div class="badge-b"><span class="emoji">&#x1F468;&#x200D;&#x1F373;</span><span>@dave</span><span class="chevron">&#x25BE;</span></div></div>
+    <span class="state-label">Hover</span>
+    <div class="badge-b-wrap hovered"><div class="badge-b"><span class="emoji">&#x1F468;&#x200D;&#x1F373;</span><span>@dave</span><span class="chevron">&#x25BE;</span></div></div>
+  </div>
+  <div class="description">
+    <span class="pros">+</span> Distinct identity, doesn't clash with CartCapsule's shimmer. <span class="pros">+</span> Gradient border signals "interactive / clickable."<br>
+    <span class="cons">&ndash;</span> Slightly more "designed" than the rest of the minimal nav.
+  </div>
+</div>
+
+<!-- C: Glass Frost -->
+<div class="section">
+  <div class="section-title">Option C <span class="tag">Glass Frost</span></div>
+  <div class="nav-preview">
+    <div class="nav-logo"><span>&#x1F944;</span> Spoonfury</div>
+    <div class="nav-links">
+      <a href="#" class="active">Stir the Pot</a>
+      <a href="#">My Books</a>
+      <a href="#">+ Recipe</a>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="mini-cart"><div class="mini-cart-inner"><span>&#x1F697; Pickup</span><div class="divider"></div><span>&#x1F3E0; Delivery</span><div class="divider"></div><span class="cart-icon">&#x1F6D2;</span></div></div>
+    <div class="badge-c">
+      <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+      <span>@dave</span>
+      <span class="chevron">&#x25BE;</span>
+    </div>
+  </div>
+  <div class="states-row">
+    <span class="state-label">Normal</span>
+    <div class="badge-c"><span class="emoji">&#x1F468;&#x200D;&#x1F373;</span><span>@dave</span><span class="chevron">&#x25BE;</span></div>
+    <span class="state-label">Hover</span>
+    <div class="badge-c hovered"><span class="emoji">&#x1F468;&#x200D;&#x1F373;</span><span>@dave</span><span class="chevron">&#x25BE;</span></div>
+  </div>
+  <div class="description">
+    <span class="pros">+</span> Ultra-minimal, blends with the clean nav. <span class="pros">+</span> <code>backdrop-blur</code> feels modern/premium.<br>
+    <span class="cons">&ndash;</span> Might be <em>too</em> subtle — users may not realize it's clickable.
+  </div>
+</div>
+
+<!-- HYBRID: Gradient Outline + Glass Interior -->
+<div class="section">
+  <div class="section-title">Option B+C <span class="tag">Hybrid &mdash; Gradient Outline + Glass Interior</span></div>
+  <div class="nav-preview">
+    <div class="nav-logo"><span>&#x1F944;</span> Spoonfury</div>
+    <div class="nav-links">
+      <a href="#" class="active">Stir the Pot</a>
+      <a href="#">My Books</a>
+      <a href="#">+ Recipe</a>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="mini-cart"><div class="mini-cart-inner"><span>&#x1F697; Pickup</span><div class="divider"></div><span>&#x1F3E0; Delivery</span><div class="divider"></div><span class="cart-icon">&#x1F6D2;</span></div></div>
+    <div class="badge-hybrid-wrap">
+      <div class="badge-hybrid">
+        <span class="emoji">&#x1F468;&#x200D;&#x1F373;</span>
+        <span>@dave</span>
+        <span class="chevron">&#x25BE;</span>
+      </div>
+    </div>
+  </div>
+  <div class="states-row">
+    <span class="state-label">Normal</span>
+    <div class="badge-hybrid-wrap"><div class="badge-hybrid"><span class="emoji">&#x1F468;&#x200D;&#x1F373;</span><span>@dave</span><span class="chevron">&#x25BE;</span></div></div>
+    <span class="state-label">Hover</span>
+    <div class="badge-hybrid-wrap hovered"><div class="badge-hybrid"><span class="emoji">&#x1F468;&#x200D;&#x1F373;</span><span>@dave</span><span class="chevron">&#x25BE;</span></div></div>
+  </div>
+  <div class="description">
+    <span class="pros">+</span> Best of both: gradient border for identity + frosted glass interior for that modern feel.<br>
+    <span class="pros">+</span> Clearly clickable (border), clearly minimal (glass).<br>
+    <span class="pros">+</span> Interior is slightly translucent (<code>rgba(255,255,255,0.85)</code>) — gives it depth without being loud.
+  </div>
+</div>
+
+<div class="winner-banner">
+  Pick your favorite and I'll implement it, move the theme picker into the dropdown, and swap the hamburger for a shadcn Sheet.
+</div>
+
+<div style="height: 2rem;"></div>
+
+</body>
+</html>
