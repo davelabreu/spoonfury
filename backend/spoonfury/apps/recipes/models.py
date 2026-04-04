@@ -108,3 +108,33 @@ class Recipe(models.Model):
                 n += 1
             self.slug = slug
         super().save(*args, **kwargs)
+
+
+class TestKitchenInvite(models.Model):
+    """
+    Grants a specific user (invitee) read access to another user's (owner)
+    test kitchen — all of the owner's draft recipes become visible to the
+    invitee. Access is all-or-nothing; no per-recipe granularity.
+
+    The unique constraint on (owner, invitee) prevents duplicate invites.
+    """
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="kitchen_invites_sent",
+        help_text="The user whose test kitchen is being shared.",
+    )
+    invitee = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="kitchen_invites_received",
+        help_text="The user who gains read access to the owner's drafts.",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = [("owner", "invitee")]
+
+    def __str__(self):
+        return f"{self.owner.username} → {self.invitee.username}"
