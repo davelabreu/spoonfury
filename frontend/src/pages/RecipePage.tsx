@@ -276,7 +276,7 @@ export function RecipePage() {
                           disabled={!Object.values(getPublishGate(recipe)).every(Boolean)}
                           className="bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 gap-1.5"
                         >
-                          Resubmit for Review
+                          Send to Moderation
                         </Button>
                       </>
                     )}

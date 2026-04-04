@@ -53,7 +53,7 @@ export function DraftBanner({ status, gate, slug, moderationFeedback }: DraftBan
       };
 
   const statusLabel = isRevision
-    ? "Revision requested"
+    ? isReady ? "Ready to send to moderation" : "Revision requested"
     : isReady
     ? "Ready to submit!"
     : "Only you can see this";

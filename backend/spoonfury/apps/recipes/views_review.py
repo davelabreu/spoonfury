@@ -31,7 +31,14 @@ def _validate_gate(recipe):
 @api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
 def submit_for_review(request, slug):
-    """Submit a draft/revision_requested recipe for community review."""
+    """
+    Submit a draft/revision_requested recipe for review.
+
+    - From draft: enters community in_review, review_round increments, invitees notified.
+    - From revision_requested: skips community voting entirely and goes straight back to
+      mod_queue. The recipe already cleared the threshold; the moderator just needs to
+      approve the revision. review_round is NOT incremented — previous votes still count.
+    """
     recipe = Recipe.objects.select_related("author").get(slug=slug)
 
     if recipe.author != request.user:
@@ -47,20 +54,33 @@ def submit_for_review(request, slug):
     if errors:
         return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    recipe.status = "in_review"
-    recipe.review_round = F("review_round") + 1
-    recipe.save(update_fields=["status", "review_round"])
-    recipe.refresh_from_db()
-
-    # Notify all kitchen invitees
-    for invite in TestKitchenInvite.objects.filter(owner=recipe.author).select_related("invitee"):
-        notify(
-            recipient=invite.invitee,
-            notification_type="review_requested",
-            recipe=recipe,
-            actor=recipe.author,
-            message=f"{recipe.author.username} wants your feedback on {recipe.title}",
-        )
+    if recipe.status == "revision_requested":
+        # Already cleared community voting — send straight back to moderator queue.
+        recipe.status = "mod_queue"
+        recipe.save(update_fields=["status"])
+        User = get_user_model()
+        for staff in User.objects.filter(is_staff=True):
+            notify(
+                recipient=staff,
+                notification_type="recipe_in_mod_queue",
+                recipe=recipe,
+                actor=recipe.author,
+                message=f"{recipe.author.username} revised and resubmitted: {recipe.title}",
+            )
+    else:
+        # First submission from draft — enter community review.
+        recipe.status = "in_review"
+        recipe.review_round = F("review_round") + 1
+        recipe.save(update_fields=["status", "review_round"])
+        recipe.refresh_from_db()
+        for invite in TestKitchenInvite.objects.filter(owner=recipe.author).select_related("invitee"):
+            notify(
+                recipient=invite.invitee,
+                notification_type="review_requested",
+                recipe=recipe,
+                actor=recipe.author,
+                message=f"{recipe.author.username} wants your feedback on {recipe.title}",
+            )
 
     return Response(RecipeSerializer(recipe, context={"request": request}).data)
 
