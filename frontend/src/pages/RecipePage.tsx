@@ -396,7 +396,7 @@ export function RecipePage() {
           recipe={recipe}
           token={token!}
           onClose={() => setForking(false)}
-          onSuccess={(bookId: number) => navigate(`/books/${bookId}`)}
+          onSuccess={() => navigate("/kitchen")}
         />
       )}
 
