@@ -51,7 +51,7 @@ export function RecipePage() {
   useEffect(() => {
     if (!slug) return;
     setHeroImgError(false); // Reset broken-image state when navigating to a new recipe
-    api.get(`/recipes/${slug}/`).then((data: Recipe) => setRecipe(data)).catch(() => setError("Recipe not found."));
+    api.get(`/recipes/${slug}/`, token ?? undefined).then((data: Recipe) => setRecipe(data)).catch(() => setError("Recipe not found."));
   }, [slug]);
 
   useEffect(() => {
