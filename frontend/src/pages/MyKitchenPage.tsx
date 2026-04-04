@@ -106,7 +106,9 @@ export function MyKitchenPage() {
 
   useEffect(() => {
     if (!token) return;
-    api.get("/recipes/", token)
+    // page_size=200 ensures all user recipes are returned in one request —
+    // the kitchen page must show every draft/published recipe the user owns.
+    api.get("/recipes/?page_size=200", token)
       .then((data: { results?: Recipe[] }) => setRecipes(data.results ?? []))
       .catch(() => {})
       .finally(() => setLoading(false));
