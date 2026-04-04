@@ -44,3 +44,37 @@ def other_auth_client(other_user):
     client = APIClient()
     client.force_authenticate(user=other_user)
     return client
+
+
+@pytest.fixture
+def staff_user(db):
+    """A moderator (staff) user."""
+    return User.objects.create_user(
+        username="modchef", email="mod@test.com", password="testpass123", is_staff=True,
+    )
+
+
+@pytest.fixture
+def staff_client(staff_user):
+    """Authenticated client for the staff/moderator user."""
+    from rest_framework.test import APIClient
+    client = APIClient()
+    client.force_authenticate(user=staff_user)
+    return client
+
+
+@pytest.fixture
+def invitee_user(db):
+    """A third user who will be invited to kitchens for review."""
+    return User.objects.create_user(
+        username="inviteechef", email="invitee@test.com", password="testpass123",
+    )
+
+
+@pytest.fixture
+def invitee_client(invitee_user):
+    """Authenticated client for the invitee user."""
+    from rest_framework.test import APIClient
+    client = APIClient()
+    client.force_authenticate(user=invitee_user)
+    return client
