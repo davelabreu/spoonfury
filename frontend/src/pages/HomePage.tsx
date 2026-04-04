@@ -23,7 +23,8 @@ export function HomePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Latest Recipes</h1>
+      <h1 className="text-2xl font-bold mb-1">Stir the Pot</h1>
+      <p className="text-sm text-muted-foreground mb-6">Perfected recipes from the community</p>
       <div className="space-y-3">
         {recipes.map((r: Recipe) => (
           <RecipeCard key={r.slug} recipe={r} />
