@@ -22,6 +22,17 @@ Spoonfury — a recipe-first social platform. Core mechanic: **Fork** a recipe, 
 - **Worktrees**: Use `.worktrees/` for features. Start dev servers from *inside* the worktree directory.
 - **Python**: Root `.venv` is shared. Ref it via `../.venv/Scripts/python` (backend) or `../../.venv/Scripts/python` (worktree backend).
 
+## Merge Policy
+
+**Never merge a feature branch to `master` without a human-initiated test session.**
+
+The workflow is:
+1. AI implements the feature on a worktree branch and runs automated tests.
+2. Human starts the dev servers from inside the worktree and tests in the browser.
+3. Human explicitly says "merge" or "ready to merge" — only then does merging happen.
+
+AI agents must not offer, suggest, or attempt a merge to `master` at the end of an implementation session. Always stop at "keep the branch as-is" and remind the human to test first.
+
 ## MCP Server Usage
 AI agents have access to specialized tools for development:
 - **shadcn/studio**: `/cui`, `/rui`, `/ftc` for UI components.
