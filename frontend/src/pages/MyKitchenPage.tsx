@@ -64,6 +64,18 @@ function GateChecklist({ gate }: { gate: PublishGate }) {
   );
 }
 
+function StatusBadge({ status }: { status: string }) {
+  const config: Record<string, { label: string; className: string }> = {
+    draft: { label: "Draft", className: "bg-gray-100 text-gray-600" },
+    in_review: { label: "In Review", className: "bg-blue-100 text-blue-700" },
+    mod_queue: { label: "In Moderation", className: "bg-purple-100 text-purple-700" },
+    revision_requested: { label: "Revision Needed", className: "bg-orange-100 text-orange-700" },
+    published: { label: "Published", className: "bg-green-100 text-green-700" },
+  };
+  const c = config[status] || config.draft;
+  return <Badge variant="outline" className={`text-[10px] ${c.className}`}>{c.label}</Badge>;
+}
+
 /** Card for a single recipe in the kitchen or published section. */
 function RecipeCard({ recipe, showGate }: { recipe: Recipe; showGate?: boolean }) {
   const gate = getPublishGate(recipe);
@@ -84,8 +96,14 @@ function RecipeCard({ recipe, showGate }: { recipe: Recipe; showGate?: boolean }
               Published {new Date(recipe.published_at).toLocaleDateString()}
             </p>
           )}
+          {recipe.status === "revision_requested" && (
+            <p className="text-xs text-orange-600 mt-1">
+              Moderator requested changes — view recipe for details
+            </p>
+          )}
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
+          <StatusBadge status={recipe.status} />
           <Badge variant="secondary">{recipe.category}</Badge>
           {recipe.fork_count > 0 && (
             <span className="text-xs text-muted-foreground">🍴 {recipe.fork_count}</span>
@@ -123,7 +141,9 @@ export function MyKitchenPage() {
   }
 
   const myRecipes = recipes.filter(r => r.author_username === username);
-  const drafts = myRecipes.filter(r => r.status === "draft");
+  const drafts = myRecipes.filter(r => r.status === "draft" || r.status === "revision_requested");
+  const inReview = myRecipes.filter(r => r.status === "in_review");
+  const inModeration = myRecipes.filter(r => r.status === "mod_queue");
   const published = myRecipes.filter(r => r.status === "published");
 
   const handleInvite = async () => {
@@ -193,6 +213,42 @@ export function MyKitchenPage() {
           )}
         </div>
       </section>
+
+      {/* In Review Section */}
+      {inReview.length > 0 && (
+        <>
+          <Separator />
+          <section>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-lg font-semibold">🔍 In Review</h2>
+              <Badge variant="outline">{inReview.length}</Badge>
+            </div>
+            <div className="space-y-3">
+              {inReview.map(r => (
+                <RecipeCard key={r.slug} recipe={r} />
+              ))}
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* In Moderation Section */}
+      {inModeration.length > 0 && (
+        <>
+          <Separator />
+          <section>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-lg font-semibold">⏳ In Moderation</h2>
+              <Badge variant="outline">{inModeration.length}</Badge>
+            </div>
+            <div className="space-y-3">
+              {inModeration.map(r => (
+                <RecipeCard key={r.slug} recipe={r} />
+              ))}
+            </div>
+          </section>
+        </>
+      )}
 
       <Separator />
 
