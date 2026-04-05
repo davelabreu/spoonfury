@@ -1,3 +1,7 @@
+from datetime import timedelta
+
+from django.db.models import Count, F, FloatField, Q, Value
+from django.db.models.functions import Cast, Coalesce, NullIf
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions
@@ -7,7 +11,6 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status as http_status
-from django.db.models import Q
 from .models import Recipe, Tag, TestKitchenInvite, ModerationAction
 from .serializers import RecipeSerializer, TagSerializer
 from .filters import RecipeFilter
@@ -196,3 +199,43 @@ def force_publish(request, slug):
     )
 
     return Response(RecipeSerializer(recipe, context={"request": request}).data)
+
+
+@api_view(["GET"])
+@permission_classes([permissions.AllowAny])
+def hot_recipes(request):
+    """
+    Return the top 2 'hot' published recipes from the last 30 days.
+
+    Hotness score = (fork_count * 0.4) + (positive_vote_rate * 10 * 0.6)
+    Only recipes with at least 1 review vote are eligible.
+    """
+    cutoff = timezone.now() - timedelta(days=30)
+    qs = (
+        Recipe.objects
+        .filter(status="published", published_at__gte=cutoff)
+        .select_related("author", "parent_recipe__author")
+        .prefetch_related("tags")
+        .annotate(
+            total_votes=Count("reviews"),
+            positive_votes=Count("reviews", filter=Q(reviews__is_positive=True)),
+        )
+        .filter(total_votes__gte=1)
+        .annotate(
+            vote_rate=Cast(F("positive_votes"), FloatField())
+            / Cast(NullIf(F("total_votes"), Value(0)), FloatField()),
+            hot_score=F("fork_count") * Value(0.4)
+            + (
+                Cast(F("positive_votes"), FloatField())
+                / Coalesce(
+                    Cast(NullIf(F("total_votes"), Value(0)), FloatField()),
+                    Value(1.0),
+                )
+                * Value(10.0)
+                * Value(0.6)
+            ),
+        )
+        .order_by("-hot_score")[:2]
+    )
+    serializer = RecipeSerializer(qs, many=True, context={"request": request})
+    return Response(serializer.data)
