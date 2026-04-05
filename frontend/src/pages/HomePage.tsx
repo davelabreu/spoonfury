@@ -1,88 +1,119 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { ChefHat, Clock } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getCategoryFallback } from "@/lib/categoryFallback";
 import { SearchBanner } from "@/components/SearchBanner";
 import { FilterShelf, type FilterState } from "@/components/FilterShelf";
 import { HotStrip } from "@/components/HotStrip";
 import type { Recipe } from "@/types";
 
-// ─── Grid card ───────────────────────────────────────────────────────────────
+// ─── Modern recipe card (full-bleed image, overlay text, hover reveal) ───────
 
-function GridCard({ recipe }: { recipe: Recipe }) {
+function RecipeCard({ recipe, featured = false }: { recipe: Recipe; featured?: boolean }) {
   const [err, setErr] = useState(false);
   const fallback = getCategoryFallback(recipe.category);
 
   return (
-    <Link
-      to={`/recipes/${recipe.slug}`}
-      className="group flex flex-col rounded-xl overflow-hidden border border-border hover:border-foreground/20 hover:shadow-md hover:scale-[1.01] transition-all duration-200 bg-card"
-    >
-      {/* Image / placeholder with overlay badges */}
-      <div className="aspect-[4/3] w-full shrink-0 overflow-hidden relative">
-        {recipe.image_url && !err ? (
-          <img
-            src={recipe.image_url}
-            alt={recipe.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={() => setErr(true)}
-          />
-        ) : (
-          <div
-            className={`w-full h-full bg-gradient-to-br ${fallback.gradient} flex items-center justify-center`}
-          >
-            <span className="text-5xl drop-shadow">{fallback.emoji}</span>
-          </div>
-        )}
-        {/* Overlay: fork count badge */}
-        {recipe.fork_count > 0 && (
-          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-            🍴 {recipe.fork_count}
-          </div>
-        )}
-        {/* Overlay: category pill */}
-        <div className="absolute bottom-2 left-2">
-          <Badge className="bg-black/50 backdrop-blur-sm text-white border-0 text-[10px]">
-            {recipe.category.replace(/_/g, " ")}
-          </Badge>
-        </div>
-      </div>
-
-      <div className="p-3 flex flex-col gap-1.5">
-        <h3 className="font-bold text-sm leading-snug line-clamp-2">{recipe.title}</h3>
-        <p className="text-[11px] text-muted-foreground line-clamp-2">{recipe.description}</p>
-
-        {/* Tags */}
-        {recipe.tags && recipe.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 pt-0.5">
-            {recipe.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag.slug}
-                className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground"
-              >
-                {tag.name}
-              </span>
-            ))}
-            {recipe.tags.length > 3 && (
-              <span className="text-[10px] text-muted-foreground">+{recipe.tags.length - 3}</span>
-            )}
-          </div>
-        )}
-
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground mt-auto pt-1">
-          <span>@{recipe.author_username}</span>
-          {recipe.parent_recipe_slug && (
-            <span className="text-indigo-500 text-[10px]">forked</span>
+    <Link to={`/recipes/${recipe.slug}`} className="group">
+      <Card className={`relative overflow-hidden rounded-3xl border-0 shadow-sm py-0 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 cursor-pointer ${featured ? "col-span-2 row-span-2" : ""}`}>
+        {/* Full-bleed image */}
+        <div className="absolute inset-0">
+          {recipe.image_url && !err ? (
+            <img
+              src={recipe.image_url}
+              alt={recipe.title}
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              onError={() => setErr(true)}
+            />
+          ) : (
+            <div className={`h-full w-full bg-gradient-to-br ${fallback.gradient} flex items-center justify-center`}>
+              <span className={`${featured ? "text-8xl" : "text-5xl"} drop-shadow-lg`}>{fallback.emoji}</span>
+            </div>
           )}
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80" />
         </div>
-      </div>
+
+        <CardContent className={`relative flex flex-col justify-between p-5 sm:p-6 ${featured ? "min-h-[400px]" : "min-h-[280px]"}`}>
+          {/* Top: badges + quick action */}
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-2">
+              <Badge className="backdrop-blur-md bg-white/20 text-white hover:bg-white/30 border-0 text-[10px]">
+                {recipe.category.replace(/_/g, " ")}
+              </Badge>
+              {recipe.fork_count > 0 && (
+                <Badge className="backdrop-blur-md bg-white/15 text-white/90 border-0 text-[10px]">
+                  🍴 {recipe.fork_count}
+                </Badge>
+              )}
+            </div>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="rounded-full bg-white/15 text-white backdrop-blur-md opacity-0 translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 hover:bg-white/30 h-8 w-8"
+              tabIndex={-1}
+            >
+              <ChefHat className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Bottom: content */}
+          <div className="text-white">
+            <h3 className={`font-bold tracking-tight leading-tight mb-2 ${featured ? "text-2xl sm:text-3xl" : "text-lg sm:text-xl"}`}>
+              {recipe.title}
+            </h3>
+            <p className={`text-white/60 line-clamp-2 mb-3 ${featured ? "text-sm" : "text-xs"}`}>
+              {recipe.description}
+            </p>
+
+            {/* Tags — slide up on hover */}
+            {recipe.tags && recipe.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-3 opacity-0 translate-y-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+                {recipe.tags.slice(0, 3).map((tag) => (
+                  <span
+                    key={tag.slug}
+                    className="text-[10px] px-2 py-0.5 rounded-full bg-white/15 backdrop-blur-sm text-white/80"
+                  >
+                    {tag.name}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Author + meta — slide up on hover */}
+            <div className="flex items-center gap-3 text-sm text-white/70 opacity-0 translate-y-2 transition-all duration-300 delay-75 group-hover:opacity-100 group-hover:translate-y-0">
+              <span>@{recipe.author_username}</span>
+              {recipe.parent_recipe_slug && (
+                <>
+                  <span className="text-white/30">·</span>
+                  <span className="text-white/50 text-xs">forked</span>
+                </>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </Link>
   );
 }
 
-// ─── Community Kitchen sidebar (kept from original) ──────────────────────────
+// ─── Skeleton cards ──────────────────────────────────────────────────────────
+
+function RecipeCardSkeleton({ featured = false }: { featured?: boolean }) {
+  return (
+    <Card className={`overflow-hidden rounded-3xl border-0 py-0 ${featured ? "col-span-2 row-span-2" : ""}`}>
+      <Skeleton className={`w-full ${featured ? "min-h-[400px]" : "min-h-[280px]"}`} />
+    </Card>
+  );
+}
+
+// ─── Community Kitchen sidebar ───────────────────────────────────────────────
 
 function CommunityKitchenSidebar({
   recipes,
@@ -93,7 +124,7 @@ function CommunityKitchenSidebar({
 }) {
   return (
     <aside className="w-72 shrink-0 hidden lg:block">
-      <div className="sticky top-4 rounded-2xl border border-indigo-200/60 bg-gradient-to-b from-indigo-50 to-white overflow-hidden shadow-sm">
+      <Card className="sticky top-4 rounded-2xl overflow-hidden border-indigo-200/60 bg-gradient-to-b from-indigo-50 to-white py-0 shadow-sm">
         <div className="px-4 pt-4 pb-3 border-b border-indigo-100">
           <div className="flex items-center gap-2">
             <span className="text-base">🧪</span>
@@ -118,15 +149,9 @@ function CommunityKitchenSidebar({
                 </span>
                 <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
                   {r.image_url ? (
-                    <img
-                      src={r.image_url}
-                      alt={r.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={r.image_url} alt={r.title} className="w-full h-full object-cover" />
                   ) : (
-                    <div
-                      className={`w-full h-full bg-gradient-to-br ${fallback.gradient} flex items-center justify-center`}
-                    >
+                    <div className={`w-full h-full bg-gradient-to-br ${fallback.gradient} flex items-center justify-center`}>
                       <span className="text-lg">{fallback.emoji}</span>
                     </div>
                   )}
@@ -173,7 +198,7 @@ function CommunityKitchenSidebar({
             {isLoggedIn ? "Click a recipe to cast your vote" : "Log in to cast your vote"}
           </p>
         </div>
-      </div>
+      </Card>
     </aside>
   );
 }
@@ -183,12 +208,10 @@ function CommunityKitchenSidebar({
 function buildQueryString(filters: FilterState, search: string, orFallback = false): string {
   const params = new URLSearchParams();
 
-  // Category — skip if OR fallback (relax category constraint)
   if (filters.category && !orFallback) {
     params.append("category", filters.category);
   }
 
-  // Tags (cuisine + lifestyle are both tag slugs)
   const tags: string[] = [];
   if (filters.cuisine) tags.push(filters.cuisine);
   if (filters.lifestyle) tags.push(filters.lifestyle);
@@ -200,13 +223,47 @@ function buildQueryString(filters: FilterState, search: string, orFallback = fal
   return qs ? `/recipes/?${qs}` : "/recipes/";
 }
 
+// ─── Bento grid layout ──────────────────────────────────────────────────────
+
+function BentoGrid({ recipes }: { recipes: Recipe[] }) {
+  if (recipes.length === 0) return null;
+
+  // First recipe is featured (large), rest are standard
+  const [featured, ...rest] = recipes;
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-auto">
+      {/* Featured card spans 2 cols on lg */}
+      <div className="sm:col-span-2 lg:col-span-2 lg:row-span-2">
+        <RecipeCard recipe={featured} featured />
+      </div>
+      {rest.map((r) => (
+        <RecipeCard key={r.slug} recipe={r} />
+      ))}
+    </div>
+  );
+}
+
+function BentoGridSkeleton() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-auto">
+      <div className="sm:col-span-2 lg:col-span-2 lg:row-span-2">
+        <RecipeCardSkeleton featured />
+      </div>
+      <RecipeCardSkeleton />
+      <RecipeCardSkeleton />
+      <RecipeCardSkeleton />
+      <RecipeCardSkeleton />
+    </div>
+  );
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export function HomePage() {
   const { token } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Parse URL state
   const urlSearch = searchParams.get("search") || "";
   const urlCategory = searchParams.get("category") || "";
   const urlCuisine = searchParams.get("cuisine") || "";
@@ -224,7 +281,6 @@ export function HomePage() {
   const [error, setError] = useState("");
   const [isFiltered, setIsFiltered] = useState(false);
 
-  // Fetch recipes — supports AND filtering with OR fallback
   const fetchRecipes = useCallback(
     async (f: FilterState, search: string) => {
       setLoading(true);
@@ -234,7 +290,6 @@ export function HomePage() {
         const data = await api.get(path);
         let results = data.results || [];
 
-        // OR fallback: if AND returned nothing and we had a category, retry without it
         if (results.length === 0 && f.category && (f.cuisine || f.lifestyle)) {
           const fallbackPath = buildQueryString(f, search, true);
           const fallbackData = await api.get(fallbackPath);
@@ -252,7 +307,6 @@ export function HomePage() {
     []
   );
 
-  // Initial load + URL-driven fetch
   useEffect(() => {
     fetchRecipes(
       { category: urlCategory, cuisine: urlCuisine, lifestyle: urlLifestyle },
@@ -260,7 +314,6 @@ export function HomePage() {
     );
   }, [urlSearch, urlCategory, urlCuisine, urlLifestyle, fetchRecipes]);
 
-  // In-review sidebar
   useEffect(() => {
     if (!token) return;
     api
@@ -269,7 +322,6 @@ export function HomePage() {
       .catch(() => {});
   }, [token]);
 
-  // Push filter state to URL
   function applyFilters(f: FilterState, search: string) {
     const params: Record<string, string> = {};
     if (f.category) params.category = f.category;
@@ -298,8 +350,8 @@ export function HomePage() {
   if (error) return <p className="text-destructive">{error}</p>;
 
   return (
-    <div className="space-y-6">
-      {/* Hero search banner */}
+    <div className="space-y-8">
+      {/* Liquid glass hero */}
       <SearchBanner onSearch={handleSearch} initial={urlSearch} />
 
       {/* Filter shelf */}
@@ -310,14 +362,14 @@ export function HomePage() {
         onClear={handleClearFilters}
       />
 
-      {/* Hot this month — only show when not filtering */}
+      {/* Hot this month — hide when filtering */}
       {!isFiltered && <HotStrip />}
 
-      {/* Main content area */}
+      {/* Main content */}
       <div className="flex gap-8 items-start">
-        <div className="flex-1 min-w-0 space-y-4">
+        <div className="flex-1 min-w-0 space-y-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+            <h2 className="text-base font-bold tracking-tight">
               {isFiltered ? "Results" : "All Recipes"}
             </h2>
             {isFiltered && (
@@ -328,25 +380,23 @@ export function HomePage() {
           </div>
 
           {loading ? (
-            <p className="text-muted-foreground text-sm py-8 text-center">Loading recipes...</p>
+            <BentoGridSkeleton />
           ) : recipes.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {recipes.map((r) => (
-                <GridCard key={r.slug} recipe={r} />
-              ))}
-            </div>
+            <BentoGrid recipes={recipes} />
           ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                {isFiltered
-                  ? "No recipes match your filters. Try broadening your search."
-                  : "No recipes yet. Be the first!"}
-              </p>
-            </div>
+            <Card className="rounded-3xl border-dashed py-16 text-center">
+              <CardContent>
+                <p className="text-muted-foreground text-lg mb-1">
+                  {isFiltered ? "No recipes match your filters" : "No recipes yet"}
+                </p>
+                <p className="text-muted-foreground/60 text-sm">
+                  {isFiltered ? "Try broadening your search." : "Be the first to share a recipe!"}
+                </p>
+              </CardContent>
+            </Card>
           )}
         </div>
 
-        {/* Sidebar */}
         {showSidebar && (
           <CommunityKitchenSidebar recipes={inReviewRecipes} isLoggedIn={!!token} />
         )}
