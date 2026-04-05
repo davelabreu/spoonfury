@@ -6,44 +6,48 @@ Quick orientation file. Update at the end of each session.
 
 ## Last Session
 
-**Date:** 2026-04-04  
-**Focus:** UI polish + review pipeline fixes  
-**Branch:** `master`  
-**Status:** Shipped ✅
+**Date:** 2026-04-05  
+**Focus:** Filter bar + modern UI overhaul on Stir the Pot  
+**Branch:** `filter-bar` (worktree at `.worktrees/filter-bar`)  
+**Status:** Ready for browser testing, then merge to master
 
 ### What was built
-- Magazine-style homepage: hero card, 2-col recipe grid, Rising Stars sidebar with live vote bars
-- RecipePage editorial split layout: story left (image → ingredients → instructions), context right (about + notes, sticky)
-- BooksPage library grid: portrait book cards, deterministic gradient covers, monogram letters
-- Cook Now banner repositioned to between action strip and ingredients
-- `is_staff` exposed via `/api/auth/user/` endpoint; AuthContext stores `isStaff`; Moderation Queue nav link shown to staff
-- Staff visibility fix: `mod_queue` recipes visible to staff in queryset
-- Notification routing: `recipe_in_mod_queue` notifications navigate to `/moderation`
-- Review pipeline hardening:
-  - Moderator feedback stored and displayed in DraftBanner on `revision_requested`
-  - `all_rounds` vote history preserved across rounds, visible to owner and staff
-  - `revision_requested` resubmit skips community vote → goes straight to `mod_queue`
-  - `total_votes` / `positive_votes` added to RecipeSerializer for `in_review` recipes
-  - Vote tally shown on MyKitchenPage in-review cards
-  - Staff see full vote history, ReviewBanner, and back-to-queue link on `mod_queue` recipe page
+- **Search banner**: Liquid glass Card over gradient with shimmer animation, full-width search input
+- **3-tier filter shelf**: Category (15 chips w/ food emoji), Cuisine & Heritage (7 chips w/ flag emoji), Lifestyle (7 chips w/ lifestyle emoji). Color-coded rows (indigo/amber/green), solid-fill selected state with shadow. AND logic with OR fallback (drops category when zero results)
+- **Hot this month**: Top 2 published recipes from last 30 days scored by `(fork_count × 0.4) + (positive_vote_rate × 10 × 0.6)`. Full-bleed image cards with hover reveal
+- **Bento grid recipe cards**: Full-bleed images with gradient overlay, glass badges (category + fork count), hover micro-interactions (ChefHat button slides in, tags/author slide up). First recipe featured (2-col span)
+- **Skeleton loading**: Shimmer placeholders for grid and hot strip while data loads
+- **Warm "Hearth" palette**: Saffron primary, warm off-white background, 1rem radius
+- **Backend**: Migration 0011 seeds 9 filter tags (cuisine + dietary + vibe). `GET /api/recipes/hot/` endpoint with hotness scoring
+- **URL-synced filters**: useSearchParams for shareable filter URLs
+
+### Backend changes
+- New migration: `0011_seed_filter_tags.py` — seeds 9 tags for filter chips
+- New endpoint: `GET /api/recipes/hot/` — top 2 hot published recipes (public, no auth)
+- New test file: `test_hot_recipes.py` — 4 tests (all passing)
 
 ---
 
 ## Current State
 
-**Branch:** `master`  
-**Version:** v0.7 (polish pass complete)
+**Branch:** `filter-bar` (not yet merged)  
+**Version:** v0.7 on master, filter-bar branch ready for testing
+
+### To test & merge
+1. Run both servers from inside the worktree
+2. Browse the homepage — verify search, filters, hot strip, bento grid
+3. Test filter combinations and URL sharing
+4. Say "merge" when satisfied
 
 ---
 
 ## Up Next (priority order)
 
-1. **Filter bar on Stir the Pot** — category chips + search input. Backend ready, just needs UI.
+1. ~~**Filter bar on Stir the Pot**~~ — **DONE** (on `filter-bar` branch, pending merge)
 2. **Cook Mode sticky ingredients** — when Cook Now active, ingredients pin to right column on desktop, FAB bottom sheet on mobile.
 3. **Shadcn UI consistency pass** — EditRecipePage, LoginPage, RegisterPage still use raw inputs.
 4. **User profile / account hub** — public `/@username` pages, edit profile, avatar.
 5. **Recipe ratings & comments** — spoon ratings + comment threads on published recipes.
-6. **Search & discovery brainstorm** — tags, cultural filters, vibe/effort, similar recipes.
-7. **Social login** — Google/Apple OAuth via django-allauth.
+6. **Social login** — Google/Apple OAuth via django-allauth.
 
 See `docs/TODO.md` for full detail on each.
