@@ -9,7 +9,7 @@ import { FilterShelf, type FilterState } from "@/components/FilterShelf";
 import { HotStrip } from "@/components/HotStrip";
 import type { Recipe } from "@/types";
 
-// ─── Grid card (kept from original) ─────────────────────────────────────────
+// ─── Grid card ───────────────────────────────────────────────────────────────
 
 function GridCard({ recipe }: { recipe: Recipe }) {
   const [err, setErr] = useState(false);
@@ -20,7 +20,8 @@ function GridCard({ recipe }: { recipe: Recipe }) {
       to={`/recipes/${recipe.slug}`}
       className="group flex flex-col rounded-xl overflow-hidden border border-border hover:border-foreground/20 hover:shadow-md hover:scale-[1.01] transition-all duration-200 bg-card"
     >
-      <div className="aspect-[4/3] w-full shrink-0 overflow-hidden">
+      {/* Image / placeholder with overlay badges */}
+      <div className="aspect-[4/3] w-full shrink-0 overflow-hidden relative">
         {recipe.image_url && !err ? (
           <img
             src={recipe.image_url}
@@ -35,19 +36,45 @@ function GridCard({ recipe }: { recipe: Recipe }) {
             <span className="text-5xl drop-shadow">{fallback.emoji}</span>
           </div>
         )}
-      </div>
-      <div className="p-3 flex flex-col gap-1.5">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-bold text-sm leading-snug line-clamp-2 flex-1">{recipe.title}</h3>
-          <Badge variant="secondary" className="text-[10px] shrink-0 mt-0.5">
+        {/* Overlay: fork count badge */}
+        {recipe.fork_count > 0 && (
+          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+            🍴 {recipe.fork_count}
+          </div>
+        )}
+        {/* Overlay: category pill */}
+        <div className="absolute bottom-2 left-2">
+          <Badge className="bg-black/50 backdrop-blur-sm text-white border-0 text-[10px]">
             {recipe.category.replace(/_/g, " ")}
           </Badge>
         </div>
+      </div>
+
+      <div className="p-3 flex flex-col gap-1.5">
+        <h3 className="font-bold text-sm leading-snug line-clamp-2">{recipe.title}</h3>
         <p className="text-[11px] text-muted-foreground line-clamp-2">{recipe.description}</p>
+
+        {/* Tags */}
+        {recipe.tags && recipe.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 pt-0.5">
+            {recipe.tags.slice(0, 3).map((tag) => (
+              <span
+                key={tag.slug}
+                className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground"
+              >
+                {tag.name}
+              </span>
+            ))}
+            {recipe.tags.length > 3 && (
+              <span className="text-[10px] text-muted-foreground">+{recipe.tags.length - 3}</span>
+            )}
+          </div>
+        )}
+
         <div className="flex items-center justify-between text-[11px] text-muted-foreground mt-auto pt-1">
           <span>@{recipe.author_username}</span>
-          {recipe.fork_count > 0 && (
-            <span className="text-amber-600 font-semibold">🍴 {recipe.fork_count}</span>
+          {recipe.parent_recipe_slug && (
+            <span className="text-indigo-500 text-[10px]">forked</span>
           )}
         </div>
       </div>
