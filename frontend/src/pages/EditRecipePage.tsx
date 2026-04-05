@@ -4,7 +4,18 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ChevronLeft, Plus, X } from "lucide-react";
 import type { Ingredient, ReviewsResponse } from "@/types";
 import { IngredientEmojiPicker } from "@/components/IngredientEmojiPicker";
 import { ImageUploadField } from "@/components/ImageUploadField";
@@ -113,108 +124,159 @@ export function EditRecipePage() {
       )}
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Edit Recipe</h1>
-        <Badge variant="secondary">{category}</Badge>
+        <h1 className="text-2xl font-bold tracking-tight">Edit Recipe</h1>
+        <Badge variant="secondary" className="px-3 py-1 font-semibold">{category.replace(/_/g, " ")}</Badge>
       </div>
 
-      <input
-        className="w-full border rounded px-3 py-2 text-sm"
-        value={title}
-        onChange={e => setTitle(e.target.value)}
-        placeholder="Title"
-      />
-      <textarea
-        className="w-full border rounded px-3 py-2 text-sm"
-        rows={2}
-        value={description}
-        onChange={e => setDescription(e.target.value)}
-        maxLength={280}
-        placeholder="Description (280 chars)"
-      />
-      <input
-        className="w-full border rounded px-3 py-2 text-sm"
-        value={serves}
-        onChange={e => setServes(e.target.value)}
-        placeholder="Serves"
-      />
-      <ImageUploadField
-        value={imageUrl}
-        onChange={setImageUrl}
-        token={token!}
-      />
+      <div className="space-y-4 pt-2">
+        <div>
+          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-1.5 block">Title</label>
+          <Input
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            placeholder="What are we cooking?"
+            className="text-lg font-semibold h-11"
+          />
+        </div>
 
-      <div>
-        <h3 className="text-sm font-semibold mb-2">Ingredients</h3>
-        {ingredients.map((ing, i) => (
-          <div key={i} className="flex gap-2 mb-2 items-center">
-            <IngredientEmojiPicker
-              value={ing.emoji}
-              ingredientName={ing.name}
-              onChange={v => updateIngredient(i, "emoji", v)}
-            />
-            <input className="border rounded px-2 py-1 text-xs w-14" value={ing.quantity}
-              onChange={e => updateIngredient(i, "quantity", e.target.value)} placeholder="Qty" />
-            <select className="border rounded px-2 py-1 text-xs w-20 bg-white" value={ing.unit}
-              onChange={e => updateIngredient(i, "unit", e.target.value)}>
-              <option value="">— unit</option>
-              <optgroup label="Volume">
-                <option>tsp</option>
-                <option>tbsp</option>
-                <option>cup</option>
-                <option>fl oz</option>
-                <option>ml</option>
-                <option>L</option>
-              </optgroup>
-              <optgroup label="Weight">
-                <option>g</option>
-                <option>kg</option>
-                <option>oz</option>
-                <option>lb</option>
-              </optgroup>
-              <optgroup label="Cooking">
-                <option>pinch</option>
-                <option>clove</option>
-                <option>slice</option>
-                <option>sprig</option>
-                <option>bunch</option>
-                <option>head</option>
-                <option>can</option>
-                <option>pkg</option>
-              </optgroup>
-            </select>
-            <input className="border rounded px-2 py-1 text-xs flex-1" value={ing.name}
-              onChange={e => updateIngredient(i, "name", e.target.value)} placeholder="Name" />
-            <input className="border rounded px-2 py-1 text-xs w-24" value={ing.note}
-              onChange={e => updateIngredient(i, "note", e.target.value)} placeholder="Note" />
-            <button onClick={() => removeIngredient(i)} className="text-xs text-destructive hover:opacity-70">✕</button>
+        <div>
+          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-1.5 block">Description</label>
+          <Textarea
+            rows={2}
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            maxLength={280}
+            placeholder="A short tweet-style description..."
+            className="resize-none"
+          />
+        </div>
+
+        <div className="w-48">
+          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-1.5 block">Serves</label>
+          <Input
+            value={serves}
+            onChange={e => setServes(e.target.value)}
+            placeholder="e.g. 4"
+          />
+        </div>
+
+        <div>
+          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-1.5 block">Recipe Photo</label>
+          <ImageUploadField
+            value={imageUrl}
+            onChange={setImageUrl}
+            token={token!}
+          />
+        </div>
+
+        <div className="pt-4">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Ingredients</h3>
+          <div className="space-y-2">
+            {ingredients.map((ing, i) => (
+              <div key={i} className="flex gap-2 items-center bg-muted/30 p-2 rounded-lg border border-border/40">
+                <IngredientEmojiPicker
+                  value={ing.emoji}
+                  ingredientName={ing.name}
+                  onChange={v => updateIngredient(i, "emoji", v)}
+                />
+                <Input 
+                  className="w-16 h-9" 
+                  value={ing.quantity}
+                  onChange={e => updateIngredient(i, "quantity", e.target.value)} 
+                  placeholder="Qty" 
+                />
+                
+                <Select value={ing.unit} onValueChange={v => updateIngredient(i, "unit", v)}>
+                  <SelectTrigger className="w-24 h-9 bg-white">
+                    <SelectValue placeholder="unit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Volume</SelectLabel>
+                      <SelectItem value="tsp">tsp</SelectItem>
+                      <SelectItem value="tbsp">tbsp</SelectItem>
+                      <SelectItem value="cup">cup</SelectItem>
+                      <SelectItem value="fl oz">fl oz</SelectItem>
+                      <SelectItem value="ml">ml</SelectItem>
+                      <SelectItem value="L">L</SelectItem>
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Weight</SelectLabel>
+                      <SelectItem value="g">g</SelectItem>
+                      <SelectItem value="kg">kg</SelectItem>
+                      <SelectItem value="oz">oz</SelectItem>
+                      <SelectItem value="lb">lb</SelectItem>
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Cooking</SelectLabel>
+                      <SelectItem value="pinch">pinch</SelectItem>
+                      <SelectItem value="clove">clove</SelectItem>
+                      <SelectItem value="slice">slice</SelectItem>
+                      <SelectItem value="sprig">sprig</SelectItem>
+                      <SelectItem value="bunch">bunch</SelectItem>
+                      <SelectItem value="head">head</SelectItem>
+                      <SelectItem value="can">can</SelectItem>
+                      <SelectItem value="pkg">pkg</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+
+                <Input 
+                  className="flex-1 h-9" 
+                  value={ing.name}
+                  onChange={e => updateIngredient(i, "name", e.target.value)} 
+                  placeholder="Ingredient name" 
+                />
+                <Input 
+                  className="w-32 h-9" 
+                  value={ing.note}
+                  onChange={e => updateIngredient(i, "note", e.target.value)} 
+                  placeholder="Note" 
+                />
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => removeIngredient(i)} 
+                  className="size-8 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-full"
+                >
+                  <X className="size-4" />
+                </Button>
+              </div>
+            ))}
           </div>
-        ))}
-        <Button variant="outline" size="sm" onClick={addIngredient}>+ Add ingredient</Button>
+          <Button variant="outline" size="sm" onClick={addIngredient} className="mt-3 border-dashed w-full gap-2 text-muted-foreground hover:text-foreground">
+            <Plus className="size-3.5" /> Add ingredient
+          </Button>
+        </div>
+
+        <div className="pt-4">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Instructions</h3>
+          <Textarea
+            className="w-full font-mono min-h-[200px]"
+            value={instructions}
+            onChange={e => setInstructions(e.target.value)}
+            placeholder="1. Start by... \n2. Then..."
+          />
+        </div>
+
+        <div className="pt-4">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Notes (optional)</h3>
+          <Textarea
+            className="w-full font-mono min-h-[100px]"
+            value={notes}
+            onChange={e => setNotes(e.target.value)}
+            placeholder="Optional tips, variations, or serving suggestions..."
+          />
+        </div>
       </div>
 
-      <div>
-        <h3 className="text-sm font-semibold mb-2">Instructions</h3>
-        <textarea
-          className="w-full border rounded px-3 py-2 text-sm font-mono"
-          rows={8}
-          value={instructions}
-          onChange={e => setInstructions(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <h3 className="text-sm font-semibold mb-2">Notes (optional)</h3>
-        <textarea
-          className="w-full border rounded px-3 py-2 text-sm font-mono"
-          rows={3}
-          value={notes}
-          onChange={e => setNotes(e.target.value)}
-        />
-      </div>
-
-      <div className="flex gap-3 pt-2">
-        <Button onClick={submit} className="flex-1">Save changes</Button>
-        <Button variant="outline" onClick={() => navigate(`/recipes/${slug}`)}>Cancel</Button>
+      <div className="flex gap-3 pt-6">
+        <Button onClick={submit} className="flex-1 h-11 bg-saffron hover:bg-saffron-dark text-white border-0 font-bold text-base shadow-lg shadow-saffron/20 transition-all">
+          Save changes
+        </Button>
+        <Button variant="outline" onClick={() => navigate(`/recipes/${slug}`)} className="h-11 px-8 rounded-xl">
+          Cancel
+        </Button>
       </div>
     </div>
   );

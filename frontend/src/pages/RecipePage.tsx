@@ -1,15 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import { motion, AnimatePresence } from "framer-motion";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { IngredientChecklist } from "@/components/IngredientChecklist";
 import { ForkModal } from "@/components/ForkModal";
 import { ShareModal } from "@/components/ShareModal";
 import { PublishModal } from "@/components/PublishModal";
-import { ChevronLeft, Camera } from "lucide-react";
+import { CookModeIngredients } from "@/components/CookModeIngredients";
+import { ChevronLeft, Camera, Clock } from "lucide-react";
 import { getCategoryFallback } from "@/lib/categoryFallback";
 import type { Ingredient, Recipe, Book, PublishGate } from "@/types";
 import { BuyNowSheet } from "@/components/BuyNowSheet";
@@ -303,14 +312,18 @@ export function RecipePage() {
 
                     {books.length > 0 ? (
                       <div className="flex items-center gap-2">
-                        <select
-                          className="border border-indigo-100 rounded px-2 py-1 text-sm bg-white/50 text-indigo-900 focus:outline-none"
-                          defaultValue=""
-                          onChange={e => { if (e.target.value) addToBook(Number(e.target.value)); e.target.value = ""; }}
-                        >
-                          <option value="" disabled>Add to book…</option>
-                          {books.map(b => <option key={b.id} value={b.id}>{b.title}</option>)}
-                        </select>
+                        <Select onValueChange={(value) => { if (value) addToBook(Number(value)); }}>
+                          <SelectTrigger className="w-[140px] h-9 bg-white/50 border-indigo-100 text-indigo-900 focus:ring-indigo-100">
+                            <SelectValue placeholder="Add to book…" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {books.map(b => (
+                              <SelectItem key={b.id} value={b.id.toString()}>
+                                {b.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         {saveMsg && <span className="text-sm font-medium text-indigo-600 animate-in fade-in slide-in-from-left-1">{saveMsg}</span>}
                       </div>
                     ) : (
@@ -457,8 +470,28 @@ export function RecipePage() {
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-8 space-y-6">
 
+            {/* Cook Mode Sticky Ingredients (Desktop only) */}
+            <AnimatePresence>
+              {cookNow.active && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0, marginBottom: 0 }}
+                  animate={{ height: "auto", opacity: 1, marginBottom: 24 }}
+                  exit={{ height: 0, opacity: 0, marginBottom: 0 }}
+                  className="rounded-xl border-2 border-amber-200 bg-amber-50/30 p-5 shadow-sm overflow-hidden"
+                >
+                  <IngredientChecklist
+                    ingredients={recipe.ingredients}
+                    inList={inList}
+                    onAddToList={token ? addToList : undefined}
+                    onBuyNow={setBuyNowIngredients}
+                    addBtnRef={addBtnRef}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* About this recipe */}
-            <div className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
+            <div className={`rounded-xl border border-border/60 bg-card p-5 space-y-4 transition-opacity duration-300 ${cookNow.active ? "opacity-40" : ""}`}>
               <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">About</h2>
               <p className="text-sm leading-relaxed text-muted-foreground">{recipe.description}</p>
 
@@ -472,7 +505,7 @@ export function RecipePage() {
                 )}
                 {/* Cook time — placeholder for future field */}
                 <div className="flex items-center gap-1.5 rounded-full border border-dashed border-border/40 bg-muted/20 px-3 py-1.5 text-xs text-muted-foreground/50 italic">
-                  <span>⏱️</span>
+                  <Clock className="w-3.5 h-3.5" />
                   <span>Cook time TBD</span>
                 </div>
               </div>
@@ -480,7 +513,7 @@ export function RecipePage() {
 
             {/* Notes */}
             {recipe.notes && (
-              <div className="rounded-xl bg-accent/40 border border-accent p-5">
+              <div className={`rounded-xl bg-accent/40 border border-accent p-5 transition-opacity duration-300 ${cookNow.active ? "opacity-40" : ""}`}>
                 <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">Notes</h2>
                 <div className="prose prose-sm prose-stone max-w-none dark:prose-invert prose-p:leading-relaxed">
                   <ReactMarkdown>{recipe.notes}</ReactMarkdown>
@@ -491,6 +524,16 @@ export function RecipePage() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Sticky Ingredients (FAB + Bottom Sheet) */}
+      <CookModeIngredients
+        ingredients={recipe.ingredients}
+        inList={inList}
+        onAddToList={token ? addToList : undefined}
+        onBuyNow={setBuyNowIngredients}
+        addBtnRef={addBtnRef}
+        active={cookNow.active}
+      />
 
       {/* Modals */}
       {publishModalOpen && recipe && (

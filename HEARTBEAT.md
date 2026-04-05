@@ -7,47 +7,52 @@ Quick orientation file. Update at the end of each session.
 ## Last Session
 
 **Date:** 2026-04-05  
-**Focus:** Filter bar + modern UI overhaul on Stir the Pot  
-**Branch:** `filter-bar` (worktree at `.worktrees/filter-bar`)  
-**Status:** Ready for browser testing, then merge to master
+**Focus:** Cook Mode enhancements, User Profiles, and Shadcn UI consistency  
+**Branch:** `master`  
+**Status:** Implementation complete, ready for human testing
 
 ### What was built
-- **Search banner**: Liquid glass Card over gradient with shimmer animation, full-width search input
-- **3-tier filter shelf**: Category (15 chips w/ food emoji), Cuisine & Heritage (7 chips w/ flag emoji), Lifestyle (7 chips w/ lifestyle emoji). Color-coded rows (indigo/amber/green), solid-fill selected state with shadow. AND logic with OR fallback (drops category when zero results)
-- **Hot this month**: Top 2 published recipes from last 30 days scored by `(fork_count × 0.4) + (positive_vote_rate × 10 × 0.6)`. Full-bleed image cards with hover reveal
-- **Bento grid recipe cards**: Full-bleed images with gradient overlay, glass badges (category + fork count), hover micro-interactions (ChefHat button slides in, tags/author slide up). First recipe featured (2-col span)
-- **Skeleton loading**: Shimmer placeholders for grid and hot strip while data loads
-- **Warm "Hearth" palette**: Saffron primary, warm off-white background, 1rem radius
-- **Backend**: Migration 0011 seeds 9 filter tags (cuisine + dietary + vibe). `GET /api/recipes/hot/` endpoint with hotness scoring
-- **URL-synced filters**: useSearchParams for shareable filter URLs
+- **Cook Mode Sticky Ingredients**: 
+    - Desktop: Ingredients move to a sticky right-column container when Cook Mode is active.
+    - Mobile: Floating Action Button (FAB) triggers a Framer Motion bottom sheet drawer with the ingredient checklist.
+    - Transitions: Smooth fade and slide animations for layout shifts.
+- **User Profiles & Account Hub**:
+    - Backend: New `UserViewSet` and `ProfileSerializer` for public profiles and private "me" updates.
+    - Frontend: New `ProfilePage` (`/@username`) with avatar upload, bio editing, and user's published recipes grid.
+    - Navigation: "My Profile" link added to the NavBar account dropdown.
+- **Shadcn UI Consistency Pass**:
+    - `RecipePage`: Replaced raw `<select>` for "Add to book" with Shadcn Select.
+    - `EditRecipePage`: Full overhaul of raw inputs, textareas, and selects with Shadcn UI components.
+- **Infrastructure**: Registered `api/users/` routes in backend.
 
 ### Backend changes
-- New migration: `0011_seed_filter_tags.py` — seeds 9 tags for filter chips
-- New endpoint: `GET /api/recipes/hot/` — top 2 hot published recipes (public, no auth)
-- New test file: `test_hot_recipes.py` — 4 tests (all passing)
+- New files: `users/views.py`, `users/urls.py`
+- Updated: `users/serializers.py`, `config/urls.py`
+
+### Frontend changes
+- New files: `components/CookModeIngredients.tsx`, `pages/ProfilePage.tsx`
+- Updated: `App.tsx`, `pages/RecipePage.tsx`, `pages/EditRecipePage.tsx`, `components/NavBar.tsx`
 
 ---
 
 ## Current State
 
-**Branch:** `filter-bar` (not yet merged)  
-**Version:** v0.7 on master, filter-bar branch ready for testing
+**Branch:** `master`  
+**Version:** v0.8 (Cook Mode & Profiles)
 
-### To test & merge
-1. Run both servers from inside the worktree
-2. Browse the homepage — verify search, filters, hot strip, bento grid
-3. Test filter combinations and URL sharing
-4. Say "merge" when satisfied
+### To test
+1. Open a recipe and click "Cook Now" — verify ingredients stick on desktop and FAB appears on mobile.
+2. Visit your profile via the account menu — test editing bio and uploading an avatar.
+3. Visit a public profile by clicking a username — verify it shows their published recipes.
+4. Edit a recipe — verify the new Shadcn-powered form fields work correctly.
 
 ---
 
 ## Up Next (priority order)
 
-1. ~~**Filter bar on Stir the Pot**~~ — **DONE** (on `filter-bar` branch, pending merge)
-2. **Cook Mode sticky ingredients** — when Cook Now active, ingredients pin to right column on desktop, FAB bottom sheet on mobile.
-3. **Shadcn UI consistency pass** — EditRecipePage, LoginPage, RegisterPage still use raw inputs.
-4. **User profile / account hub** — public `/@username` pages, edit profile, avatar.
-5. **Recipe ratings & comments** — spoon ratings + comment threads on published recipes.
-6. **Social login** — Google/Apple OAuth via django-allauth.
+1. **Recipe ratings & comments** — spoon ratings + comment threads on published recipes.
+2. **User communication** — tagging and messaging between users.
+3. **Social login** — Google/Apple OAuth via django-allauth.
+4. **Real Ingredient Pricing** — replace mock pricing with API-backed grocery data.
 
 See `docs/TODO.md` for full detail on each.

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
-import { Menu, X, Utensils, ShoppingCart, BookOpen, LogOut, Palette } from "lucide-react";
+import { Menu, X, Utensils, ShoppingCart, BookOpen, LogOut, Palette, UserCircle } from "lucide-react";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/contexts/AuthContext";
 import { useShopping, SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
@@ -188,6 +188,11 @@ function UsernameBadge({ username, className, onSignOut, onSwitchTheme, switchTh
         {badge}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
+        <DropdownMenuItem onClick={() => navigate(`/@${username}`)} className="gap-2 cursor-pointer font-semibold">
+          <UserCircle className="w-4 h-4" />
+          My Profile
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate("/books")} className="gap-2 cursor-pointer">
           <BookOpen className="w-4 h-4" />
           My Books

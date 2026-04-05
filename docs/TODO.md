@@ -71,6 +71,7 @@ Published recipes should have a community rating system and comment threads.
 - Use spoons (🥄) instead of stars — fits the Spoonfury brand
 - 1–5 spoon rating, average displayed on recipe cards and recipe page
 - Comment threads on published recipes — top-level comments + replies
+- **Data Retention**: Reviews and votes from the "Community Review Gate" phase MUST be retained and visible even after a recipe is upgraded to "Published".
 - Needs backend models: `RecipeRating`, `RecipeComment`
 - Comment attribution by username, timestamp, optional edit/delete by author
 

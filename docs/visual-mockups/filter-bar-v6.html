@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Filter Bar v6 — Spoonfury</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f8fafc; color: #0f172a; }
+
+  .nav { background: #0f172a; color: white; padding: 10px 24px; font-size: 13px; font-weight: 700; letter-spacing: .04em; display: flex; align-items: center; gap: 12px; }
+  .nav-logo { font-size: 15px; }
+  .nav-links { display: flex; gap: 16px; font-size: 12px; font-weight: 500; opacity: .6; }
+
+  .page { max-width: 960px; margin: 0 auto; padding: 28px 20px 48px; }
+
+  /* ── Hero banner ── */
+  .hero-banner {
+    background: linear-gradient(135deg, #312e81 0%, #4f46e5 40%, #7c3aed 100%);
+    border-radius: 20px 20px 0 0;
+    padding: 36px 36px 30px;
+    position: relative; overflow: hidden;
+  }
+  .hero-banner::before {
+    content: "🍳 🥗 🍕 🍝 🥩 🍜 🥣 🍰 🍹 🥪";
+    position: absolute; top: 12px; right: -10px;
+    font-size: 22px; letter-spacing: 6px; opacity: .18; white-space: nowrap; pointer-events: none;
+  }
+  .hero-banner h1 { color: white; font-size: 26px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px; }
+  .hero-banner p { color: rgba(255,255,255,.6); font-size: 13px; margin-bottom: 20px; }
+  .search-wrap { position: relative; }
+  .search-input {
+    width: 100%; padding: 13px 48px 13px 18px;
+    border-radius: 12px; border: none; font-size: 14px;
+    background: rgba(255,255,255,.13); color: white; outline: none;
+  }
+  .search-input::placeholder { color: rgba(255,255,255,.45); }
+  .search-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,.45); font-size: 15px; }
+
+  /* ── Filter shelf ── */
+  .filter-shelf {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    margin-bottom: 20px;
+    border-radius: 0 0 16px 16px;
+    overflow: hidden;
+  }
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    padding: 10px 16px;
+  }
+  .filter-row + .filter-row {
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .filter-group-label {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: #cbd5e1;
+    width: 100%;
+    margin-bottom: -2px;
+  }
+
+  /* base chip */
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11.5px; font-weight: 600; padding: 4px 12px;
+    border-radius: 99px; cursor: pointer; border: 1.5px solid transparent; white-space: nowrap;
+    transition: all .12s;
+  }
+
+  /* Category — indigo */
+  .chip.cat        { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+  .chip.cat.active { background: #6366f1; color: white; border-color: #6366f1; }
+
+  /* Cuisine — amber */
+  .chip.cuisine        { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+  .chip.cuisine.active { background: #f59e0b; color: white; border-color: #f59e0b; }
+
+  /* Lifestyle — green */
+  .chip.life        { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+  .chip.life.active { background: #22c55e; color: white; border-color: #22c55e; }
+
+  /* ── Filter action row ── */
+  .filter-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px 12px;
+    border-top: 1px solid #f1f5f9;
+    background: #fafafa;
+  }
+  .active-summary {
+    font-size: 11px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .active-tag {
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 99px;
+    border: 1px solid #e2e8f0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .active-tag .x { color: #94a3b8; font-size: 9px; cursor: pointer; }
+  .btn-search {
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 22px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .btn-clear {
+    font-size: 11px;
+    color: #94a3b8;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-right: 10px;
+  }
+
+  /* ── Section headers ── */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .section-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #0f172a; }
+  .sort-select {
+    font-size: 12px; color: #6366f1; font-weight: 600;
+    background: none; border: 1px solid #c7d2fe; border-radius: 6px; padding: 3px 10px; cursor: pointer;
+  }
+
+  /* ── Hot Recipes strip ── */
+  .hot-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .hot-card { background: white; border: 1px solid #fde68a; border-radius: 12px; overflow: hidden; display: flex; align-items: stretch; }
+  .hot-thumb { width: 80px; min-width: 80px; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+  .hot-body { padding: 11px 14px 12px; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .hot-title { font-size: 13px; font-weight: 700; line-height: 1.3; }
+  .hot-meta { font-size: 10px; color: #94a3b8; display: flex; gap: 8px; }
+  .hot-desc { font-size: 11px; color: #94a3b8; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* ── Recipe grid ── */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .recipe-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+  .recipe-thumb { height: 110px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+  .recipe-meta { padding: 10px 12px; }
+  .recipe-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .recipe-sub { font-size: 11px; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <span class="nav-logo">🥄 Spoonfury</span>
+  <span class="nav-links"><span>Stir the Pot</span><span>My Books</span><span>Shopping</span></span>
+</div>
+
+<div class="page">
+
+  <div class="hero-banner">
+    <h1>What will you cook today?</h1>
+    <p>Explore recipes from our community kitchen</p>
+    <div class="search-wrap">
+      <input class="search-input" type="text" placeholder="Search recipes, ingredients, vibes…" />
+      <span class="search-icon">🔍</span>
+    </div>
+  </div>
+
+  <div class="filter-shelf">
+
+    <!-- Row 1: Category -->
+    <div class="filter-row">
+      <span class="filter-group-label">Category</span>
+      <span class="chip cat">All</span>
+      <span class="chip cat">🍔 Burger</span>
+      <span class="chip cat active">🍕 Pizza</span>
+      <span class="chip cat">🍲 Soup</span>
+      <span class="chip cat">🥗 Salad</span>
+      <span class="chip cat">🍝 Pasta</span>
+      <span class="chip cat">🥩 Meat &amp; Seafood</span>
+      <span class="chip cat">🥣 Bowl</span>
+      <span class="chip cat">🍞 Casserole</span>
+      <span class="chip cat">🥦 Side Dish</span>
+      <span class="chip cat">🫙 Sauce</span>
+      <span class="chip cat">🍳 Breakfast</span>
+      <span class="chip cat">🍰 Dessert</span>
+      <span class="chip cat">🍹 Drink</span>
+      <span class="chip cat">🍿 Snack</span>
+      <span class="chip cat">🍽️ Other</span>
+    </div>
+
+    <!-- Row 2: Cuisine & Heritage -->
+    <div class="filter-row">
+      <span class="filter-group-label">Cuisine &amp; Heritage</span>
+      <span class="chip cuisine">All</span>
+      <span class="chip cuisine">🇺🇸 American</span>
+      <span class="chip cuisine active">🇮🇹 Italian</span>
+      <span class="chip cuisine">🇲🇽 Mexican</span>
+      <span class="chip cuisine">🥢 Asian</span>
+      <span class="chip cuisine">🥐 European &amp; Iberian</span>
+      <span class="chip cuisine">🫒 Mediterranean</span>
+      <span class="chip cuisine">🌴 Latin American</span>
+    </div>
+
+    <!-- Row 3: Lifestyle -->
+    <div class="filter-row">
+      <span class="filter-group-label">Lifestyle &amp; Constraints</span>
+      <span class="chip life">All</span>
+      <span class="chip life">⚡ Quick &amp; Easy</span>
+      <span class="chip life">🌿 Vegetarian / Vegan</span>
+      <span class="chip life">💪 Health &amp; Fitness</span>
+      <span class="chip life active">🏠 Weeknight Staples</span>
+      <span class="chip life">🌾 Gluten-Free / Dairy-Free</span>
+      <span class="chip life">🥩 High Protein / Keto</span>
+      <span class="chip life">📦 Meal Prep / Freezer</span>
+    </div>
+
+    <!-- Action row -->
+    <div class="filter-action">
+      <div class="active-summary">
+        <span style="color:#cbd5e1;font-size:11px;">Filtering by:</span>
+        <span class="active-tag">🍕 Pizza <span class="x">✕</span></span>
+        <span class="active-tag">🇮🇹 Italian <span class="x">✕</span></span>
+        <span class="active-tag">🏠 Weeknight <span class="x">✕</span></span>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <button class="btn-clear">Clear all</button>
+        <button class="btn-search">Search Recipes</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Hot this month -->
+  <div class="section-header">
+    <div class="section-title"><span>🔥</span> Hot this month</div>
+  </div>
+  <div class="hot-strip">
+    <div class="hot-card">
+      <div class="hot-thumb" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">🍝</div>
+      <div class="hot-body">
+        <div class="hot-title">Spicy Rigatoni alla Vodka</div>
+        <div class="hot-meta"><span>@chef_marco</span><span>🍴 14</span><span>👍 92%</span></div>
+        <div class="hot-desc">A silky, fiery vodka sauce clings to every ridge of the rigatoni. Quick enough for a weeknight, impressive enough to share.</div>
+      </div>
+    </div>
+    <div class="hot-card">
+      <div class="hot-thumb" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">🥩</div>
+      <div class="hot-body">
+        <div class="hot-title">Slow-Smoked Brisket Flat</div>
+        <div class="hot-meta"><span>@pitmaster_k</span><span>🍴 9</span><span>👍 88%</span></div>
+        <div class="hot-desc">12 hours over oak wood. A bark that cracks, a smoke ring that earns respect. Patient cooking for a patient weekend.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Recipes -->
+  <div class="section-header">
+    <div class="section-title">All Recipes</div>
+    <select class="sort-select">
+      <option>Sort: Newest</option>
+      <option>Most Forked</option>
+      <option>A–Z</option>
+    </select>
+  </div>
+  <div class="grid">
+    <div class="recipe-card">
+      <div class="recipe-thumb" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">🍝</div>
+      <div class="recipe-meta"><div class="recipe-title">Spicy Rigatoni alla Vodka</div><div class="recipe-sub">by @chef_marco · 🍴 14</div></div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-thumb" style="background:linear-gradient(135deg,#10b981,#059669)">🥗</div>
+      <div class="recipe-meta"><div class="recipe-title">Grilled Peach Arugula Salad</div><div class="recipe-sub">by @summer_kitchen · 🍴 8</div></div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-thumb" style="background:linear-gradient(135deg,#f97316,#dc2626)">🍕</div>
+      <div class="recipe-meta"><div class="recipe-title">Detroit Deep Dish</div><div class="recipe-sub">by @pizza_labs · 🍴 22</div></div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-thumb" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">🍜</div>
+      <div class="recipe-meta"><div class="recipe-title">Miso Ramen Tonkotsu Style</div><div class="recipe-sub">by @ramen.go · 🍴 31</div></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

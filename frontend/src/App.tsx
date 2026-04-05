@@ -13,6 +13,7 @@ import { HomePage } from "@/pages/HomePage";
 import { ShoppingListPage } from "@/pages/ShoppingListPage";
 import { MyKitchenPage } from "@/pages/MyKitchenPage";
 import { ModerationPage } from "@/pages/ModerationPage";
+import { ProfilePage } from "@/pages/ProfilePage";
 import { NavBar } from "@/components/NavBar";
 
 export default function App() {
@@ -36,6 +37,7 @@ export default function App() {
                 <Route path="/shopping-list" element={<ShoppingListPage />} />
                 <Route path="/kitchen" element={<MyKitchenPage />} />
                 <Route path="/moderation" element={<ModerationPage />} />
+                <Route path="/@:username" element={<ProfilePage />} />
               </Routes>
             </main>
           </BrowserRouter>
