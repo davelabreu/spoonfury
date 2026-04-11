@@ -122,6 +122,26 @@ function sortRecipes(recipes: Recipe[], mode: SortMode): Recipe[] {
   }
 }
 
+function SortTabs({ active, onChange }: { active: SortMode; onChange: (m: SortMode) => void }) {
+  return (
+    <div className="flex gap-3 border-b border-muted overflow-x-auto">
+      {SORT_TABS.map(tab => (
+        <button
+          key={tab.key}
+          onClick={() => onChange(tab.key)}
+          className={`text-[10px] pb-1 whitespace-nowrap transition-colors ${
+            active === tab.key
+              ? "font-semibold text-foreground border-b-2 border-foreground -mb-px"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 /** Card for a single recipe in the kitchen or published section. */
 function RecipeCard({ recipe, showGate }: { recipe: Recipe; showGate?: boolean }) {
   const gate = getPublishGate(recipe);
@@ -195,6 +215,8 @@ export function MyKitchenPage() {
   const [inviteUsername, setInviteUsername] = useState("");
   const [inviteMsg, setInviteMsg] = useState("");
   const [activeTab, setActiveTab] = useState<"recipes" | "planner">("recipes");
+  const [draftSort, setDraftSort] = useState<SortMode>("newest");
+  const [publishedSort, setPublishedSort] = useState<SortMode>("newest");
 
   useEffect(() => {
     if (!token) return;
@@ -219,6 +241,11 @@ export function MyKitchenPage() {
   const inReview = myRecipes.filter(r => r.status === "in_review");
   const inModeration = myRecipes.filter(r => r.status === "mod_queue");
   const published = myRecipes.filter(r => r.status === "published");
+
+  const sortedDrafts = sortRecipes(drafts, draftSort);
+  const sortedInReview = sortRecipes(inReview, draftSort);
+  const sortedInModeration = sortRecipes(inModeration, draftSort);
+  const sortedPublished = sortRecipes(published, publishedSort);
 
   const handleInvite = async () => {
     if (!inviteUsername.trim() || !username) return;
@@ -286,6 +313,9 @@ export function MyKitchenPage() {
               <h2 className="text-xl font-bold">🧪 Test Kitchen</h2>
               <Badge variant="outline" className="font-mono">{drafts.length} draft{drafts.length !== 1 ? "s" : ""}</Badge>
             </div>
+            <div className="mb-3">
+              <SortTabs active={draftSort} onChange={setDraftSort} />
+            </div>
 
             {drafts.length === 0 ? (
               <div className="p-8 text-center bg-muted/20 rounded-xl border border-dashed">
@@ -296,7 +326,7 @@ export function MyKitchenPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {drafts.map(r => (
+                {sortedDrafts.map(r => (
                   <RecipeCard key={r.slug} recipe={r} showGate />
                 ))}
               </div>
@@ -336,7 +366,7 @@ export function MyKitchenPage() {
                 <Badge variant="outline" className="font-mono">{inReview.length}</Badge>
               </div>
               <div className="space-y-3">
-                {inReview.map(r => (
+                {sortedInReview.map(r => (
                   <RecipeCard key={r.slug} recipe={r} />
                 ))}
               </div>
@@ -352,7 +382,7 @@ export function MyKitchenPage() {
                 <Badge variant="outline" className="font-mono">{inModeration.length}</Badge>
               </div>
               <div className="space-y-3">
-                {inModeration.map(r => (
+                {sortedInModeration.map(r => (
                   <RecipeCard key={r.slug} recipe={r} />
                 ))}
               </div>
@@ -367,6 +397,9 @@ export function MyKitchenPage() {
               <h2 className="text-xl font-bold">✅ Published</h2>
               <Badge variant="outline" className="font-mono">{published.length} recipe{published.length !== 1 ? "s" : ""}</Badge>
             </div>
+            <div className="mb-3">
+              <SortTabs active={publishedSort} onChange={setPublishedSort} />
+            </div>
 
             {published.length === 0 ? (
               <div className="p-8 text-center bg-muted/20 rounded-xl border border-dashed">
@@ -376,7 +409,7 @@ export function MyKitchenPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {published.map(r => (
+                {sortedPublished.map(r => (
                   <RecipeCard key={r.slug} recipe={r} />
                 ))}
               </div>
