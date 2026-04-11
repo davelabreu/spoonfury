@@ -9,6 +9,7 @@
  */
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { LayoutGrid, List } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
@@ -142,6 +143,63 @@ function SortTabs({ active, onChange }: { active: SortMode; onChange: (m: SortMo
   );
 }
 
+type ViewMode = "card" | "compact";
+
+function ViewToggle({ active, onChange }: { active: ViewMode; onChange: (m: ViewMode) => void }) {
+  return (
+    <div className="flex items-center gap-0.5 bg-muted rounded-md p-0.5">
+      <button
+        onClick={() => onChange("card")}
+        className={`p-1 rounded transition-all ${
+          active === "card"
+            ? "bg-background shadow-sm text-foreground"
+            : "text-muted-foreground hover:text-foreground"
+        }`}
+        title="Card view"
+      >
+        <LayoutGrid className="h-3.5 w-3.5" />
+      </button>
+      <button
+        onClick={() => onChange("compact")}
+        className={`p-1 rounded transition-all ${
+          active === "compact"
+            ? "bg-background shadow-sm text-foreground"
+            : "text-muted-foreground hover:text-foreground"
+        }`}
+        title="Compact view"
+      >
+        <List className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+}
+
+function CompactRow({ recipe, showGate }: { recipe: Recipe; showGate?: boolean }) {
+  const gate = showGate ? getPublishGate(recipe) : null;
+  const gateCount = gate ? Object.values(gate).filter(Boolean).length : null;
+  const fallback = getCategoryFallback(recipe.category);
+
+  return (
+    <Link
+      to={`/recipes/${recipe.slug}`}
+      className="flex items-center gap-2.5 px-3 py-2 bg-background hover:bg-accent transition-colors"
+    >
+      <span className="text-sm w-5 text-center shrink-0">{fallback.emoji}</span>
+      <span className="text-xs font-semibold flex-1 truncate">{recipe.title}</span>
+      {recipe.fork_count > 0 && (
+        <span className="text-[9px] text-amber-600 shrink-0">🍴 {recipe.fork_count}</span>
+      )}
+      <span className="text-[9px] px-1.5 py-0.5 bg-muted rounded-full text-muted-foreground shrink-0 hidden sm:inline">
+        {recipe.category.replace(/_/g, " ").split(" ")[0]}
+      </span>
+      <StatusBadge status={recipe.status} />
+      {gateCount !== null && (
+        <span className="text-[9px] text-muted-foreground shrink-0">{gateCount}/4</span>
+      )}
+    </Link>
+  );
+}
+
 /** Card for a single recipe in the kitchen or published section. */
 function RecipeCard({ recipe, showGate }: { recipe: Recipe; showGate?: boolean }) {
   const gate = getPublishGate(recipe);
@@ -217,6 +275,8 @@ export function MyKitchenPage() {
   const [activeTab, setActiveTab] = useState<"recipes" | "planner">("recipes");
   const [draftSort, setDraftSort] = useState<SortMode>("newest");
   const [publishedSort, setPublishedSort] = useState<SortMode>("newest");
+  const [draftView, setDraftView] = useState<ViewMode>("card");
+  const [publishedView, setPublishedView] = useState<ViewMode>("card");
 
   useEffect(() => {
     if (!token) return;
@@ -309,9 +369,12 @@ export function MyKitchenPage() {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-1 duration-500">
           {/* Test Kitchen Section */}
           <section>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-2">
               <h2 className="text-xl font-bold">🧪 Test Kitchen</h2>
               <Badge variant="outline" className="font-mono">{drafts.length} draft{drafts.length !== 1 ? "s" : ""}</Badge>
+              <div className="ml-auto flex items-center gap-2">
+                <ViewToggle active={draftView} onChange={setDraftView} />
+              </div>
             </div>
             <div className="mb-3">
               <SortTabs active={draftSort} onChange={setDraftSort} />
@@ -324,10 +387,16 @@ export function MyKitchenPage() {
                   <Link to="/recipes/new" className="text-primary hover:underline font-medium">Create one</Link> to get started.
                 </p>
               </div>
-            ) : (
+            ) : draftView === "card" ? (
               <div className="space-y-3">
                 {sortedDrafts.map(r => (
                   <RecipeCard key={r.slug} recipe={r} showGate />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-px bg-muted rounded-lg overflow-hidden">
+                {sortedDrafts.map(r => (
+                  <CompactRow key={r.slug} recipe={r} showGate />
                 ))}
               </div>
             )}
@@ -365,11 +434,19 @@ export function MyKitchenPage() {
                 <h2 className="text-xl font-bold">🔍 In Review</h2>
                 <Badge variant="outline" className="font-mono">{inReview.length}</Badge>
               </div>
-              <div className="space-y-3">
-                {sortedInReview.map(r => (
-                  <RecipeCard key={r.slug} recipe={r} />
-                ))}
-              </div>
+              {draftView === "card" ? (
+                <div className="space-y-3">
+                  {sortedInReview.map(r => (
+                    <RecipeCard key={r.slug} recipe={r} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-px bg-muted rounded-lg overflow-hidden">
+                  {sortedInReview.map(r => (
+                    <CompactRow key={r.slug} recipe={r} />
+                  ))}
+                </div>
+              )}
             </section>
           )}
 
@@ -381,11 +458,19 @@ export function MyKitchenPage() {
                 <h2 className="text-xl font-bold">⏳ In Moderation</h2>
                 <Badge variant="outline" className="font-mono">{inModeration.length}</Badge>
               </div>
-              <div className="space-y-3">
-                {sortedInModeration.map(r => (
-                  <RecipeCard key={r.slug} recipe={r} />
-                ))}
-              </div>
+              {draftView === "card" ? (
+                <div className="space-y-3">
+                  {sortedInModeration.map(r => (
+                    <RecipeCard key={r.slug} recipe={r} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-px bg-muted rounded-lg overflow-hidden">
+                  {sortedInModeration.map(r => (
+                    <CompactRow key={r.slug} recipe={r} />
+                  ))}
+                </div>
+              )}
             </section>
           )}
 
@@ -393,9 +478,12 @@ export function MyKitchenPage() {
 
           {/* Published Section */}
           <section>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-2">
               <h2 className="text-xl font-bold">✅ Published</h2>
               <Badge variant="outline" className="font-mono">{published.length} recipe{published.length !== 1 ? "s" : ""}</Badge>
+              <div className="ml-auto">
+                <ViewToggle active={publishedView} onChange={setPublishedView} />
+              </div>
             </div>
             <div className="mb-3">
               <SortTabs active={publishedSort} onChange={setPublishedSort} />
@@ -407,10 +495,16 @@ export function MyKitchenPage() {
                   No published recipes yet. Perfect a recipe in your test kitchen to publish it!
                 </p>
               </div>
-            ) : (
+            ) : publishedView === "card" ? (
               <div className="space-y-3">
                 {sortedPublished.map(r => (
                   <RecipeCard key={r.slug} recipe={r} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-px bg-muted rounded-lg overflow-hidden">
+                {sortedPublished.map(r => (
+                  <CompactRow key={r.slug} recipe={r} />
                 ))}
               </div>
             )}
