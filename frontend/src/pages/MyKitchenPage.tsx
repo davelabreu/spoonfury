@@ -277,6 +277,7 @@ export function MyKitchenPage() {
   const [publishedSort, setPublishedSort] = useState<SortMode>("newest");
   const [draftView, setDraftView] = useState<ViewMode>("card");
   const [publishedView, setPublishedView] = useState<ViewMode>("card");
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -373,9 +374,49 @@ export function MyKitchenPage() {
               <h2 className="text-xl font-bold">🧪 Test Kitchen</h2>
               <Badge variant="outline" className="font-mono">{drafts.length} draft{drafts.length !== 1 ? "s" : ""}</Badge>
               <div className="ml-auto flex items-center gap-2">
+                <button
+                  onClick={() => setInviteOpen(o => !o)}
+                  className={`text-[10px] px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 ${
+                    inviteOpen
+                      ? "bg-purple-100 text-purple-800 border border-purple-300"
+                      : "bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100"
+                  }`}
+                >
+                  <span>💌</span>
+                  <span className="hidden sm:inline">Invite a friend</span>
+                </button>
                 <ViewToggle active={draftView} onChange={setDraftView} />
               </div>
             </div>
+            {inviteOpen && (
+              <div className="animate-in fade-in slide-in-from-top-1 duration-300 p-3 bg-purple-50/50 border border-purple-100 rounded-lg mb-3">
+                <p className="text-[11px] text-purple-700 mb-2">
+                  Invite someone to peek behind the curtain — they'll see your experiments before anyone else.
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    className="bg-background border border-purple-200 rounded-lg px-3 py-1.5 text-sm flex-1 focus:ring-2 focus:ring-purple-200 outline-none transition-all"
+                    placeholder="Enter their username..."
+                    value={inviteUsername}
+                    onChange={e => setInviteUsername(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && handleInvite()}
+                  />
+                  <Button
+                    size="sm"
+                    onClick={handleInvite}
+                    disabled={!inviteUsername.trim()}
+                    className="rounded-lg bg-purple-600 hover:bg-purple-700"
+                  >
+                    Send
+                  </Button>
+                </div>
+                {inviteMsg && (
+                  <p className="text-[10px] font-medium text-purple-600 mt-1.5 animate-in fade-in">
+                    {inviteMsg}
+                  </p>
+                )}
+              </div>
+            )}
             <div className="mb-3">
               <SortTabs active={draftSort} onChange={setDraftSort} />
             </div>
@@ -401,29 +442,6 @@ export function MyKitchenPage() {
               </div>
             )}
 
-            {/* Kitchen sharing */}
-            <div className="mt-6 p-4 bg-muted/30 rounded-xl border border-muted/50">
-              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
-                Share your test kitchen
-              </p>
-              <div className="flex gap-2">
-                <input
-                  className="bg-background border rounded-lg px-3 py-2 text-sm flex-1 focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                  placeholder="Enter a username..."
-                  value={inviteUsername}
-                  onChange={e => setInviteUsername(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && handleInvite()}
-                />
-                <Button onClick={handleInvite} disabled={!inviteUsername.trim()} className="rounded-lg">
-                  Invite
-                </Button>
-              </div>
-              {inviteMsg && (
-                <p className="text-xs font-medium text-primary mt-2 animate-in fade-in">
-                  {inviteMsg}
-                </p>
-              )}
-            </div>
           </section>
 
           {/* In Review Section */}
