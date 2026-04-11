@@ -20,7 +20,6 @@ import { getCategoryFallback } from "@/lib/categoryFallback";
 import type { Recipe, PublishGate } from "@/types";
 
 /** Check which publish gate criteria a recipe meets. */
-// ... (rest of helper functions remain unchanged)
 function getPublishGate(recipe: Recipe): PublishGate {
   const validIngredients = recipe.ingredients.filter(i => i.name.trim() !== "");
   return {
