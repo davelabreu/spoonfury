@@ -218,3 +218,25 @@ def test_list_reviews_after_voting(other_auth_client, invited_setup):
     response = other_auth_client.get(list_url)
     assert response.status_code == 200
     assert "reviews" in response.data
+
+
+@pytest.mark.django_db
+def test_unique_constraint_rejects_duplicate_reviewer(db):
+    """After migration 0013, a reviewer can only vote once per recipe, ever."""
+    from django.db import IntegrityError
+    author = User.objects.create_user(username="vr_author", password="x")
+    reviewer = User.objects.create_user(username="vr_reviewer", password="x")
+    recipe = Recipe.objects.create(
+        title="Vouch Retention Test",
+        description="desc",
+        serves="2",
+        category="pasta_noodles",
+        ingredients=VALID_INGREDIENTS,
+        instructions="boil water then wait twenty seconds and stir it",
+        author=author,
+        status="in_review",
+        review_round=1,
+    )
+    RecipeReview.objects.create(recipe=recipe, reviewer=reviewer, review_round=1, is_positive=True)
+    with pytest.raises(IntegrityError):
+        RecipeReview.objects.create(recipe=recipe, reviewer=reviewer, review_round=2, is_positive=False)

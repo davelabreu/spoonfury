@@ -149,10 +149,11 @@ class TestKitchenInvite(models.Model):
 
 class RecipeReview(models.Model):
     """
-    Records a community member's vote on a recipe that is currently in_review.
-    One vote per reviewer per review_round — the unique_together constraint
-    enforces this at the database level. Positive votes move the recipe toward
-    the moderation queue; negative votes push it back to the author.
+    Records a community member's vote on a recipe.
+    One vote per reviewer per recipe, forever — review_round is retained
+    as a historical timestamp but does not partition uniqueness. The gate
+    math in views_review.py counts positive reviews across the recipe's
+    entire lifetime (see _check_threshold).
     """
 
     recipe = models.ForeignKey(
@@ -170,7 +171,12 @@ class RecipeReview(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = [("recipe", "reviewer", "review_round")]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["recipe", "reviewer"],
+                name="one_vote_per_reviewer_per_recipe",
+            ),
+        ]
 
     def __str__(self):
         verdict = "+" if self.is_positive else "-"
