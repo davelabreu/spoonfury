@@ -14,9 +14,11 @@ interface ReviewPanelProps {
   reviewData?: ReviewsResponse | null;
   /** Called after voting so the parent (and ReviewBanner) can update. */
   onReviewData?: (data: ReviewsResponse) => void;
+  /** When true, hide the voting affordance and render reviews read-only. */
+  readOnly?: boolean;
 }
 
-export function ReviewPanel({ recipeSlug, token, reviewData: externalData, onReviewData }: ReviewPanelProps) {
+export function ReviewPanel({ recipeSlug, token, reviewData: externalData, onReviewData, readOnly = false }: ReviewPanelProps) {
   const [localData, setLocalData] = useState<ReviewsResponse | null>(null);
   const reviewData = externalData !== undefined ? externalData : localData;
   const [vote, setVote] = useState<boolean | null>(null);
@@ -83,8 +85,8 @@ export function ReviewPanel({ recipeSlug, token, reviewData: externalData, onRev
           )}
         </div>
 
-        {/* Vote form — only if user hasn't voted yet */}
-        {!reviewData.has_voted ? (
+        {/* Vote form — only if user hasn't voted yet and panel isn't read-only */}
+        {readOnly ? null : !reviewData.has_voted ? (
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Button

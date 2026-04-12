@@ -73,9 +73,13 @@ export function RecipePage() {
   }, [token]);
 
   useEffect(() => {
-    if (!token || !recipe) return;
-    if (!["in_review", "revision_requested", "mod_queue"].includes(recipe.status)) return;
-    api.get(`/recipes/${recipe.slug}/reviews/`, token)
+    if (!recipe) return;
+    // Published recipes: fetch reviews publicly (no token required) so anyone can see vouches.
+    // In-review / mod_queue / revision_requested: requires token for the blind-gate flow.
+    const needsToken = ["in_review", "revision_requested", "mod_queue"].includes(recipe.status);
+    if (needsToken && !token) return;
+    if (recipe.status !== "published" && !needsToken) return;
+    api.get(`/recipes/${recipe.slug}/reviews/`, token || undefined)
       .then((data: ReviewsResponse) => setReviewData(data))
       .catch(() => {});
   }, [token, recipe?.slug, recipe?.status]);
@@ -197,6 +201,14 @@ export function RecipePage() {
             </Badge>
           )}
         </div>
+        {recipe.status === "published" && recipe.vouch_count > 0 && (
+          <p className="text-sm text-violet-700 flex items-center gap-1.5 mt-1">
+            <span>✨</span>
+            <span>
+              Vouched for by {recipe.vouch_count} {recipe.vouch_count === 1 ? "cook" : "cooks"} in the test kitchen
+            </span>
+          </p>
+        )}
       </div>
 
       {/* Split grid — starts here so right column aligns with the image top */}
@@ -421,6 +433,19 @@ export function RecipePage() {
                 token={token}
                 reviewData={reviewData}
                 onReviewData={setReviewData}
+              />
+            </div>
+          )}
+
+          {/* Public reviews on published recipes — read-only vouches */}
+          {recipe.status === "published" && reviewData && (reviewData.reviews?.length ?? 0) > 0 && (
+            <div id="review-panel">
+              <ReviewPanel
+                recipeSlug={recipe.slug}
+                token={token ?? ""}
+                reviewData={reviewData}
+                onReviewData={setReviewData}
+                readOnly
               />
             </div>
           )}
