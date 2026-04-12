@@ -18,7 +18,7 @@ function formatForkCount(count: number): string {
 }
 
 export function RecipeCard({ recipe }: RecipeCardProps) {
-  const { slug, title, description, image_url, category, author_username, fork_count } = recipe;
+  const { slug, title, description, image_url, category, author_username, fork_count, vouch_count } = recipe;
   const fallback = getCategoryFallback(category);
 
   // Track whether the image failed to load — if so, show the placeholder
@@ -62,12 +62,17 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
           {description}
         </p>
 
-        {/* Author + fork count */}
+        {/* Author + fork count + vouch count */}
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span>by @{author_username}</span>
           {fork_count > 0 && (
             <span className="text-amber-600 font-medium">
               🍴 {formatForkCount(fork_count)}
+            </span>
+          )}
+          {vouch_count > 0 && (
+            <span className="text-violet-600 font-medium">
+              ✨ {vouch_count} {vouch_count === 1 ? "vouch" : "vouches"}
             </span>
           )}
         </div>

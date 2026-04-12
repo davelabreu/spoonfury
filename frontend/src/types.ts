@@ -15,6 +15,14 @@ export interface Tag {
   kind: "cuisine" | "dietary" | "ingredient" | "vibe";
 }
 
+/** Owner/staff-only structured progression indicator for in_review recipes. */
+export interface ReviewProgress {
+  positive: number;
+  total: number;
+  needed_for_threshold: number;
+  threshold_met: boolean;
+}
+
 /** Full recipe object returned by the API. */
 export interface Recipe {
   id: number;
@@ -43,6 +51,10 @@ export interface Recipe {
   /** Live vote tally — only present when status is in_review or mod_queue */
   total_votes?: number | null;
   positive_votes?: number | null;
+  /** Cumulative count of positive reviews (vouches). Always present, >= 0. */
+  vouch_count: number;
+  /** Owner/staff-only structured progression indicator, null for other viewers. */
+  review_progress: ReviewProgress | null;
 }
 
 export interface Book {
