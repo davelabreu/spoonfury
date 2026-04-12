@@ -194,3 +194,18 @@ Items identified during v0.5 security audit to move from prototype to production
 ### Account Spam
 - **Risk:** `ACCOUNT_EMAIL_VERIFICATION = "none"` allows fake account bloat.
 - **Fix:** Enable email verification and add CAPTCHA to registration before public launch.
+
+## Recipe Ratings & Reviews (v0.9.1 — Part B)
+
+Part A (v0.9) surfaced vouch counts and made historical reviews public. Part B extends the system into a living ratings feature.
+
+**Scope:**
+- **Post-publish voting.** `review_vote` endpoint accepts votes for `status in ("in_review", "published")`. Published recipes accumulate vouches from any logged-in user (except author).
+- **5-spoon rating.** Replace the boolean `RecipeReview.is_positive` with a 1–5 integer rating (spoons). Migration converts legacy `is_positive=True` → 4 spoons, `is_positive=False` → 2 spoons (or similar — decide during spec).
+- **Drive-by negativity mitigation.** Require a comment on low ratings (e.g., any rating ≤ 2). Optional: weighted scoring that favors reviewers who have also forked or cooked the recipe.
+- **Update the published detail-line copy.** "Vouched for by N cooks in the test kitchen" no longer fits once post-publish votes are counted — revise to something like "N cooks have vouched for this recipe."
+- **"Kitchen Tested" signature treatment (Option C from brainstorm).** Named visual badge with reviewer avatars.
+
+**Data retention:** Part A's durability guarantees (one vote per reviewer per recipe, forever) continue to apply. A reviewer who voted during in_review cannot vote again after publish.
+
+**Reference:** `docs/plans/completed/2026-04-12-vouch-retention.spec.md` (Part A spec, §11 Explicit Non-Goals).

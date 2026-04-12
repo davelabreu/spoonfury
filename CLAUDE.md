@@ -69,6 +69,7 @@ Active plans live in `docs/plans/active/`. Shipped features are archived in `doc
 | Feature | Spec | Impl |
 |---------|------|------|
 | v0.85 Kitchen Controls | `active/2026-04-11-kitchen-controls.spec.md` | `active/2026-04-11-kitchen-controls.impl.md` |
+| v0.9 Vouch Retention | `active/2026-04-12-vouch-retention.spec.md` | `active/2026-04-12-vouch-retention.impl.md` |
 
 ### Completed
 | Feature | Spec | Impl |
