@@ -1,6 +1,6 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path
-from .views import RecipeViewSet, TagListView, force_publish, hot_recipes
+from .views import RecipeViewSet, TagListView, force_publish, hot_recipes, WeeklyPlanViewSet
 from .views_fork import fork_recipe
 from .views_upload import upload_recipe_image
 from .views_kitchen import kitchen_detail, kitchen_invite, kitchen_revoke
@@ -9,6 +9,7 @@ from .views_moderation import moderation_queue, moderation_approve, moderation_r
 
 router = DefaultRouter()
 router.register(r"recipes", RecipeViewSet, basename="recipe")
+router.register(r"weekly-plan", WeeklyPlanViewSet, basename="weekly-plan")
 
 urlpatterns = [
     # Fixed paths must come before the router's <slug> catch-all

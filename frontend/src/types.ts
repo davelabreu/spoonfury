@@ -34,6 +34,7 @@ export interface Recipe {
   parent_recipe_title: string | null;
   parent_recipe_author: string | null;
   fork_count: number;
+  prep_time?: number;
   created_at: string;
   updated_at?: string;
   status: RecipeStatus;
@@ -139,4 +140,18 @@ export interface ModerationQueueEntry extends Recipe {
   total_votes: number;
   positive_votes: number;
   author_strike_count: number;
+}
+
+export interface WeeklyPlanItem {
+  id: number;
+  day: number; // 0-6 (Monday-Sunday)
+  order: number;
+  recipe: Recipe;
+}
+
+export interface WeeklyPlan {
+  id: number;
+  owner: string;
+  updated_at: string;
+  items: WeeklyPlanItem[];
 }

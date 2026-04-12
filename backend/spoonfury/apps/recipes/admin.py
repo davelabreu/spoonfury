@@ -1,5 +1,8 @@
 from django.contrib import admin
-from .models import Recipe, Tag, TestKitchenInvite, RecipeReview, ModerationAction, AuthorStrike
+from .models import (
+    Recipe, Tag, TestKitchenInvite, RecipeReview, 
+    ModerationAction, AuthorStrike, WeeklyPlan, WeeklyPlanItem
+)
 
 
 @admin.register(Tag)
@@ -49,3 +52,24 @@ class AuthorStrikeAdmin(admin.ModelAdmin):
     """Admin view for author strikes issued during moderation."""
     list_display = ["author", "recipe", "created_at"]
     search_fields = ["author__username", "recipe__title"]
+
+
+class WeeklyPlanItemInline(admin.TabularInline):
+    model = WeeklyPlanItem
+    extra = 1
+
+
+@admin.register(WeeklyPlan)
+class WeeklyPlanAdmin(admin.ModelAdmin):
+    """Admin view for user weekly meal plans."""
+    list_display = ["owner", "updated_at"]
+    search_fields = ["owner__username"]
+    inlines = [WeeklyPlanItemInline]
+
+
+@admin.register(WeeklyPlanItem)
+class WeeklyPlanItemAdmin(admin.ModelAdmin):
+    """Admin view for specific recipes scheduled in a weekly plan."""
+    list_display = ["plan", "recipe", "day", "order"]
+    list_filter = ["day"]
+    search_fields = ["plan__owner__username", "recipe__title"]

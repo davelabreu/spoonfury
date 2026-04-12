@@ -236,3 +236,57 @@ class AuthorStrike(models.Model):
 
     def __str__(self):
         return f"Strike: {self.author.username} ← {self.recipe.title}"
+
+
+DAY_CHOICES = [
+    (0, "Monday"),
+    (1, "Tuesday"),
+    (2, "Wednesday"),
+    (3, "Thursday"),
+    (4, "Friday"),
+    (5, "Saturday"),
+    (6, "Sunday"),
+]
+
+
+class WeeklyPlan(models.Model):
+    """
+    A user's weekly meal plan. Each user has exactly one plan,
+    which serves as a container for their scheduled recipes.
+    """
+
+    owner = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="weekly_plan",
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Weekly Plan for {self.owner.username}"
+
+
+class WeeklyPlanItem(models.Model):
+    """
+    A single recipe scheduled within a user's WeeklyPlan.
+    Each item is assigned to a specific day of the week and an ordering.
+    """
+
+    plan = models.ForeignKey(
+        WeeklyPlan,
+        on_delete=models.CASCADE,
+        related_name="items",
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+    )
+    day = models.IntegerField(choices=DAY_CHOICES)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["day", "order"]
+
+    def __str__(self):
+        day_name = dict(DAY_CHOICES).get(self.day, "Unknown Day")
+        return f"{day_name}: {self.recipe.title} (Plan: {self.plan.owner.username})"

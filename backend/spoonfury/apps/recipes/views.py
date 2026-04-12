@@ -11,8 +11,10 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status as http_status
-from .models import Recipe, Tag, TestKitchenInvite, ModerationAction
+from .models import Recipe, Tag, TestKitchenInvite, ModerationAction, WeeklyPlan, WeeklyPlanItem
+from spoonfury.apps.shopping.models import ShoppingList, ShoppingListItem
 from .serializers import RecipeSerializer, TagSerializer
+from .serializers_planner import WeeklyPlanSerializer, WeeklyPlanItemSerializer
 from .filters import RecipeFilter
 
 
@@ -146,6 +148,33 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(recipe)
         return Response(serializer.data)
 
+    @action(detail=False, methods=["get"], url_path="planner-library", url_name="planner-library")
+    def planner_library(self, request):
+        """
+        Return a list of recipes suitable for the Weekly Planner.
+        Includes own recipes and recipes from invited kitchens.
+        Limited to 'published' and 'draft' statuses.
+        """
+        user = request.user
+        if not user.is_authenticated:
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=http_status.HTTP_401_UNAUTHORIZED
+            )
+
+        invited_owner_ids = TestKitchenInvite.objects.filter(
+            invitee=user
+        ).values_list("owner_id", flat=True)
+
+        queryset = Recipe.objects.filter(
+            Q(author=user) | Q(author_id__in=invited_owner_ids)
+        ).filter(
+            status__in=["published", "draft"]
+        ).select_related("author").prefetch_related("tags").distinct()
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class TagListView(ListAPIView):
     serializer_class = TagSerializer
@@ -239,3 +268,159 @@ def hot_recipes(request):
     )
     serializer = RecipeSerializer(qs, many=True, context={"request": request})
     return Response(serializer.data)
+
+
+class WeeklyPlanViewSet(viewsets.ViewSet):
+    """
+    ViewSet for managing the user's weekly plan.
+    Each user has exactly one plan.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        """
+        Return the current user's WeeklyPlan.
+        Creates one if it doesn't exist.
+        """
+        plan, created = WeeklyPlan.objects.get_or_create(owner=request.user)
+        # Prefetch items and recipes for efficiency
+        plan = WeeklyPlan.objects.prefetch_related(
+            "items__recipe__author",
+            "items__recipe__tags"
+        ).get(id=plan.id)
+        
+        serializer = WeeklyPlanSerializer(plan)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["post"], url_path="add-recipe")
+    def add_recipe(self, request):
+        """
+        Add a recipe to the user's weekly plan.
+        Body: { "recipe_slug": "...", "day": 0 }
+        """
+        recipe_slug = request.data.get("recipe_slug")
+        day = request.data.get("day")
+
+        if recipe_slug is None or day is None:
+            return Response(
+                {"error": "recipe_slug and day are required."},
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            recipe = Recipe.objects.get(slug=recipe_slug)
+        except Recipe.DoesNotExist:
+            return Response(
+                {"error": "Recipe not found."},
+                status=http_status.HTTP_404_NOT_FOUND
+            )
+
+        plan, _ = WeeklyPlan.objects.get_or_create(owner=request.user)
+        
+        # Simple ordering: append to the end of the day
+        last_item = WeeklyPlanItem.objects.filter(plan=plan, day=day).order_by("-order").first()
+        order = (last_item.order + 1) if last_item else 0
+
+        item = WeeklyPlanItem.objects.create(
+            plan=plan,
+            recipe=recipe,
+            day=day,
+            order=order
+        )
+
+        return Response(WeeklyPlanItemSerializer(item).data, status=http_status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=["post"], url_path="remove-item")
+    def remove_item(self, request):
+        """
+        Remove an item from the user's weekly plan.
+        Body: { "item_id": 123 }
+        """
+        item_id = request.data.get("item_id")
+        if not item_id:
+            return Response(
+                {"error": "item_id is required."},
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            item = WeeklyPlanItem.objects.get(id=item_id, plan__owner=request.user)
+            item.delete()
+            return Response(status=http_status.HTTP_204_NO_CONTENT)
+        except WeeklyPlanItem.DoesNotExist:
+            return Response(
+                {"error": "Item not found in your plan."},
+                status=http_status.HTTP_404_NOT_FOUND
+            )
+
+    @action(detail=False, methods=["post"], url_path="clear")
+    def clear(self, request):
+        """
+        Delete all items in the user's weekly plan.
+        """
+        plan, _ = WeeklyPlan.objects.get_or_create(owner=request.user)
+        plan.items.all().delete()
+        return Response(status=http_status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=["post"], url_path="sync-to-cart")
+    def sync_to_cart(self, request):
+        """
+        Sync all ingredients from the weekly plan to the shopping list.
+        Iterates through all recipes in the plan and adds their ingredients.
+        Also updates multipliers based on recipe frequency in the plan.
+        """
+        from spoonfury.apps.shopping.models import RecipeMultiplier
+
+        plan, _ = WeeklyPlan.objects.get_or_create(owner=request.user)
+        shopping_list, _ = ShoppingList.objects.get_or_create(owner=request.user)
+        
+        # 1. Count recipe frequencies in the plan
+        recipe_counts = {}
+        items = plan.items.select_related("recipe").all()
+        for item in items:
+            slug = item.recipe.slug
+            recipe_counts[slug] = recipe_counts.get(slug, 0) + 1
+            
+        # 2. Add ingredients for each recipe in the plan
+        added_count = 0
+        for slug, count in recipe_counts.items():
+            # Get the recipe (all items for the same slug have same recipe content)
+            # Find the first item with this slug to get the recipe object
+            recipe_item = next(i for i in items if i.recipe.slug == slug)
+            recipe = recipe_item.recipe
+            
+            # Update multiplier for this recipe in shopping list
+            RecipeMultiplier.objects.update_or_create(
+                shopping_list=shopping_list,
+                recipe_slug=slug,
+                defaults={"multiplier": count}
+            )
+            
+            # Pre-fetch existing names for this recipe to avoid duplicates
+            existing_names = set(
+                shopping_list.items.filter(recipe_slug=slug)
+                .values_list("name", flat=True)
+            )
+            
+            # Add ingredients
+            ingredients = recipe.ingredients # it's a JSONField (list)
+            for ing in ingredients:
+                name = ing.get("name", "").strip()
+                if not name or name in existing_names:
+                    continue
+                
+                ShoppingListItem.objects.create(
+                    shopping_list=shopping_list,
+                    recipe=recipe,
+                    recipe_title=recipe.title,
+                    recipe_slug=recipe.slug,
+                    name=name,
+                    quantity=ing.get("quantity", ""),
+                    unit=ing.get("unit", ""),
+                    note=ing.get("note", ""),
+                )
+                existing_names.add(name)
+                added_count += 1
+                
+        shopping_list.save(update_fields=["updated_at"])
+        return Response({"added": added_count}, status=http_status.HTTP_200_OK)
