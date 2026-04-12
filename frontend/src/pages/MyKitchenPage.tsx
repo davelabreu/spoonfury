@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { WeeklyPlanner } from "@/components/planner/WeeklyPlanner";
 import { getCategoryFallback } from "@/lib/categoryFallback";
-import type { Recipe, PublishGate } from "@/types";
+import type { Recipe, PublishGate, ReviewProgress } from "@/types";
 
 /** Check which publish gate criteria a recipe meets. */
 function getPublishGate(recipe: Recipe): PublishGate {
@@ -28,11 +28,6 @@ function getPublishGate(recipe: Recipe): PublishGate {
     hasDescription: recipe.description.trim().length > 0,
     hasCategory: recipe.category.trim().length > 0,
   };
-}
-
-/** Whether all gate criteria are met. */
-function isPublishReady(gate: PublishGate): boolean {
-  return Object.values(gate).every(Boolean);
 }
 
 /** Visual checklist indicator for a single recipe's publish readiness. */
@@ -173,6 +168,32 @@ function ViewToggle({ active, onChange }: { active: ViewMode; onChange: (m: View
   );
 }
 
+function ReviewProgressLine({ progress }: { progress: ReviewProgress }) {
+  const { positive, total, needed_for_threshold, threshold_met } = progress;
+
+  if (threshold_met) {
+    return (
+      <span className="text-[10px] font-semibold text-violet-600">
+        ✨ Passed community review — in moderator queue
+      </span>
+    );
+  }
+
+  if (total === 0) {
+    return (
+      <span className="text-[10px] text-violet-600">
+        ✨ 0 votes · {needed_for_threshold} more needed to publish
+      </span>
+    );
+  }
+
+  return (
+    <span className="text-[10px] text-violet-600">
+      ✨ {positive}/{total} votes · {needed_for_threshold} more yes to publish
+    </span>
+  );
+}
+
 function CompactRow({ recipe, showGate }: { recipe: Recipe; showGate?: boolean }) {
   const gate = showGate ? getPublishGate(recipe) : null;
   const gateCount = gate ? Object.values(gate).filter(Boolean).length : null;
@@ -187,6 +208,9 @@ function CompactRow({ recipe, showGate }: { recipe: Recipe; showGate?: boolean }
       <span className="text-xs font-semibold flex-1 truncate">{recipe.title}</span>
       {recipe.fork_count > 0 && (
         <span className="text-[9px] text-amber-600 shrink-0">🍴 {recipe.fork_count}</span>
+      )}
+      {recipe.vouch_count > 0 && (
+        <span className="text-[9px] text-violet-600 shrink-0">✨ {recipe.vouch_count}</span>
       )}
       <span className="text-[9px] px-1.5 py-0.5 bg-muted rounded-full text-muted-foreground shrink-0 hidden sm:inline">
         {recipe.category.replace(/_/g, " ").split(" ")[0]}
@@ -249,10 +273,11 @@ function RecipeCard({ recipe, showGate }: { recipe: Recipe; showGate?: boolean }
           <div className="flex flex-col items-end gap-1 shrink-0">
             <StatusBadge status={recipe.status} />
             <Badge variant="secondary" className="text-[10px]">{recipe.category}</Badge>
-            {recipe.status === "in_review" && recipe.total_votes != null && (
-              <span className="text-[10px] font-semibold text-blue-600">
-                👍 {recipe.positive_votes}/{recipe.total_votes} votes
-              </span>
+            {recipe.status === "in_review" && recipe.review_progress && (
+              <ReviewProgressLine progress={recipe.review_progress} />
+            )}
+            {recipe.vouch_count > 0 && (
+              <span className="text-[10px] text-violet-600">✨ {recipe.vouch_count}</span>
             )}
             {recipe.fork_count > 0 && (
               <span className="text-[10px] text-muted-foreground">🍴 {recipe.fork_count}</span>
