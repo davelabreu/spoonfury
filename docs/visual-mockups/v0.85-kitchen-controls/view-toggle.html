@@ -1,0 +1,189 @@
+<h2>Card View vs Compact View</h2>
+<p class="subtitle">A toggle between the current thumbnail cards and a denser list. The toggle icon sits in the section header row.</p>
+
+<div class="section">
+  <h3>Toggle Placement</h3>
+  <div style="padding: 20px; background: #fafafa; border-radius: 12px; margin-bottom: 24px;">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+      <span style="font-size: 20px;">🧪</span>
+      <span style="font-weight: 700; font-size: 16px;">Test Kitchen</span>
+      <span style="font-size: 11px; padding: 2px 8px; border: 1px solid #e2e2e2; border-radius: 99px; color: #888;">6 drafts</span>
+      <!-- View toggle pushed right -->
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 2px; background: #f0f0f0; border-radius: 6px; padding: 2px;">
+        <button style="padding: 4px 6px; border: none; background: white; border-radius: 4px; cursor: pointer; display: flex; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.08);" title="Card view">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </button>
+        <button style="padding: 4px 6px; border: none; background: transparent; border-radius: 4px; cursor: pointer; display: flex; align-items: center;" title="Compact view">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        </button>
+      </div>
+    </div>
+    <!-- Micro-tabs sort bar -->
+    <div style="display: flex; gap: 12px; border-bottom: 1px solid #f0f0f0;">
+      <button style="font-size: 10px; padding: 4px 0; border: none; background: none; color: #333; font-weight: 600; cursor: pointer; border-bottom: 2px solid #333; margin-bottom: -1px;">Newest</button>
+      <button style="font-size: 10px; padding: 4px 0; border: none; background: none; color: #aaa; cursor: pointer;">A-Z</button>
+      <button style="font-size: 10px; padding: 4px 0; border: none; background: none; color: #aaa; cursor: pointer;">Category</button>
+      <button style="font-size: 10px; padding: 4px 0; border: none; background: none; color: #aaa; cursor: pointer;">Cuisine</button>
+      <button style="font-size: 10px; padding: 4px 0; border: none; background: none; color: #aaa; cursor: pointer;">Lifestyle</button>
+    </div>
+  </div>
+</div>
+
+<h3>Current: Card View</h3>
+<p class="subtitle">What you have now — thumbnail on left, title + description + badges</p>
+<div style="padding: 20px; background: #fafafa; border-radius: 12px; margin-bottom: 32px;">
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div style="display: flex; border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: white;">
+      <div style="width: 72px; background: linear-gradient(135deg, #fde68a, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 22px; shrink: 0;">🍳</div>
+      <div style="padding: 10px 14px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div>
+            <div style="font-size: 13px; font-weight: 600;">Avocado Toast Deluxe</div>
+            <div style="font-size: 11px; color: #aaa; margin-top: 2px;">Smashed avo with everything bagel seasoning...</div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px;">
+            <span style="font-size: 9px; padding: 1px 6px; border: 1px solid #e5e5e5; border-radius: 99px; color: #888;">Draft</span>
+            <span style="font-size: 9px; padding: 1px 6px; background: #f5f5f5; border-radius: 99px; color: #888;">breakfast_bakery</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap;">
+          <span style="font-size: 9px; padding: 1px 6px; border-radius: 99px; background: #dcfce7; color: #16a34a;">&#10003; 2+ ingredients</span>
+          <span style="font-size: 9px; padding: 1px 6px; border-radius: 99px; background: #dcfce7; color: #16a34a;">&#10003; Instructions</span>
+          <span style="font-size: 9px; padding: 1px 6px; border-radius: 99px; background: #f3f4f6; color: #aaa;">&#9675; Description</span>
+          <span style="font-size: 9px; padding: 1px 6px; border-radius: 99px; background: #dcfce7; color: #16a34a;">&#10003; Category</span>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: white;">
+      <div style="width: 72px; background: linear-gradient(135deg, #bfdbfe, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 22px;">🍝</div>
+      <div style="padding: 10px 14px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div>
+            <div style="font-size: 13px; font-weight: 600;">Baked Ziti Supreme</div>
+            <div style="font-size: 11px; color: #aaa; margin-top: 2px;">Creamy ricotta layers with sausage...</div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px;">
+            <span style="font-size: 9px; padding: 1px 6px; border: 1px solid #e5e5e5; border-radius: 99px; color: #888;">Draft</span>
+            <span style="font-size: 9px; padding: 1px 6px; background: #f5f5f5; border-radius: 99px; color: #888;">pasta_noodles</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: white;">
+      <div style="width: 72px; background: linear-gradient(135deg, #fecaca, #ef4444); display: flex; align-items: center; justify-content: center; font-size: 22px;">🥩</div>
+      <div style="padding: 10px 14px; flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div>
+            <div style="font-size: 13px; font-weight: 600;">Chimichurri Steak</div>
+            <div style="font-size: 11px; color: #aaa; margin-top: 2px;">Grilled flank with fresh herb sauce...</div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px;">
+            <span style="font-size: 9px; padding: 1px 6px; border: 1px solid #dbeafe; border-radius: 99px; color: #3b82f6; background: #eff6ff;">In Review</span>
+            <span style="font-size: 9px; padding: 1px 6px; background: #f5f5f5; border-radius: 99px; color: #888;">meat_seafood</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>New: Compact View</h3>
+<p class="subtitle">Dense single-line rows. No thumbnail, no description. Just the essentials for scanning a long list fast.</p>
+<div style="padding: 20px; background: #fafafa; border-radius: 12px; margin-bottom: 16px;">
+  <div style="display: flex; flex-direction: column; gap: 1px; background: #f0f0f0; border-radius: 8px; overflow: hidden;">
+    <!-- Row 1 -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: white;">
+      <span style="font-size: 14px; width: 20px; text-align: center;">🍳</span>
+      <span style="font-size: 12px; font-weight: 600; flex: 1;">Avocado Toast Deluxe</span>
+      <span style="font-size: 9px; padding: 1px 6px; background: #f5f5f5; border-radius: 99px; color: #888;">breakfast</span>
+      <span style="font-size: 9px; padding: 1px 6px; border: 1px solid #e5e5e5; border-radius: 99px; color: #888;">Draft</span>
+      <span style="font-size: 9px; color: #ccc;">3/4</span>
+    </div>
+    <!-- Row 2 -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: white;">
+      <span style="font-size: 14px; width: 20px; text-align: center;">🍝</span>
+      <span style="font-size: 12px; font-weight: 600; flex: 1;">Baked Ziti Supreme</span>
+      <span style="font-size: 9px; padding: 1px 6px; background: #f5f5f5; border-radius: 99px; color: #888;">pasta</span>
+      <span style="font-size: 9px; padding: 1px 6px; border: 1px solid #e5e5e5; border-radius: 99px; color: #888;">Draft</span>
+      <span style="font-size: 9px; color: #ccc;">2/4</span>
+    </div>
+    <!-- Row 3 -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: white;">
+      <span style="font-size: 14px; width: 20px; text-align: center;">🥩</span>
+      <span style="font-size: 12px; font-weight: 600; flex: 1;">Chimichurri Steak</span>
+      <span style="font-size: 9px; padding: 1px 6px; background: #f5f5f5; border-radius: 99px; color: #888;">meat</span>
+      <span style="font-size: 9px; padding: 1px 6px; border: 1px solid #dbeafe; border-radius: 99px; color: #3b82f6; background: #eff6ff;">Review</span>
+      <span style="font-size: 9px; color: #ccc;">4/4</span>
+    </div>
+    <!-- Row 4 -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: white;">
+      <span style="font-size: 14px; width: 20px; text-align: center;">🥗</span>
+      <span style="font-size: 12px; font-weight: 600; flex: 1;">Greek Goddess Bowl</span>
+      <span style="font-size: 9px; padding: 1px 6px; background: #f5f5f5; border-radius: 99px; color: #888;">salad</span>
+      <span style="font-size: 9px; padding: 1px 6px; border: 1px solid #e5e5e5; border-radius: 99px; color: #888;">Draft</span>
+      <span style="font-size: 9px; color: #ccc;">4/4</span>
+    </div>
+    <!-- Row 5 -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: white;">
+      <span style="font-size: 14px; width: 20px; text-align: center;">🍕</span>
+      <span style="font-size: 12px; font-weight: 600; flex: 1;">Margherita Pizza</span>
+      <span style="font-size: 9px; padding: 1px 6px; background: #f5f5f5; border-radius: 99px; color: #888;">pizza</span>
+      <span style="font-size: 9px; padding: 1px 6px; border: 1px solid #e5e5e5; border-radius: 99px; color: #888;">Draft</span>
+      <span style="font-size: 9px; color: #ccc;">1/4</span>
+    </div>
+    <!-- Row 6 -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: white;">
+      <span style="font-size: 14px; width: 20px; text-align: center;">🍲</span>
+      <span style="font-size: 12px; font-weight: 600; flex: 1;">Tom Kha Gai</span>
+      <span style="font-size: 9px; padding: 1px 6px; background: #f5f5f5; border-radius: 99px; color: #888;">soup</span>
+      <span style="font-size: 9px; padding: 1px 6px; border: 1px solid #e5e5e5; border-radius: 99px; color: #888;">Draft</span>
+      <span style="font-size: 9px; color: #ccc;">3/4</span>
+    </div>
+  </div>
+</div>
+<p style="font-size: 11px; color: #aaa; text-align: center;">The "3/4" on the right is the publish gate progress (compact form of the checklist pills). On mobile, the category badge hides and you just get: emoji + title + status + gate score.</p>
+
+<div class="section" style="margin-top: 32px;">
+  <h3>Mobile Compact View</h3>
+  <p class="subtitle">On narrow screens, the compact rows drop the category badge to keep things scannable</p>
+  <div style="max-width: 340px; margin: 0 auto; padding: 16px; background: #fafafa; border-radius: 12px; border: 2px solid #e8e8e8;">
+    <div style="display: flex; flex-direction: column; gap: 1px; background: #f0f0f0; border-radius: 8px; overflow: hidden;">
+      <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: white;">
+        <span style="font-size: 13px;">🍳</span>
+        <span style="font-size: 11px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Avocado Toast Deluxe</span>
+        <span style="font-size: 8px; padding: 1px 5px; border: 1px solid #e5e5e5; border-radius: 99px; color: #888;">Draft</span>
+        <span style="font-size: 8px; color: #ccc;">3/4</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: white;">
+        <span style="font-size: 13px;">🍝</span>
+        <span style="font-size: 11px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Baked Ziti Supreme</span>
+        <span style="font-size: 8px; padding: 1px 5px; border: 1px solid #e5e5e5; border-radius: 99px; color: #888;">Draft</span>
+        <span style="font-size: 8px; color: #ccc;">2/4</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: white;">
+        <span style="font-size: 13px;">🥩</span>
+        <span style="font-size: 11px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Chimichurri Steak</span>
+        <span style="font-size: 8px; padding: 1px 5px; border: 1px solid #dbeafe; border-radius: 99px; color: #3b82f6; background: #eff6ff;">Review</span>
+        <span style="font-size: 8px; color: #ccc;">4/4</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: white;">
+        <span style="font-size: 13px;">🥗</span>
+        <span style="font-size: 11px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Greek Goddess Bowl</span>
+        <span style="font-size: 8px; padding: 1px 5px; border: 1px solid #e5e5e5; border-radius: 99px; color: #888;">Draft</span>
+        <span style="font-size: 8px; color: #ccc;">4/4</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: white;">
+        <span style="font-size: 13px;">🍕</span>
+        <span style="font-size: 11px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Margherita Pizza</span>
+        <span style="font-size: 8px; padding: 1px 5px; border: 1px solid #e5e5e5; border-radius: 99px; color: #888;">Draft</span>
+        <span style="font-size: 8px; color: #ccc;">1/4</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: white;">
+        <span style="font-size: 13px;">🍲</span>
+        <span style="font-size: 11px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Tom Kha Gai</span>
+        <span style="font-size: 8px; padding: 1px 5px; border: 1px solid #e5e5e5; border-radius: 99px; color: #888;">Draft</span>
+        <span style="font-size: 8px; color: #ccc;">3/4</span>
+      </div>
+    </div>
+  </div>
+</div>

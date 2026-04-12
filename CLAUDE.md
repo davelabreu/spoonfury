@@ -59,7 +59,7 @@ AI agents have access to specialized tools for development:
 `docs/CHANGELOG.md` — human-first dev log. **Focus** lines are written by the human; bullet lists are AI-generated detail. Update it at the end of each session. **Always ask the user for their Focus statement before writing a changelog entry.** The Focus must capture the human's emotional intent and motivation — never generate it yourself.
 
 ## 🎨 Visual Mockups
-Interactive HTML mockups live in `docs/visual-mockups/`. Always save UI/UX brainstorming mockups here (not just in `.superpowers/brainstorm/`) so they persist and can be shared. Present visual options in the browser before implementing UI changes.
+Interactive HTML mockups live in `docs/visual-mockups/`. Organize into **unique folders per feature/version** (e.g., `docs/visual-mockups/v0.85-kitchen-controls/`). Never dump loose files into the root. Always save UI/UX brainstorming mockups here (not just in `.superpowers/brainstorm/`) so they persist and can be shared. Present visual options in the browser before implementing UI changes.
 
 ## 🗺️ Plans
 Active plans live in `docs/plans/active/`. Shipped features are archived in `docs/plans/completed/`.
@@ -68,7 +68,7 @@ Active plans live in `docs/plans/active/`. Shipped features are archived in `doc
 ### Active
 | Feature | Spec | Impl |
 |---------|------|------|
-| *(none)* | — | — |
+| v0.85 Kitchen Controls | `active/2026-04-11-kitchen-controls.spec.md` | `active/2026-04-11-kitchen-controls.impl.md` |
 
 ### Completed
 | Feature | Spec | Impl |

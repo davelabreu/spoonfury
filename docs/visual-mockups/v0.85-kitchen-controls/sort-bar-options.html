@@ -1,0 +1,141 @@
+<h2>Per-Section Sort Bar</h2>
+<p class="subtitle">A muted sorting strip that sits between the section header and the recipe list. Same control repeated for Test Kitchen and Published independently.</p>
+
+<div class="cards">
+
+  <!-- Option A: Inline text pills -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 24px; background: #fafafa;">
+      <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 20px;">🧪</span>
+        <span style="font-weight: 700; font-size: 16px;">Test Kitchen</span>
+        <span style="font-size: 11px; padding: 2px 8px; border: 1px solid #e2e2e2; border-radius: 99px; color: #888;">4 drafts</span>
+      </div>
+      <!-- Sort bar -->
+      <div style="display: flex; align-items: center; gap: 6px; padding: 6px 0; margin-bottom: 12px;">
+        <span style="font-size: 10px; color: #aaa; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Sort:</span>
+        <button style="font-size: 11px; padding: 3px 10px; border-radius: 99px; border: 1px solid #e0e0e0; background: #f0f0f0; color: #555; font-weight: 600; cursor: pointer;">A-Z</button>
+        <button style="font-size: 11px; padding: 3px 10px; border-radius: 99px; border: 1px solid transparent; background: transparent; color: #aaa; cursor: pointer;">Category</button>
+        <button style="font-size: 11px; padding: 3px 10px; border-radius: 99px; border: 1px solid transparent; background: transparent; color: #aaa; cursor: pointer;">Cuisine</button>
+        <button style="font-size: 11px; padding: 3px 10px; border-radius: 99px; border: 1px solid transparent; background: transparent; color: #aaa; cursor: pointer;">Lifestyle</button>
+      </div>
+      <!-- Mock recipe cards -->
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; border: 1px solid #eee; border-radius: 10px; overflow: hidden; height: 52px;">
+          <div style="width: 52px; background: linear-gradient(135deg, #fde68a, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 18px;">🍳</div>
+          <div style="padding: 8px 12px; flex: 1;">
+            <div style="font-size: 11px; font-weight: 600;">Avocado Toast Deluxe</div>
+            <div style="font-size: 9px; color: #aaa;">No description yet...</div>
+          </div>
+        </div>
+        <div style="display: flex; border: 1px solid #eee; border-radius: 10px; overflow: hidden; height: 52px;">
+          <div style="width: 52px; background: linear-gradient(135deg, #bfdbfe, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 18px;">🍝</div>
+          <div style="padding: 8px 12px; flex: 1;">
+            <div style="font-size: 11px; font-weight: 600;">Baked Ziti Supreme</div>
+            <div style="font-size: 9px; color: #aaa;">Creamy ricotta layers...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A: Pill Toggles</h3>
+      <p>Tiny rounded pills in a row. Active pill gets a subtle fill. Very lightweight, feels like part of the section header.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Dropdown-style with icon -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 24px; background: #fafafa;">
+      <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 20px;">🧪</span>
+        <span style="font-weight: 700; font-size: 16px;">Test Kitchen</span>
+        <span style="font-size: 11px; padding: 2px 8px; border: 1px solid #e2e2e2; border-radius: 99px; color: #888;">4 drafts</span>
+        <!-- Sort control pushed to far right -->
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><path d="M3 6h18M6 12h12M9 18h6"/></svg>
+          <select style="font-size: 10px; border: 1px solid #e0e0e0; border-radius: 6px; padding: 3px 8px; color: #888; background: white; outline: none; cursor: pointer; -webkit-appearance: auto;">
+            <option>Newest</option>
+            <option selected>A-Z</option>
+            <option>Category</option>
+            <option>Cuisine</option>
+            <option>Lifestyle</option>
+          </select>
+        </div>
+      </div>
+      <!-- Mock recipe cards -->
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; border: 1px solid #eee; border-radius: 10px; overflow: hidden; height: 52px;">
+          <div style="width: 52px; background: linear-gradient(135deg, #fde68a, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 18px;">🍳</div>
+          <div style="padding: 8px 12px; flex: 1;">
+            <div style="font-size: 11px; font-weight: 600;">Avocado Toast Deluxe</div>
+            <div style="font-size: 9px; color: #aaa;">No description yet...</div>
+          </div>
+        </div>
+        <div style="display: flex; border: 1px solid #eee; border-radius: 10px; overflow: hidden; height: 52px;">
+          <div style="width: 52px; background: linear-gradient(135deg, #bfdbfe, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 18px;">🍝</div>
+          <div style="padding: 8px 12px; flex: 1;">
+            <div style="font-size: 11px; font-weight: 600;">Baked Ziti Supreme</div>
+            <div style="font-size: 9px; color: #aaa;">Creamy ricotta layers...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B: Inline Dropdown</h3>
+      <p>A tiny native <code>&lt;select&gt;</code> tucked into the section header row, far right. Minimal footprint, zero extra vertical space. One control for everything.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Segmented underline tabs -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 24px; background: #fafafa;">
+      <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 20px;">🧪</span>
+        <span style="font-weight: 700; font-size: 16px;">Test Kitchen</span>
+        <span style="font-size: 11px; padding: 2px 8px; border: 1px solid #e2e2e2; border-radius: 99px; color: #888;">4 drafts</span>
+      </div>
+      <!-- Sort bar as micro-tabs -->
+      <div style="display: flex; gap: 12px; border-bottom: 1px solid #f0f0f0; margin-bottom: 12px;">
+        <button style="font-size: 10px; padding: 4px 0; border: none; background: none; color: #aaa; cursor: pointer; position: relative;">Newest</button>
+        <button style="font-size: 10px; padding: 4px 0; border: none; background: none; color: #333; font-weight: 600; cursor: pointer; position: relative; border-bottom: 2px solid #333; margin-bottom: -1px;">A-Z</button>
+        <button style="font-size: 10px; padding: 4px 0; border: none; background: none; color: #aaa; cursor: pointer;">Category</button>
+        <button style="font-size: 10px; padding: 4px 0; border: none; background: none; color: #aaa; cursor: pointer;">Cuisine</button>
+        <button style="font-size: 10px; padding: 4px 0; border: none; background: none; color: #aaa; cursor: pointer;">Lifestyle</button>
+      </div>
+      <!-- Mock recipe cards -->
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; border: 1px solid #eee; border-radius: 10px; overflow: hidden; height: 52px;">
+          <div style="width: 52px; background: linear-gradient(135deg, #fde68a, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 18px;">🍳</div>
+          <div style="padding: 8px 12px; flex: 1;">
+            <div style="font-size: 11px; font-weight: 600;">Avocado Toast Deluxe</div>
+            <div style="font-size: 9px; color: #aaa;">No description yet...</div>
+          </div>
+        </div>
+        <div style="display: flex; border: 1px solid #eee; border-radius: 10px; overflow: hidden; height: 52px;">
+          <div style="width: 52px; background: linear-gradient(135deg, #bfdbfe, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 18px;">🍝</div>
+          <div style="padding: 8px 12px; flex: 1;">
+            <div style="font-size: 11px; font-weight: 600;">Baked Ziti Supreme</div>
+            <div style="font-size: 9px; color: #aaa;">Creamy ricotta layers...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C: Micro-Tabs</h3>
+      <p>Tiny underlined tab-style links below the heading. Echoes the "My Recipes / Weekly Planner" tab pattern above but at a smaller scale. Active sort gets an underline.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <h3>How the sort options work</h3>
+  <ul style="font-size: 13px; color: #888; line-height: 1.8;">
+    <li><strong>Newest</strong> (default) — current behavior, by created_at descending</li>
+    <li><strong>A-Z</strong> — alphabetical by title</li>
+    <li><strong>Category</strong> — groups recipes by their category, alphabetically within each</li>
+    <li><strong>Cuisine</strong> — groups by cuisine tag (e.g. Italian, Mexican, Asian)</li>
+    <li><strong>Lifestyle</strong> — groups by lifestyle tag (e.g. Vegetarian, Quick & Easy)</li>
+  </ul>
+  <p style="font-size: 12px; color: #aaa; margin-top: 8px;">Category/Cuisine/Lifestyle would group recipes with a subtle label divider between groups. Recipes with no matching tag land in an "Other" bucket at the bottom.</p>
+</div>
