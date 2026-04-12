@@ -53,6 +53,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             Recipe.objects
             .select_related("author", "parent_recipe__author")
             .prefetch_related("tags")
+            .annotate(
+                _vouch_count_ann=Count("reviews", filter=Q(reviews__is_positive=True))
+            )
         )
         user = self.request.user
 

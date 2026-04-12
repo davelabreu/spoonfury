@@ -1,3 +1,5 @@
+from math import ceil
+
 from django.db import IntegrityError, transaction
 from rest_framework import serializers
 from .models import Recipe, Tag, RecipeReview
@@ -34,17 +36,33 @@ class RecipeSerializer(serializers.ModelSerializer):
         default=list,
     )
 
+    vouch_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Recipe
         fields = [
             "id", "slug", "title", "description", "serves",
             "ingredients", "instructions", "notes", "category",
-            "image_url", "tags",
+            "image_url", "tags", "vouch_count",
             "author_username", "author_display_name",
             "parent_recipe_slug", "parent_recipe_title", "parent_recipe_author",
             "fork_count", "created_at", "status", "published_at", "review_round",
         ]
-        read_only_fields = ["slug", "fork_count", "created_at", "author_username", "status", "published_at", "review_round"]
+        read_only_fields = [
+            "slug", "fork_count", "created_at", "author_username",
+            "status", "published_at", "review_round", "vouch_count",
+        ]
+
+    def get_vouch_count(self, obj):
+        """Cumulative count of positive reviews — always present, regardless of recipe status.
+
+        Uses the queryset annotation (_vouch_count_ann) when available to avoid
+        N+1 queries in list views; falls back to a single COUNT(*) otherwise.
+        """
+        ann = getattr(obj, "_vouch_count_ann", None)
+        if ann is not None:
+            return ann
+        return obj.reviews.filter(is_positive=True).count()
 
     def to_representation(self, instance):
         # Build representation field-by-field, skipping the write-only tags ListField
@@ -60,18 +78,55 @@ class RecipeSerializer(serializers.ModelSerializer):
             ret[field_name] = field.to_representation(attribute) if attribute is not None else None
         ret["tags"] = TagSerializer(instance.tags.all(), many=True).data
 
-        # Attach live vote tally for recipes currently under review
+        # Attach live vote tally for recipes currently under review.
+        # Cumulative across all review rounds (matches the new gate math).
         if instance.status in ("in_review", "mod_queue"):
-            reviews = RecipeReview.objects.filter(
-                recipe=instance, review_round=instance.review_round
-            )
+            reviews = RecipeReview.objects.filter(recipe=instance)
             ret["total_votes"] = reviews.count()
             ret["positive_votes"] = reviews.filter(is_positive=True).count()
         else:
             ret["total_votes"] = None
             ret["positive_votes"] = None
 
+        # Owner/staff-only structured progression indicator.
+        request = self.context.get("request")
+        user = getattr(request, "user", None) if request else None
+        is_owner_or_staff = (
+            user is not None
+            and user.is_authenticated
+            and (user == instance.author or user.is_staff)
+        )
+        if is_owner_or_staff:
+            ret["review_progress"] = self._compute_review_progress(instance)
+        else:
+            ret["review_progress"] = None
+
         return ret
+
+    def _compute_review_progress(self, instance):
+        """Compute the structured progression indicator for owner/staff view.
+
+        Shape: {positive, total, needed_for_threshold, threshold_met}
+        - needed_for_threshold: minimum additional positive votes required to hit
+          80% / ≥3. When total < 3, this is (3 - total). When total >= 3, this is
+          max(0, ceil(0.8 * total) - positive).
+        """
+        reviews = RecipeReview.objects.filter(recipe=instance)
+        total = reviews.count()
+        positive = reviews.filter(is_positive=True).count()
+        if total < 3:
+            needed = max(0, 3 - total)
+            threshold_met = False
+        else:
+            required_positive = ceil(0.8 * total)
+            needed = max(0, required_positive - positive)
+            threshold_met = positive >= required_positive
+        return {
+            "positive": positive,
+            "total": total,
+            "needed_for_threshold": needed,
+            "threshold_met": threshold_met,
+        }
 
     def _resolve_tags(self, tag_names):
         """Get-or-create tags with race condition safety.
