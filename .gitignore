@@ -25,6 +25,9 @@ frontend/dist/
 # Worktrees
 .worktrees/
 
+# MCP tool output
+.playwright-mcp/
+
 # Example templates
 docs/references/
 spoonfury_REAL.sql
