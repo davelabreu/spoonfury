@@ -240,3 +240,77 @@ def test_unique_constraint_rejects_duplicate_reviewer(db):
     RecipeReview.objects.create(recipe=recipe, reviewer=reviewer, review_round=1, is_positive=True)
     with pytest.raises(IntegrityError):
         RecipeReview.objects.create(recipe=recipe, reviewer=reviewer, review_round=2, is_positive=False)
+
+
+@pytest.mark.django_db
+def test_check_threshold_is_cumulative_across_rounds():
+    """After the cumulative gate, votes from all rounds count toward the threshold."""
+    from spoonfury.apps.recipes.views_review import _check_threshold
+
+    author = User.objects.create_user(username="cum_author", password="x")
+    recipe = Recipe.objects.create(
+        title="Cumulative R", description="d", serves="2", category="pasta_noodles",
+        ingredients=VALID_INGREDIENTS,
+        instructions="stir vigorously for a full minute and taste carefully",
+        author=author, status="in_review", review_round=2,
+    )
+    # Three positive votes cast in an earlier round (round=1), recipe is now in round=2.
+    for i in range(3):
+        r = User.objects.create_user(username=f"cum_r{i}", password="x")
+        RecipeReview.objects.create(recipe=recipe, reviewer=r, review_round=1, is_positive=True)
+
+    assert _check_threshold(recipe) is True
+    recipe.refresh_from_db()
+    assert recipe.status == "mod_queue"
+
+
+@pytest.mark.django_db
+def test_review_vote_rejects_duplicate_reviewer_any_round():
+    """A reviewer who already voted (any round) cannot vote again on the same recipe."""
+    from rest_framework.test import APIClient
+
+    author = User.objects.create_user(username="dup_author", password="x")
+    reviewer = User.objects.create_user(username="dup_reviewer", password="x")
+    recipe = Recipe.objects.create(
+        title="Dup R", description="d", serves="2", category="pasta_noodles",
+        ingredients=VALID_INGREDIENTS,
+        instructions="stir and wait a full twenty seconds before tasting",
+        author=author, status="in_review", review_round=2,
+    )
+    # Prior vote from round 1
+    RecipeReview.objects.create(recipe=recipe, reviewer=reviewer, review_round=1, is_positive=True)
+
+    c = APIClient()
+    c.force_authenticate(reviewer)
+    url = reverse("recipe-review-vote", kwargs={"slug": recipe.slug})
+    resp = c.post(url, {"is_positive": False}, format="json")
+    assert resp.status_code == 400
+    assert "already voted on this recipe" in resp.data["detail"].lower()
+
+
+@pytest.mark.django_db
+def test_review_list_public_for_published_recipe():
+    """Published recipes return the full reviews array to anonymous viewers."""
+    from rest_framework.test import APIClient
+
+    author = User.objects.create_user(username="pub_author", password="x")
+    voter = User.objects.create_user(username="pub_voter", password="x")
+    recipe = Recipe.objects.create(
+        title="Pub R", description="d", serves="2", category="pasta_noodles",
+        ingredients=VALID_INGREDIENTS,
+        instructions="bake for thirty minutes at three fifty degrees",
+        author=author, status="published", review_round=1,
+    )
+    RecipeReview.objects.create(
+        recipe=recipe, reviewer=voter, review_round=1, is_positive=True, comment="Loved it"
+    )
+
+    c = APIClient()  # anonymous
+    url = reverse("recipe-reviews-list", kwargs={"slug": recipe.slug})
+    resp = c.get(url)
+    assert resp.status_code == 200
+    data = resp.data
+    assert data["total_votes"] == 1
+    assert data["positive_votes"] == 1
+    assert len(data["reviews"]) == 1
+    assert data["reviews"][0]["comment"] == "Loved it"

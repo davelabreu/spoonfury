@@ -107,8 +107,13 @@ def withdraw_review(request, slug):
 
 
 def _check_threshold(recipe):
-    """Check if review threshold is met and auto-promote to mod_queue."""
-    reviews = RecipeReview.objects.filter(recipe=recipe, review_round=recipe.review_round)
+    """Check if the cumulative review threshold is met and auto-promote to mod_queue.
+
+    Lifetime-cumulative: counts ALL reviews on the recipe, not just the current round.
+    Once the gate is hit, the recipe is promoted; subsequent state transitions
+    (e.g. revision_requested → mod_queue) preserve the same vote pool.
+    """
+    reviews = RecipeReview.objects.filter(recipe=recipe)
     total = reviews.count()
     if total < 3:
         return False
@@ -142,9 +147,12 @@ def review_vote(request, slug):
         raise PermissionDenied("You cannot review your own recipe.")
 
     if RecipeReview.objects.filter(
-        recipe=recipe, reviewer=request.user, review_round=recipe.review_round
+        recipe=recipe, reviewer=request.user
     ).exists():
-        return Response({"detail": "You already voted in this round."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"detail": "You already voted on this recipe."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     is_positive = request.data.get("is_positive")
     if is_positive is None:
@@ -172,20 +180,27 @@ def review_vote(request, slug):
 
 
 @api_view(["GET"])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.AllowAny])
 def review_list(request, slug):
     """
-    List reviews for the current round. Blind until viewer has voted.
-    Also returns:
-      - all_rounds: historical reviews grouped by round (always visible to owner)
-      - moderation_feedback: all moderator revision-request notes (always visible to owner)
+    List reviews for the recipe.
+
+    - Published recipes: fully public. Anyone (even anonymous) reads all reviews.
+    - In-review recipes: blind until viewer has voted (unchanged behavior).
+    - Owner and staff always see full history + moderator feedback.
     """
     from .models import ModerationAction
     recipe = Recipe.objects.select_related("author").get(slug=slug)
-    current_reviews = RecipeReview.objects.filter(recipe=recipe, review_round=recipe.review_round)
-    total = current_reviews.count()
-    positive = current_reviews.filter(is_positive=True).count()
-    has_voted = current_reviews.filter(reviewer=request.user).exists()
+    all_reviews_qs = RecipeReview.objects.filter(recipe=recipe)
+    total = all_reviews_qs.count()
+    positive = all_reviews_qs.filter(is_positive=True).count()
+
+    is_authed = request.user.is_authenticated
+    has_voted = is_authed and all_reviews_qs.filter(reviewer=request.user).exists()
+    is_owner_or_staff = is_authed and (
+        request.user == recipe.author or request.user.is_staff
+    )
+    is_published = recipe.status == "published"
 
     data = {
         "review_round": recipe.review_round,
@@ -195,8 +210,8 @@ def review_list(request, slug):
         "has_voted": has_voted,
     }
 
-    # Current round reviews revealed after voting
-    if has_voted:
+    reveal_reviews = is_published or has_voted or is_owner_or_staff
+    if reveal_reviews:
         data["reviews"] = [
             {
                 "reviewer": r.reviewer.username,
@@ -205,12 +220,12 @@ def review_list(request, slug):
                 "round": r.review_round,
                 "created_at": r.created_at.isoformat(),
             }
-            for r in current_reviews.select_related("reviewer")
+            for r in all_reviews_qs.select_related("reviewer").order_by("review_round", "created_at")
         ]
 
-    # Owner and staff see full history across all rounds
-    if request.user == recipe.author or request.user.is_staff:
-        all_reviews = RecipeReview.objects.filter(recipe=recipe).select_related("reviewer").order_by("review_round", "created_at")
+    # Owner and staff see full history across all rounds + moderation feedback
+    if is_owner_or_staff:
+        all_reviews = all_reviews_qs.select_related("reviewer").order_by("review_round", "created_at")
         data["all_rounds"] = [
             {
                 "reviewer": r.reviewer.username,
