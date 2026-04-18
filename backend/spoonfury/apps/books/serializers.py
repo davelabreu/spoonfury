@@ -12,16 +12,16 @@ class RecipeBookSerializer(serializers.ModelSerializer):
         model = RecipeBook
         fields = [
             "id", "title", "cover_image", "owner_username",
-            "is_public", "share_token", "share_url",
+            "is_public", "is_default", "share_token", "share_url",
             "recipe_count", "created_at",
         ]
-        read_only_fields = ["share_token", "owner_username", "created_at"]
+        read_only_fields = ["share_token", "owner_username", "is_default", "created_at"]
 
     def get_recipe_count(self, obj):
         return obj.recipes.count()
 
     def get_share_url(self, obj):
-        return f"/books/share/{obj.share_token}"
+        return f"/collections/share/{obj.share_token}"
 
     def create(self, validated_data):
         validated_data["owner"] = self.context["request"].user
