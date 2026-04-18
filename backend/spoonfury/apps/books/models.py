@@ -21,6 +21,8 @@ class RecipeBook(models.Model):
         ("kitchen_sink", "Kitchen Sink"),
     ]
     default_role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="", blank=True)
+    icon = models.CharField(max_length=10, default="", blank=True)
+    description = models.CharField(max_length=200, default="", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

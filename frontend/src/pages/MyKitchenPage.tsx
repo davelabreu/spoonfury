@@ -8,8 +8,8 @@
  * Also includes test kitchen sharing controls.
  */
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { LayoutGrid, List, MoreHorizontal, Trash2, FolderInput } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { LayoutGrid, List, MoreVertical, Trash2, FolderInput, Pencil, Share2, Settings2 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,15 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { WeeklyPlanner } from "@/components/planner/WeeklyPlanner";
 import { toast } from "sonner";
 import { getCategoryFallback } from "@/lib/categoryFallback";
@@ -71,7 +80,7 @@ function GateChecklist({ gate }: { gate: PublishGate }) {
 
 function StatusBadge({ status, isForked }: { status: string; isForked?: boolean }) {
   const config: Record<string, { label: string; className: string }> = {
-    draft: { label: isForked ? "Forked Draft" : "Draft", className: isForked ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-600" },
+    draft: { label: isForked ? "Forked Draft" : "Original Draft", className: isForked ? "bg-indigo-100 text-indigo-700" : "bg-orange-100 text-orange-700" },
     in_review: { label: "In Review", className: "bg-blue-100 text-blue-700" },
     mod_queue: { label: "In Moderation", className: "bg-purple-100 text-purple-700" },
     revision_requested: { label: "Revision Needed", className: "bg-orange-100 text-orange-700" },
@@ -208,6 +217,7 @@ function CompactRow({ recipe, collections, onMove, onDelete }: {
   onDelete?: (slug: string) => void;
 }) {
   const fallback = getCategoryFallback(recipe.category);
+  const navigate = useNavigate();
 
   return (
     <div className="flex items-center gap-2.5 px-3 py-2 bg-background hover:bg-accent transition-colors">
@@ -227,6 +237,24 @@ function CompactRow({ recipe, collections, onMove, onDelete }: {
       </Link>
       {(onMove || onDelete) && (
         <div className="flex items-center gap-1 shrink-0">
+          <button
+            onClick={() => navigate(`/recipes/${recipe.slug}/edit`)}
+            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            title="Edit recipe"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => {
+              const url = `${window.location.origin}/recipes/${recipe.slug}`;
+              navigator.clipboard.writeText(url);
+              toast("Link copied!");
+            }}
+            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            title="Share"
+          >
+            <Share2 className="h-3.5 w-3.5" />
+          </button>
           {onMove && collections && collections.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -266,6 +294,7 @@ function RecipeCard({ recipe, showGate, collections, onMove, onDelete }: {
   onMove?: (slug: string, bookId: number) => void;
   onDelete?: (slug: string) => void;
 }) {
+  const navigate = useNavigate();
   const gate = showGate ? getPublishGate(recipe) : null;
   const fallback = getCategoryFallback(recipe.category);
   const [imgError, setImgError] = useState(false);
@@ -333,31 +362,48 @@ function RecipeCard({ recipe, showGate, collections, onMove, onDelete }: {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="p-1.5 rounded-lg bg-background/80 backdrop-blur-sm border border-border/50 text-muted-foreground hover:text-foreground hover:bg-background transition-colors shadow-sm">
-                <MoreHorizontal className="h-4 w-4" />
+                <MoreVertical className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-[180px]">
+              <DropdownMenuItem onClick={() => navigate(`/recipes/${recipe.slug}/edit`)}>
+                <Pencil className="h-3.5 w-3.5 mr-2" />
+                <span className="text-xs">Edit Recipe</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => {
+                const url = `${window.location.origin}/recipes/${recipe.slug}`;
+                navigator.clipboard.writeText(url);
+                toast("Link copied!");
+              }}>
+                <Share2 className="h-3.5 w-3.5 mr-2" />
+                <span className="text-xs">Share</span>
+              </DropdownMenuItem>
               {onMove && collections && collections.length > 0 && (
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <FolderInput className="h-3.5 w-3.5 mr-2" />
-                    <span className="text-xs">Move to collection</span>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="min-w-[160px]">
-                    {collections.map(c => (
-                      <DropdownMenuItem key={c.id} onClick={() => onMove(recipe.slug, c.id)}>
-                        <span className="text-xs">{c.title}</span>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <FolderInput className="h-3.5 w-3.5 mr-2" />
+                      <span className="text-xs">Move to Collection</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className="min-w-[160px]">
+                      {collections.map(c => (
+                        <DropdownMenuItem key={c.id} onClick={() => onMove(recipe.slug, c.id)}>
+                          <span className="text-xs">{c.title}</span>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                </>
               )}
-              {onMove && onDelete && <DropdownMenuSeparator />}
               {onDelete && (
-                <DropdownMenuItem onClick={() => onDelete(recipe.slug)} className="text-red-600 focus:text-red-600">
-                  <Trash2 className="h-3.5 w-3.5 mr-2" />
-                  <span className="text-xs">Delete recipe</span>
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => onDelete(recipe.slug)} className="text-red-600 focus:text-red-600">
+                    <Trash2 className="h-3.5 w-3.5 mr-2" />
+                    <span className="text-xs">Delete Recipe</span>
+                  </DropdownMenuItem>
+                </>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -463,14 +509,42 @@ export function MyKitchenPage() {
     } catch {}
   };
 
+  const refreshCollections = async () => {
+    if (!token) return;
+    const data = await api.get("/books/", token);
+    const results: Book[] = data.results ?? data;
+    setCollections(results);
+    // Refresh expanded collection if one is open
+    if (expandedId) {
+      try {
+        const detail = await api.get(`/books/${expandedId}/`, token);
+        setExpandedRecipes(detail.recipes ?? []);
+      } catch {
+        setExpandedRecipes([]);
+      }
+    }
+  };
+
   const handleMoveToCollection = async (recipeSlug: string, bookId: number) => {
     if (!token) return;
     try {
+      // Remove from all current collections first
+      for (const col of collections) {
+        if (col.id !== bookId) {
+          try {
+            await api.post(`/books/${col.id}/remove-recipe/`, { recipe_slug: recipeSlug }, token);
+          } catch {
+            // Recipe may not be in this collection — ignore
+          }
+        }
+      }
+      // Add to the target collection
       await api.post(`/books/${bookId}/add-recipe/`, { recipe_slug: recipeSlug }, token);
       const col = collections.find(c => c.id === bookId);
-      toast(`Added to ${col?.title ?? "collection"}`);
+      toast(`Moved to ${col?.title ?? "collection"}`);
+      await refreshCollections();
     } catch {
-      toast.error("Failed to add to collection.");
+      toast.error("Failed to move to collection.");
     }
   };
 
@@ -482,8 +556,78 @@ export function MyKitchenPage() {
       await api.delete(`/recipes/${recipeSlug}/`, token);
       setRecipes(prev => prev.filter(r => r.slug !== recipeSlug));
       toast("Recipe deleted.");
+      await refreshCollections();
     } catch {
       toast.error("Failed to delete recipe.");
+    }
+  };
+
+  const handleRenameCollection = async (collectionId: number) => {
+    if (!token) return;
+    const col = collections.find(c => c.id === collectionId);
+    if (!col) return;
+    const newName = prompt("Rename collection:", col.title);
+    if (!newName || !newName.trim() || newName.trim() === col.title) return;
+    try {
+      await api.patch(`/books/${collectionId}/`, { title: newName.trim() }, token);
+      toast(`Renamed to "${newName.trim()}"`);
+      await refreshCollections();
+    } catch {
+      toast.error("Failed to rename collection.");
+    }
+  };
+
+  // ── Edit Collection dialog state ──
+  const COLLECTION_PRESETS = [
+    { label: "Quick Meals", icon: "\u26A1" },
+    { label: "Meal Prep", icon: "\u{1F371}" },
+    { label: "Slow Cooking", icon: "\u{1F372}" },
+    { label: "Vegetarian", icon: "\u{1F331}" },
+    { label: "Clean Eating", icon: "\u{1F96C}" },
+    { label: "Custom", icon: "\u{1F4C1}" },
+  ];
+  const [editingCollection, setEditingCollection] = useState<Book | null>(null);
+  const [editIcon, setEditIcon] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+
+  const openEditCollection = (collectionId: number) => {
+    const col = collections.find(c => c.id === collectionId);
+    if (!col) return;
+    setEditingCollection(col);
+    setEditIcon(col.icon || "\u{1F4C1}");
+    setEditDescription(col.description || "");
+  };
+
+  const saveEditCollection = async () => {
+    if (!token || !editingCollection) return;
+    try {
+      await api.patch(`/books/${editingCollection.id}/`, {
+        icon: editIcon,
+        description: editDescription.trim(),
+      }, token);
+      toast("Collection updated!");
+      setEditingCollection(null);
+      await refreshCollections();
+    } catch {
+      toast.error("Failed to update collection.");
+    }
+  };
+
+  const handleDeleteCollection = async (collectionId: number) => {
+    if (!token) return;
+    const col = collections.find(c => c.id === collectionId);
+    if (!col) return;
+    if (!confirm(`Delete collection "${col.title}"? Recipes inside won't be deleted.`)) return;
+    try {
+      await api.delete(`/books/${collectionId}/`, token);
+      toast(`Deleted "${col.title}"`);
+      if (expandedId === collectionId) {
+        setExpandedId(null);
+        setExpandedRecipes([]);
+      }
+      await refreshCollections();
+    } catch {
+      toast.error("Failed to delete collection.");
     }
   };
 
@@ -548,31 +692,74 @@ export function MyKitchenPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-              {collections.map((c, i) => {
-                const gradients = [
-                  "from-amber-500 to-orange-600",
-                  "from-teal-400 to-emerald-600",
-                  "from-indigo-500 to-purple-600",
-                  "from-pink-400 to-rose-600",
-                  "from-sky-400 to-blue-600",
-                  "from-lime-400 to-green-600",
-                  "from-fuchsia-400 to-purple-600",
-                  "from-orange-400 to-red-600",
-                ];
-                const gradient = gradients[i % gradients.length];
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[...collections].sort((a, b) => {
+                const roleOrder = (r: string) => r === "kitchen_sink" ? 0 : r === "forked" ? 1 : 2;
+                const oa = roleOrder(a.default_role ?? "");
+                const ob = roleOrder(b.default_role ?? "");
+                if (oa !== ob) return oa - ob;
+                return a.title.localeCompare(b.title);
+              }).map(c => {
+                const role = c.default_role ?? "";
                 const isExpanded = expandedId === c.id;
+                const stripeColor = role === "kitchen_sink" ? "bg-primary" : role === "forked" ? "bg-indigo-500" : "bg-slate-300";
+                const icon = role === "kitchen_sink" ? "\u{1F9D1}\u200D\u{1F373}" : role === "forked" ? "\u{1F374}" : (c.icon || "\u{1F4C1}");
                 return (
-                  <button
+                  <div
                     key={c.id}
-                    onClick={() => toggleCollection(c.id)}
-                    className={`bg-gradient-to-br ${gradient} rounded-lg p-3 text-white text-left transition-all ${
-                      isExpanded ? "ring-2 ring-offset-2 ring-amber-500" : "hover:scale-[1.02]"
-                    }`}
+                    className={`relative flex items-center gap-3 bg-white rounded-xl px-4 py-3 text-left shadow-sm transition-all ${
+                      isExpanded ? "ring-2 ring-primary shadow-md" : "hover:shadow-md"
+                    } border-l-[3px] ${stripeColor}`}
                   >
-                    <div className="font-bold text-sm truncate">{c.title}</div>
-                    <div className="text-xs opacity-80">{c.recipe_count ?? 0} recipe{(c.recipe_count ?? 0) !== 1 ? "s" : ""}</div>
-                  </button>
+                    <button
+                      onClick={() => toggleCollection(c.id)}
+                      className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                    >
+                      <span className="text-xl w-9 h-9 flex items-center justify-center rounded-lg bg-muted shrink-0">{icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-[13px] truncate">{c.title}</div>
+                        {c.description && (
+                          <p className="text-[10px] text-muted-foreground truncate mt-0.5">{c.description}</p>
+                        )}
+                        <div className="flex items-center gap-2 mt-1">
+                          {role === "kitchen_sink" && (
+                            <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">Originals</span>
+                          )}
+                          {role === "forked" && (
+                            <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 border border-indigo-200">Forked</span>
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-xl font-extrabold text-zinc-200 shrink-0">{c.recipe_count ?? 0}</span>
+                    </button>
+                    {!role && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            onClick={e => e.stopPropagation()}
+                            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="min-w-[160px]">
+                          <DropdownMenuItem onClick={() => openEditCollection(c.id)}>
+                            <Settings2 className="h-3.5 w-3.5 mr-2" />
+                            <span className="text-xs">Edit Collection</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleRenameCollection(c.id)}>
+                            <Pencil className="h-3.5 w-3.5 mr-2" />
+                            <span className="text-xs">Rename Collection</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleDeleteCollection(c.id)} className="text-red-600 focus:text-red-600">
+                            <Trash2 className="h-3.5 w-3.5 mr-2" />
+                            <span className="text-xs">Delete Collection</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -766,13 +953,13 @@ export function MyKitchenPage() {
             ) : publishedView === "card" ? (
               <div className="space-y-3">
                 {sortedPublished.map(r => (
-                  <RecipeCard key={r.slug} recipe={r} />
+                  <RecipeCard key={r.slug} recipe={r} collections={collections} onMove={handleMoveToCollection} onDelete={handleDeleteRecipe} />
                 ))}
               </div>
             ) : (
               <div className="flex flex-col gap-px bg-muted rounded-lg overflow-hidden">
                 {sortedPublished.map(r => (
-                  <CompactRow key={r.slug} recipe={r} />
+                  <CompactRow key={r.slug} recipe={r} collections={collections} onMove={handleMoveToCollection} onDelete={handleDeleteRecipe} />
                 ))}
               </div>
             )}
@@ -783,6 +970,52 @@ export function MyKitchenPage() {
           <WeeklyPlanner />
         </div>
       )}
+
+      {/* Edit Collection Dialog */}
+      <Dialog open={!!editingCollection} onOpenChange={open => { if (!open) setEditingCollection(null); }}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Edit Collection</DialogTitle>
+            <DialogDescription>Choose an icon and add a description.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground mb-2 block">Icon</label>
+              <div className="flex flex-wrap gap-2">
+                {COLLECTION_PRESETS.map(p => (
+                  <button
+                    key={p.label}
+                    onClick={() => setEditIcon(p.icon)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm transition-all ${
+                      editIcon === p.icon
+                        ? "border-primary bg-primary/5 ring-1 ring-primary"
+                        : "border-border hover:border-foreground/20"
+                    }`}
+                  >
+                    <span>{p.icon}</span>
+                    <span className="text-xs">{p.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground mb-2 block">Description</label>
+              <Textarea
+                value={editDescription}
+                onChange={e => setEditDescription(e.target.value)}
+                placeholder="What's this collection about?"
+                className="text-sm resize-none h-10"
+                maxLength={42}
+              />
+              <p className="text-[10px] text-muted-foreground text-right mt-1">{editDescription.length}/42</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setEditingCollection(null)}>Cancel</Button>
+            <Button size="sm" onClick={saveEditCollection}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

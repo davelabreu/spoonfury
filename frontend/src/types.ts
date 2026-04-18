@@ -61,6 +61,7 @@ export interface Book {
   id: number;
   title: string;
   description?: string;
+  icon?: string;
   is_public: boolean;
   default_role?: string;
   recipe_count?: number;

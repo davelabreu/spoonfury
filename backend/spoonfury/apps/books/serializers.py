@@ -12,7 +12,8 @@ class RecipeBookSerializer(serializers.ModelSerializer):
         model = RecipeBook
         fields = [
             "id", "title", "cover_image", "owner_username",
-            "is_public", "default_role", "share_token", "share_url",
+            "is_public", "default_role", "icon", "description",
+            "share_token", "share_url",
             "recipe_count", "created_at",
         ]
         read_only_fields = ["share_token", "owner_username", "default_role", "created_at"]
