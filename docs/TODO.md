@@ -122,14 +122,10 @@ through instructions so they can reference amounts without losing their place.
 - Step interactivity: border glow or slight scale-up on the active instruction step.
 - Activates when Cook Now is on — doesn't change layout in normal reading mode.
 
-### Shadcn UI Consistency Pass
+### ~~Shadcn UI Consistency Pass~~ — DONE (v0.9.1)
 
-Uniform UI — replace remaining raw HTML elements with installed Shadcn components.
-Currently ~60% adopted. No functional changes, just consistency.
-
-- **Phase 1 (quick):** EditRecipePage raw inputs/textareas → Shadcn Input/Textarea (match CreateRecipePage), LoginPage + RegisterPage raw inputs → Shadcn Input, BooksPage input, IngredientRow raw checkbox → Shadcn Checkbox
-- **Phase 2 (medium):** 4 raw `<select>` elements → Shadcn Select (CreateRecipe, EditRecipe, RecipePage, ForkModal), simple raw buttons → Shadcn Button (ShareModal, BuyNowSheet, ReceiptSidebar)
-- **Phase 3 (larger):** Custom modals (ForkModal, ShareModal, BuyNowSheet) → Shadcn Dialog (needs Framer Motion animation preservation). NavBar buttons are fine as-is (justified by animation needs).
+~~Uniform UI — replace remaining raw HTML elements with installed Shadcn components.~~
+Shipped: Phase 1 (inputs/textareas), Phase 2 (selects/buttons), Phase 3 (modals → Dialog). NavBar buttons left as-is (Framer Motion).
 
 ### Shopping List UX Polish
 
@@ -137,6 +133,16 @@ Currently ~60% adopted. No functional changes, just consistency.
   updates via a shared context so the count updates immediately after "Add to List"
   without requiring a page navigation.
 - BuyNowSheet UX/UI improvements deferred.
+
+### Books → Collections (rebrand + My Kitchen integration)
+
+"My Books" feels redundant now that My Kitchen exists. Rebrand books as **Collections** and fold them into My Kitchen as a section.
+
+- Rename `RecipeBook` concept to "Collection" in the UI (backend model name can stay).
+- Add a **"Forked Recipes"** default collection, auto-created per user.
+- Fork flow defaults to "Forked Recipes" collection — no book picker needed for the common case. Users can change collection or create a new one, but the default should Just Work.
+- Remove standalone `/books` page — collections live inside My Kitchen.
+- Update NavBar links, ForkModal, and any references to "books".
 
 ---
 

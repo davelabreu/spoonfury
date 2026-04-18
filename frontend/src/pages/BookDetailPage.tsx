@@ -105,13 +105,15 @@ export function BookDetailPage({ shared = false }: { shared?: boolean }) {
             </div>
 
             {isOwner && !shared && (
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={(e) => removeFromBook(e, r.slug)}
-                className="flex items-center gap-1.5 p-1.5 rounded-md text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 whitespace-nowrap"
+                className="gap-1.5 p-1.5 text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 whitespace-nowrap"
               >
                 <X className="w-3.5 h-3.5" />
                 <span className="text-[10px] font-bold uppercase tracking-tight">Remove recipe from book</span>
-              </button>
+              </Button>
             )}
           </Link>
         ))}

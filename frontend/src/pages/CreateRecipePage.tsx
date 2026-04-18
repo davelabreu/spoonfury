@@ -11,7 +11,9 @@ import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -158,29 +160,48 @@ export function CreateRecipePage() {
                 />
                 <Input className="w-16 text-xs" placeholder="Qty"
                   value={ing.quantity} onChange={e => updateIng(i, "quantity", e.target.value)} />
-                <select className="h-9 rounded-md border border-input bg-transparent px-2 text-xs"
-                  value={ing.unit} onChange={e => updateIng(i, "unit", e.target.value)}>
-                  <option value="">unit</option>
-                  <optgroup label="Volume">
-                    <option>tsp</option><option>tbsp</option><option>cup</option>
-                    <option>fl oz</option><option>ml</option><option>L</option>
-                  </optgroup>
-                  <optgroup label="Weight">
-                    <option>g</option><option>kg</option><option>oz</option><option>lb</option>
-                  </optgroup>
-                  <optgroup label="Cooking">
-                    <option>pinch</option><option>clove</option><option>slice</option>
-                    <option>sprig</option><option>bunch</option><option>head</option>
-                    <option>can</option><option>pkg</option>
-                  </optgroup>
-                </select>
+                <Select value={ing.unit} onValueChange={v => updateIng(i, "unit", v === "__none__" ? "" : v)}>
+                  <SelectTrigger className="w-20 h-9 text-xs">
+                    <SelectValue placeholder="unit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">unit</SelectItem>
+                    <SelectGroup>
+                      <SelectLabel>Volume</SelectLabel>
+                      <SelectItem value="tsp">tsp</SelectItem>
+                      <SelectItem value="tbsp">tbsp</SelectItem>
+                      <SelectItem value="cup">cup</SelectItem>
+                      <SelectItem value="fl oz">fl oz</SelectItem>
+                      <SelectItem value="ml">ml</SelectItem>
+                      <SelectItem value="L">L</SelectItem>
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Weight</SelectLabel>
+                      <SelectItem value="g">g</SelectItem>
+                      <SelectItem value="kg">kg</SelectItem>
+                      <SelectItem value="oz">oz</SelectItem>
+                      <SelectItem value="lb">lb</SelectItem>
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Cooking</SelectLabel>
+                      <SelectItem value="pinch">pinch</SelectItem>
+                      <SelectItem value="clove">clove</SelectItem>
+                      <SelectItem value="slice">slice</SelectItem>
+                      <SelectItem value="sprig">sprig</SelectItem>
+                      <SelectItem value="bunch">bunch</SelectItem>
+                      <SelectItem value="head">head</SelectItem>
+                      <SelectItem value="can">can</SelectItem>
+                      <SelectItem value="pkg">pkg</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
                 <Input className="flex-1 text-xs" placeholder="Ingredient name"
                   value={ing.name} onChange={e => updateIng(i, "name", e.target.value)} />
                 <Input className="w-24 text-xs" placeholder="Note"
                   value={ing.note} onChange={e => updateIng(i, "note", e.target.value)} />
                 {ingredients.length > 1 && (
-                  <button type="button" onClick={() => setIngredients(p => p.filter((_, idx) => idx !== i))}
-                    className="text-xs text-red-500 hover:text-red-700">✕</button>
+                  <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 shrink-0"
+                    onClick={() => setIngredients(p => p.filter((_, idx) => idx !== i))}>✕</Button>
                 )}
               </div>
             ))}

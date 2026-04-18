@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import type { ReviewsResponse, RecipeStatus } from "@/types";
 
 interface ReviewPanelProps {
@@ -174,21 +176,21 @@ export function ReviewPanel({ recipeSlug, token, recipeStatus, reviewData: exter
           {/* Comment + Submit — below the 3-column grid when voting */}
           {canVote && (
             <div className="mt-4 space-y-3">
-              <textarea
+              <Textarea
                 placeholder="Optional comment..."
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 rows={2}
-                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-4 text-[11px] font-mono tracking-wide outline-none resize-none transition-all duration-300 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"
+                className="bg-slate-50/50 border-slate-200 text-[11px] font-mono tracking-wide resize-none focus-visible:ring-amber-500/30 focus-visible:border-amber-500"
               />
-              <button
+              <Button
                 type="button"
                 onClick={handleSubmit}
                 disabled={submitDisabled}
-                className="w-full py-3 bg-amber-500 text-white font-black uppercase tracking-wide rounded-xl shadow-[0_4px_14px_rgba(245,158,11,0.2)] hover:bg-amber-600 active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full py-3 bg-amber-500 text-white font-black uppercase tracking-wide rounded-xl shadow-[0_4px_14px_rgba(245,158,11,0.2)] hover:bg-amber-600 active:scale-[0.98] disabled:opacity-40 cursor-pointer"
               >
                 {submitting ? "Submitting..." : "Submit Review"}
-              </button>
+              </Button>
               {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
           )}
@@ -287,21 +289,21 @@ export function ReviewPanel({ recipeSlug, token, recipeStatus, reviewData: exter
           {/* Comment + Submit — below the 3-column grid when voting */}
           {canVote && (
             <div className="mt-4 space-y-3">
-              <textarea
+              <Textarea
                 placeholder="Optional comment..."
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 rows={2}
-                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-4 text-[11px] font-mono tracking-wide outline-none resize-none transition-all duration-300 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"
+                className="bg-slate-50/50 border-slate-200 text-[11px] font-mono tracking-wide resize-none focus-visible:ring-amber-500/30 focus-visible:border-amber-500"
               />
-              <button
+              <Button
                 type="button"
                 onClick={handleSubmit}
                 disabled={submitDisabled}
-                className="w-full py-3 bg-amber-500 text-white font-black uppercase tracking-wide rounded-xl shadow-[0_4px_14px_rgba(245,158,11,0.2)] hover:bg-amber-600 active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full py-3 bg-amber-500 text-white font-black uppercase tracking-wide rounded-xl shadow-[0_4px_14px_rgba(245,158,11,0.2)] hover:bg-amber-600 active:scale-[0.98] disabled:opacity-40 cursor-pointer"
               >
                 {submitting ? "Submitting..." : "Submit Review"}
-              </button>
+              </Button>
               {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
           )}

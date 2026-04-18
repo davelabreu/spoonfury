@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function RegisterPage() {
@@ -25,7 +26,7 @@ export function RegisterPage() {
   };
 
   const field = (key: keyof typeof form, placeholder: string, type = "text") => (
-    <input className="w-full border rounded px-3 py-2 text-sm" type={type} placeholder={placeholder}
+    <Input type={type} placeholder={placeholder}
       value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} />
   );
 

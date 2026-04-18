@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -68,8 +69,8 @@ export function BooksPage() {
           <h1 className="text-3xl font-bold tracking-tight">My Recipe Books</h1>
         </div>
         <div className="flex gap-2 max-w-xs w-full">
-          <input
-            className="flex-1 border border-border bg-background rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+          <Input
+            className="flex-1"
             placeholder="New book title…"
             value={newTitle}
             onChange={e => setNewTitle(e.target.value)}

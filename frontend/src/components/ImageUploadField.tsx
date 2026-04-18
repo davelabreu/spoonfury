@@ -2,6 +2,7 @@ import { useRef, useState, useCallback } from "react";
 import { api } from "@/lib/api";
 import { Camera, Trash2, Upload, Loader2, Link as LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 /**
  * ImageUploadField — unified drop zone for recipe hero photos.
@@ -186,9 +187,9 @@ export function ImageUploadField({ value, onChange, token }: Props) {
           {showUrlInput ? (
             <div className="flex gap-2 items-center">
               <LinkIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-              <input
+              <Input
                 type="url"
-                className="border rounded-md px-3 py-1.5 text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                className="flex-1"
                 placeholder="https://example.com/photo.jpg"
                 autoFocus
                 onPaste={(e) => {
@@ -212,13 +213,15 @@ export function ImageUploadField({ value, onChange, token }: Props) {
               />
             </div>
           ) : (
-            <button
+            <Button
               type="button"
+              variant="link"
+              size="sm"
               onClick={() => setShowUrlInput(true)}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
             >
               or paste a URL
-            </button>
+            </Button>
           )}
         </div>
       )}

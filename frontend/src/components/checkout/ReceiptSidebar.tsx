@@ -2,6 +2,7 @@
 import { getCategoryFallback } from "@/lib/categoryFallback";
 import { getEstimatedPrice, calculateSummary } from "@/lib/pricing";
 import { buildInstacartUrl } from "@/lib/instacart";
+import { Button } from "@/components/ui/button";
 import type { Fulfillment } from "@/lib/pricing";
 import type { RecipeGroup } from "@/types";
 import type { Ingredient } from "@/types";
@@ -43,24 +44,28 @@ export function ReceiptSidebar({ groups, fulfillment, onFulfillmentChange, broke
       {/* Fulfillment toggle */}
       <div className="flex justify-end">
         <div className="flex bg-muted rounded-lg p-0.5">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => onFulfillmentChange("pickup")}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-              fulfillment === "pickup" ? "bg-amber-500 text-black" : "text-muted-foreground"
+            className={`px-3 py-1.5 text-xs font-semibold rounded-md ${
+              fulfillment === "pickup" ? "bg-amber-500 text-black hover:bg-amber-500" : "text-muted-foreground"
             }`}
           >
             🚗 Pickup
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => onFulfillmentChange("delivery")}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-              fulfillment === "delivery" ? "bg-amber-500 text-black" : "text-muted-foreground"
+            className={`px-3 py-1.5 text-xs font-semibold rounded-md ${
+              fulfillment === "delivery" ? "bg-amber-500 text-black hover:bg-amber-500" : "text-muted-foreground"
             }`}
           >
             🏠 Delivery
-          </button>
+          </Button>
         </div>
       </div>
 

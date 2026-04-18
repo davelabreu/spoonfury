@@ -1,6 +1,7 @@
 // frontend/src/components/checkout/IngredientRow.tsx
 import { useRef } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { getIngredientEmoji } from "@/lib/ingredientEmoji";
 import { getIngredientInfo } from "@/lib/ingredientInfo";
@@ -149,14 +150,16 @@ export function IngredientRow({ item, multiplier = 1, onDelete, onToggle }: Ingr
       <span className="text-sm font-semibold text-amber-500 min-w-[3rem] text-right tabular-nums">
         ${price.toFixed(2)}
       </span>
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon"
         onClick={() => onDelete(item)}
-        className="trash-shake p-1 rounded text-muted-foreground hover:text-destructive transition-colors shrink-0"
+        className="trash-shake h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
         aria-label={`Remove ${item.name}`}
       >
         <Trash2 className="w-3.5 h-3.5" />
-      </button>
+      </Button>
     </div>
   );
 }

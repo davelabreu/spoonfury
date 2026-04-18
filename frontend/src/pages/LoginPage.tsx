@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function LoginPage() {
@@ -27,9 +28,9 @@ export function LoginPage() {
         <CardHeader><CardTitle>Sign in</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={submit} className="space-y-4">
-            <input className="w-full border rounded px-3 py-2 text-sm" placeholder="Username"
+            <Input placeholder="Username"
               value={form.username} onChange={e => setForm(f => ({ ...f, username: e.target.value }))} />
-            <input className="w-full border rounded px-3 py-2 text-sm" type="password" placeholder="Password"
+            <Input type="password" placeholder="Password"
               value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} />
             {error && <p className="text-sm text-red-500">{error}</p>}
             <Button type="submit" className="w-full">Sign in</Button>

@@ -117,13 +117,15 @@ export function FilterShelf({ filters, onChange, onSearch, onClear }: FilterShel
               {activeCount}
             </Badge>
           </Button>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onClear}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="gap-1 text-xs text-muted-foreground hover:text-foreground"
           >
             <X className="h-3 w-3" />
             Clear filters
-          </button>
+          </Button>
         </div>
       )}
     </div>

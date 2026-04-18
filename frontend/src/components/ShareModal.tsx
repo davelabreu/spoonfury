@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { X, Copy, Check } from "lucide-react";
+import { Copy, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ShareModalProps {
   url: string;
@@ -21,37 +29,14 @@ export function ShareModal({ url, title, onClose }: ShareModalProps) {
     return () => clearTimeout(timer);
   }, [copied]);
 
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
-
   const waUrl = `https://wa.me/?text=${encodeURIComponent(`${title} — ${url}`)}`;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]"
-      onClick={onClose}
-    >
-      <div
-        className="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4 space-y-5"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-base">Share recipe</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            aria-label="Close"
-          >
-            <X size={18} />
-          </button>
-        </div>
+    <Dialog open onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Share recipe</DialogTitle>
+        </DialogHeader>
 
         {/* QR Code */}
         <div className="flex justify-center py-2">
@@ -60,17 +45,19 @@ export function ShareModal({ url, title, onClose }: ShareModalProps) {
 
         {/* Copyable URL */}
         <div className="flex items-center gap-2">
-          <input
+          <Input
             readOnly
             value={url}
             aria-label="Recipe URL"
-            className="flex-1 text-sm border rounded-md px-3 py-1.5 bg-muted/40 text-foreground truncate focus:outline-none"
+            className="flex-1 bg-muted/40 truncate"
             onFocus={(e) => e.target.select()}
           />
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={handleCopy}
-            className="shrink-0 flex items-center gap-1 text-sm px-3 py-1.5 rounded-md border bg-white hover:bg-muted transition-colors"
+            className="shrink-0 gap-1"
           >
             {copied ? (
               <>
@@ -83,7 +70,7 @@ export function ShareModal({ url, title, onClose }: ShareModalProps) {
                 <span>Copy</span>
               </>
             )}
-          </button>
+          </Button>
         </div>
 
         {/* WhatsApp */}
@@ -98,7 +85,7 @@ export function ShareModal({ url, title, onClose }: ShareModalProps) {
           </svg>
           Share on WhatsApp
         </a>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -14,6 +14,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { WeeklyPlanner } from "@/components/planner/WeeklyPlanner";
 import { getCategoryFallback } from "@/lib/categoryFallback";
@@ -418,8 +419,8 @@ export function MyKitchenPage() {
                   Invite someone to peek behind the curtain — they'll see your experiments before anyone else.
                 </p>
                 <div className="flex gap-2">
-                  <input
-                    className="bg-background border border-purple-200 rounded-lg px-3 py-1.5 text-sm flex-1 focus:ring-2 focus:ring-purple-200 outline-none transition-all"
+                  <Input
+                    className="flex-1 border-purple-200 focus-visible:ring-purple-200"
                     placeholder="Enter their username..."
                     value={inviteUsername}
                     onChange={e => setInviteUsername(e.target.value)}

@@ -1,4 +1,12 @@
 import { buildInstacartUrl } from "@/lib/instacart";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { Ingredient } from "@/types";
 
 interface Props {
@@ -13,47 +21,35 @@ export function BuyNowSheet({ ingredients, onClose }: Props) {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-[2px]"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-6 w-full max-w-sm relative"
-        onClick={e => e.stopPropagation()}
-      >
-        <h2 className="font-bold text-xl mb-1">Buy it NOW!</h2>
-        <p className="text-sm text-muted-foreground mb-5">
-          {ingredients.length} ingredient{ingredients.length !== 1 ? "s" : ""}
-        </p>
+    <Dialog open onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-sm sm:rounded-2xl">
+        <DialogHeader>
+          <DialogTitle>Buy it NOW!</DialogTitle>
+          <DialogDescription>
+            {ingredients.length} ingredient{ingredients.length !== 1 ? "s" : ""}
+          </DialogDescription>
+        </DialogHeader>
 
         <div className="flex flex-col gap-3">
-          <button
+          <Button
             type="button"
             onClick={() => handleBuy("pickup")}
-            className="w-full py-3 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold text-base transition-colors"
+            className="w-full py-3 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold text-base"
           >
             🚗 Pickup
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="outline"
             onClick={() => handleBuy("delivery")}
-            className="w-full py-3 rounded-xl border-2 border-green-500 text-green-700 hover:bg-green-50 font-bold text-base transition-colors"
+            className="w-full py-3 rounded-xl border-2 border-green-500 text-green-700 hover:bg-green-50 font-bold text-base"
           >
             🏠 Delivery
-          </button>
+          </Button>
         </div>
 
-        <p className="text-xs text-center text-muted-foreground mt-4">via Instacart</p>
-
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground text-xl leading-none"
-          aria-label="Close"
-        >
-          ×
-        </button>
-      </div>
-    </div>
+        <p className="text-xs text-center text-muted-foreground">via Instacart</p>
+      </DialogContent>
+    </Dialog>
   );
 }
