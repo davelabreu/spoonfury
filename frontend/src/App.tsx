@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ShoppingProvider } from "@/contexts/ShoppingContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,7 +7,7 @@ import { EditRecipePage } from "@/pages/EditRecipePage";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { BooksPage } from "@/pages/BooksPage";
-import { BookDetailPage } from "@/pages/BookDetailPage";
+import { CollectionDetailPage } from "@/pages/CollectionDetailPage";
 import { CreateRecipePage } from "@/pages/CreateRecipePage";
 import { HomePage } from "@/pages/HomePage";
 import { ShoppingListPage } from "@/pages/ShoppingListPage";
@@ -32,9 +32,9 @@ export default function App() {
                 <Route path="/recipes/:slug" element={<RecipePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-                <Route path="/books" element={<BooksPage />} />
-                <Route path="/books/share/:token" element={<BookDetailPage shared />} />
-                <Route path="/books/:id" element={<BookDetailPage />} />
+                <Route path="/books" element={<Navigate to="/kitchen" replace />} />
+                <Route path="/collections/share/:token" element={<CollectionDetailPage shared />} />
+                <Route path="/collections/:id" element={<CollectionDetailPage />} />
                 <Route path="/shopping-list" element={<ShoppingListPage />} />
                 <Route path="/kitchen" element={<MyKitchenPage />} />
                 <Route path="/moderation" element={<ModerationPage />} />

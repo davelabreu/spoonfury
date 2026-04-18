@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
-export function BookDetailPage({ shared = false }: { shared?: boolean }) {
+export function CollectionDetailPage({ shared = false }: { shared?: boolean }) {
   const { id, token: shareToken } = useParams<{ id?: string; token?: string }>();
   const { token, username } = useAuth();
   const [book, setBook] = useState<any>(null);
@@ -71,6 +71,9 @@ export function BookDetailPage({ shared = false }: { shared?: boolean }) {
 
   return (
     <div className="space-y-6">
+      <Link to="/kitchen" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+        ← Back to Kitchen
+      </Link>
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">{book.title}</h1>
@@ -112,7 +115,7 @@ export function BookDetailPage({ shared = false }: { shared?: boolean }) {
                 className="gap-1.5 p-1.5 text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 whitespace-nowrap"
               >
                 <X className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-bold uppercase tracking-tight">Remove recipe from book</span>
+                <span className="text-[10px] font-bold uppercase tracking-tight">Remove recipe from collection</span>
               </Button>
             )}
           </Link>
