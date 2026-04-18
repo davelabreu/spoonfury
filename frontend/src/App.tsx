@@ -15,6 +15,7 @@ import { MyKitchenPage } from "@/pages/MyKitchenPage";
 import { ModerationPage } from "@/pages/ModerationPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import { NavBar } from "@/components/NavBar";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
                 <Route path="/@:username" element={<ProfilePage />} />
               </Routes>
             </main>
+            <Toaster position="bottom-center" />
           </BrowserRouter>
         </TooltipProvider>
       </ShoppingProvider>
