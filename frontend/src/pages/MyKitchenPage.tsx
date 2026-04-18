@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { WeeklyPlanner } from "@/components/planner/WeeklyPlanner";
 import { getCategoryFallback } from "@/lib/categoryFallback";
-import type { Recipe, PublishGate, ReviewProgress } from "@/types";
+import type { Recipe, Book, PublishGate, ReviewProgress } from "@/types";
 
 /** Check which publish gate criteria a recipe meets. */
 function getPublishGate(recipe: Recipe): PublishGate {
@@ -303,6 +303,10 @@ export function MyKitchenPage() {
   const [draftView, setDraftView] = useState<ViewMode>("card");
   const [publishedView, setPublishedView] = useState<ViewMode>("card");
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [collections, setCollections] = useState<Book[]>([]);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [expandedRecipes, setExpandedRecipes] = useState<Recipe[]>([]);
+  const [newCollectionTitle, setNewCollectionTitle] = useState("");
 
   useEffect(() => {
     if (!token) return;
@@ -312,6 +316,14 @@ export function MyKitchenPage() {
       .then((data: { results?: Recipe[] }) => setRecipes(data.results ?? []))
       .catch(() => {})
       .finally(() => setLoading(false));
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    api.get("/books/", token).then((data: any) => {
+      const results: Book[] = data.results ?? data;
+      setCollections(results);
+    });
   }, [token]);
 
   if (!token) {
@@ -348,6 +360,31 @@ export function MyKitchenPage() {
       setInviteMsg("Failed to invite. Check the username.");
       setTimeout(() => setInviteMsg(""), 3000);
     }
+  };
+
+  const toggleCollection = async (id: number) => {
+    if (expandedId === id) {
+      setExpandedId(null);
+      setExpandedRecipes([]);
+      return;
+    }
+    setExpandedId(id);
+    try {
+      const data = await api.get(`/books/${id}/`, token!);
+      setExpandedRecipes(data.recipes ?? []);
+    } catch {
+      setExpandedRecipes([]);
+    }
+  };
+
+  const createCollection = async () => {
+    const title = newCollectionTitle.trim();
+    if (!title || !token) return;
+    try {
+      const created = await api.post("/books/", { title }, token);
+      setCollections(prev => [...prev, created]);
+      setNewCollectionTitle("");
+    } catch {}
   };
 
   if (loading) {
@@ -393,6 +430,94 @@ export function MyKitchenPage() {
 
       {activeTab === "recipes" ? (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-1 duration-500">
+          {/* ── Collections ── */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground">My Collections</h2>
+              <div className="flex items-center gap-2">
+                <Input
+                  className="h-7 w-40 text-xs"
+                  placeholder="New collection…"
+                  value={newCollectionTitle}
+                  onChange={e => setNewCollectionTitle(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") createCollection(); }}
+                />
+                <Button variant="ghost" size="sm" className="h-7 text-xs text-amber-600" onClick={createCollection} disabled={!newCollectionTitle.trim()}>
+                  + New
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {collections.map((c, i) => {
+                const gradients = [
+                  "from-amber-500 to-orange-600",
+                  "from-teal-400 to-emerald-600",
+                  "from-indigo-500 to-purple-600",
+                  "from-pink-400 to-rose-600",
+                  "from-sky-400 to-blue-600",
+                  "from-lime-400 to-green-600",
+                  "from-fuchsia-400 to-purple-600",
+                  "from-orange-400 to-red-600",
+                ];
+                const gradient = gradients[i % gradients.length];
+                const isExpanded = expandedId === c.id;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => toggleCollection(c.id)}
+                    className={`bg-gradient-to-br ${gradient} rounded-lg p-3 text-white text-left transition-all ${
+                      isExpanded ? "ring-2 ring-offset-2 ring-amber-500" : "hover:scale-[1.02]"
+                    }`}
+                  >
+                    <div className="font-bold text-sm truncate">{c.title}</div>
+                    <div className="text-xs opacity-80">{c.recipe_count ?? 0} recipe{(c.recipe_count ?? 0) !== 1 ? "s" : ""}</div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Inline preview */}
+            {expandedId && (
+              <div className="mt-3 bg-white border border-border rounded-xl p-4 border-l-4 border-l-amber-500 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-bold text-sm">
+                    {collections.find(c => c.id === expandedId)?.title}
+                  </span>
+                  <Link
+                    to={`/collections/${expandedId}`}
+                    className="text-xs font-semibold text-amber-600 hover:text-amber-700"
+                  >
+                    View all {expandedRecipes.length} →
+                  </Link>
+                </div>
+                {expandedRecipes.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No recipes in this collection yet.</p>
+                ) : (
+                  <div className="flex gap-3 overflow-x-auto pb-1">
+                    {expandedRecipes.slice(0, 6).map(r => {
+                      const fb = getCategoryFallback(r.category ?? "other");
+                      return (
+                        <Link key={r.slug} to={`/recipes/${r.slug}`} className="shrink-0 w-28 group">
+                          <div className="w-28 h-20 rounded-lg overflow-hidden mb-1">
+                            {r.image_url ? (
+                              <img src={r.image_url} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                            ) : (
+                              <div className={`w-full h-full bg-gradient-to-br ${fb.gradient} flex items-center justify-center text-2xl`}>
+                                {fb.emoji}
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-xs font-semibold truncate">{r.title}</div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Test Kitchen Section */}
           <section>
             <div className="flex items-center gap-3 mb-2">
