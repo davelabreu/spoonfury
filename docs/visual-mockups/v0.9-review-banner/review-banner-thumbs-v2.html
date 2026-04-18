@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Banner — Thumbs: Colorless vs Activate</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwindcss.config = {
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(40,33%,98%)',
+        foreground: 'hsl(20,14%,8%)',
+        card: 'hsl(0,0%,100%)',
+        muted: { DEFAULT: 'hsl(35,20%,95%)', foreground: 'hsl(20,10%,46%)' },
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background: hsl(40,33%,98%); font-family: system-ui, -apple-system, sans-serif; }
+  .label { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: hsl(20,10%,46%); margin-bottom: 4px; }
+  .sublabel { font-size: 11px; color: hsl(20,10%,56%); margin-bottom: 12px; }
+
+  /* Shared thumbs up SVG path */
+  .thu-path { d: path("M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"); }
+</style>
+</head>
+<body class="p-6 max-w-3xl mx-auto space-y-8">
+
+<h1 class="text-2xl font-bold text-foreground mb-1">Thumbs: Colorless vs Activate</h1>
+<p class="text-sm text-muted-foreground mb-8">Two directions explored deeper. Each shown across three data states in a full banner context.</p>
+
+<!-- ============================================================ -->
+<!-- DIRECTION A: No color — monochrome thumbs -->
+<!-- ============================================================ -->
+<h2 class="text-lg font-bold text-foreground mb-1">Direction A: No Color</h2>
+<p class="text-xs text-muted-foreground mb-6">Thumbs are purely structural — same muted color as surrounding text. The ring and stripe already carry all the sentiment. Thumbs are just data labels.</p>
+
+<div class="space-y-4">
+  <div class="label">A1 / Slate-400 — Both always muted</div>
+  <div class="flex gap-4">
+    <!-- +3/-0 -->
+    <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+      <div class="px-4 py-4 flex items-start gap-5">
+        <div class="flex flex-col items-center gap-2 shrink-0">
+          <div class="h-16 w-16 rounded-full bg-indigo-50 flex items-center justify-center">
+            <span class="text-sm font-black text-indigo-600">100<span class="text-[8px]">%</span></span>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-1 text-slate-400">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+              <span class="text-xs font-bold">3</span>
+            </div>
+            <div class="flex items-center gap-1 text-slate-400">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+              <span class="text-xs font-bold">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span></div>
+          <p class="text-sm font-semibold italic text-indigo-600">Community Pick</p>
+          <p class="text-[11px] text-muted-foreground">3 votes &middot; Needs 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- +3/-1 -->
+    <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-4 py-4 flex items-start gap-5">
+        <div class="flex flex-col items-center gap-2 shrink-0">
+          <div class="h-16 w-16 rounded-full bg-amber-50 flex items-center justify-center">
+            <span class="text-sm font-black text-amber-600">75<span class="text-[8px]">%</span></span>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-1 text-slate-400">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+              <span class="text-xs font-bold">3</span>
+            </div>
+            <div class="flex items-center gap-1 text-slate-400">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+              <span class="text-xs font-bold">1</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Round 2</span></div>
+          <p class="text-sm font-semibold italic text-amber-600">Warming Up</p>
+          <p class="text-[11px] text-muted-foreground">4 votes &middot; Needs 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- +1/-3 -->
+    <div class="rounded-xl bg-card shadow-sm border border-red-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+      <div class="px-4 py-4 flex items-start gap-5">
+        <div class="flex flex-col items-center gap-2 shrink-0">
+          <div class="h-16 w-16 rounded-full bg-red-50 flex items-center justify-center">
+            <span class="text-sm font-black text-red-500">25<span class="text-[8px]">%</span></span>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-1 text-slate-400">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+              <span class="text-xs font-bold">1</span>
+            </div>
+            <div class="flex items-center gap-1 text-slate-400">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+              <span class="text-xs font-bold">3</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-100 text-red-700">Round 1</span></div>
+          <p class="text-sm font-semibold italic text-red-500">Potluck Surprise</p>
+          <p class="text-[11px] text-muted-foreground">4 votes &middot; Needs 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="border-black/5 my-8">
+
+<!-- ============================================================ -->
+<!-- A2: Foreground-colored — matches text color, not semantic -->
+<!-- ============================================================ -->
+<div class="space-y-4">
+  <div class="label">A2 / Foreground — Matches the tier text color</div>
+  <p class="sublabel">Thumbs inherit the tier's accent color — indigo when indigo, amber when amber. Feels like part of the same "instrument panel."</p>
+
+  <div class="flex gap-4">
+    <!-- +3/-0 indigo -->
+    <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+      <div class="px-4 py-4 flex items-start gap-5">
+        <div class="flex flex-col items-center gap-2 shrink-0">
+          <div class="h-16 w-16 rounded-full bg-indigo-50 flex items-center justify-center">
+            <span class="text-sm font-black text-indigo-600">100<span class="text-[8px]">%</span></span>
+          </div>
+          <div class="flex items-center gap-2.5 text-indigo-400">
+            <div class="flex items-center gap-1">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+              <span class="text-xs font-bold">3</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+              <span class="text-xs font-bold">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span></div>
+          <p class="text-sm font-semibold italic text-indigo-600">Community Pick</p>
+          <p class="text-[11px] text-muted-foreground">3 votes &middot; Needs 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- +3/-1 amber -->
+    <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-4 py-4 flex items-start gap-5">
+        <div class="flex flex-col items-center gap-2 shrink-0">
+          <div class="h-16 w-16 rounded-full bg-amber-50 flex items-center justify-center">
+            <span class="text-sm font-black text-amber-600">75<span class="text-[8px]">%</span></span>
+          </div>
+          <div class="flex items-center gap-2.5 text-amber-400">
+            <div class="flex items-center gap-1">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+              <span class="text-xs font-bold">3</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+              <span class="text-xs font-bold">1</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Round 2</span></div>
+          <p class="text-sm font-semibold italic text-amber-600">Warming Up</p>
+          <p class="text-[11px] text-muted-foreground">4 votes &middot; Needs 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- +1/-3 red -->
+    <div class="rounded-xl bg-card shadow-sm border border-red-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+      <div class="px-4 py-4 flex items-start gap-5">
+        <div class="flex flex-col items-center gap-2 shrink-0">
+          <div class="h-16 w-16 rounded-full bg-red-50 flex items-center justify-center">
+            <span class="text-sm font-black text-red-500">25<span class="text-[8px]">%</span></span>
+          </div>
+          <div class="flex items-center gap-2.5 text-red-300">
+            <div class="flex items-center gap-1">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+              <span class="text-xs font-bold">1</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+              <span class="text-xs font-bold">3</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-100 text-red-700">Round 1</span></div>
+          <p class="text-sm font-semibold italic text-red-500">Potluck Surprise</p>
+          <p class="text-[11px] text-muted-foreground">4 votes &middot; Needs 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="border-black/5 my-8">
+
+<!-- ============================================================ -->
+<!-- DIRECTION B: T2 Activate refined -->
+<!-- ============================================================ -->
+<h2 class="text-lg font-bold text-foreground mb-1">Direction B: T2 Activate (refined)</h2>
+<p class="text-xs text-muted-foreground mb-6">Thumbs up always emerald. Thumbs down dormant (slate-300) at zero, wakes to rose-500 when it gets votes.</p>
+
+<div class="space-y-4">
+  <div class="label">B1 / Soft activate — rose-400 (not too loud)</div>
+  <div class="flex gap-4">
+    <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+      <div class="px-4 py-4 flex items-start gap-5">
+        <div class="flex flex-col items-center gap-2 shrink-0">
+          <div class="h-16 w-16 rounded-full bg-indigo-50 flex items-center justify-center"><span class="text-sm font-black text-indigo-600">100<span class="text-[8px]">%</span></span></div>
+          <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-1 text-emerald-500">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+              <span class="text-xs font-bold">3</span>
+            </div>
+            <div class="flex items-center gap-1 text-slate-300">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+              <span class="text-xs font-bold">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span></div>
+          <p class="text-sm font-semibold italic text-indigo-600">Community Pick</p>
+          <p class="text-[11px] text-muted-foreground">3 votes &middot; Needs 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-4 py-4 flex items-start gap-5">
+        <div class="flex flex-col items-center gap-2 shrink-0">
+          <div class="h-16 w-16 rounded-full bg-amber-50 flex items-center justify-center"><span class="text-sm font-black text-amber-600">75<span class="text-[8px]">%</span></span></div>
+          <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-1 text-emerald-500">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+              <span class="text-xs font-bold">3</span>
+            </div>
+            <div class="flex items-center gap-1 text-rose-400">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+              <span class="text-xs font-bold">1</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Round 2</span></div>
+          <p class="text-sm font-semibold italic text-amber-600">Warming Up</p>
+          <p class="text-[11px] text-muted-foreground">4 votes &middot; Needs 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-card shadow-sm border border-red-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+      <div class="px-4 py-4 flex items-start gap-5">
+        <div class="flex flex-col items-center gap-2 shrink-0">
+          <div class="h-16 w-16 rounded-full bg-red-50 flex items-center justify-center"><span class="text-sm font-black text-red-500">25<span class="text-[8px]">%</span></span></div>
+          <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-1 text-emerald-500">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+              <span class="text-xs font-bold">1</span>
+            </div>
+            <div class="flex items-center gap-1 text-rose-400">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+              <span class="text-xs font-bold">3</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-100 text-red-700">Round 1</span></div>
+          <p class="text-sm font-semibold italic text-red-500">Potluck Surprise</p>
+          <p class="text-[11px] text-muted-foreground">4 votes &middot; Needs 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="border-black/5 my-8">
+
+<!-- ============================================================ -->
+<!-- SUMMARY -->
+<!-- ============================================================ -->
+<div class="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+  <table class="w-full text-xs">
+    <thead>
+      <tr class="border-b border-zinc-100">
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground"></th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Up</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Down (0)</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Down (&gt;0)</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Philosophy</th>
+      </tr>
+    </thead>
+    <tbody class="text-foreground">
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">A1 Slate</td>
+        <td class="px-3 py-2 text-slate-400">slate-400</td>
+        <td class="px-3 py-2 text-slate-400">slate-400</td>
+        <td class="px-3 py-2 text-slate-400">slate-400</td>
+        <td class="px-3 py-2 text-muted-foreground">Pure data &mdash; zero opinion in the icons</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">A2 Foreground</td>
+        <td class="px-3 py-2 text-indigo-400">tier color</td>
+        <td class="px-3 py-2 text-indigo-400">tier color</td>
+        <td class="px-3 py-2 text-indigo-400">tier color</td>
+        <td class="px-3 py-2 text-muted-foreground">Instrument panel &mdash; everything is one color family</td>
+      </tr>
+      <tr>
+        <td class="px-3 py-2 font-bold">B1 Activate</td>
+        <td class="px-3 py-2 text-emerald-500">emerald-500</td>
+        <td class="px-3 py-2 text-slate-300">slate-300</td>
+        <td class="px-3 py-2 text-rose-400">rose-400</td>
+        <td class="px-3 py-2 text-muted-foreground">Quiet until it counts &mdash; down "wakes up" softly</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Banner — Phrase Sets</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwindcss.config = {
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(40,33%,98%)',
+        foreground: 'hsl(20,14%,8%)',
+        card: 'hsl(0,0%,100%)',
+        muted: { DEFAULT: 'hsl(35,20%,95%)', foreground: 'hsl(20,10%,46%)' },
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background: hsl(40,33%,98%); font-family: system-ui, -apple-system, sans-serif; }
+  .label { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: hsl(20,10%,46%); margin-bottom: 4px; }
+  .sublabel { font-size: 11px; color: hsl(20,10%,56%); margin-bottom: 16px; }
+  @keyframes rp { 0%,100%{filter:drop-shadow(0 0 0 rgba(99,102,241,0))}50%{filter:drop-shadow(0 0 6px rgba(99,102,241,0.25))} }
+  @keyframes rpg { 0%,100%{filter:drop-shadow(0 0 0 rgba(16,185,129,0))}50%{filter:drop-shadow(0 0 6px rgba(16,185,129,0.25))} }
+  @keyframes rpa { 0%,100%{filter:drop-shadow(0 0 0 rgba(245,158,11,0))}50%{filter:drop-shadow(0 0 6px rgba(245,158,11,0.25))} }
+  @keyframes rpr { 0%,100%{filter:drop-shadow(0 0 0 rgba(239,68,68,0))}50%{filter:drop-shadow(0 0 6px rgba(239,68,68,0.25))} }
+  .gi{animation:rp 2.5s ease-in-out infinite}.gg{animation:rpg 2.5s ease-in-out infinite}.ga{animation:rpa 2.5s ease-in-out infinite}.gr{animation:rpr 2.5s ease-in-out infinite}
+</style>
+</head>
+<body class="p-6 max-w-3xl mx-auto space-y-8">
+
+<h1 class="text-2xl font-bold text-foreground mb-1">Phrase Set Tasting Menu</h1>
+<p class="text-sm text-muted-foreground mb-2">Same S4 ring + accent-line layout. Five phrase sets to compare side by side.</p>
+<p class="text-sm text-muted-foreground mb-8">Each set shown across all five tiers: <strong>95-100%</strong> / <strong>80-94%</strong> / <strong>70-79%</strong> / <strong>40-69%</strong> / <strong>&lt;40%</strong></p>
+
+<!-- ============================================================ -->
+<!-- PHRASE TABLE — quick scan -->
+<!-- ============================================================ -->
+<div class="rounded-xl border border-zinc-200 bg-white overflow-hidden mb-10">
+  <table class="w-full text-xs">
+    <thead>
+      <tr class="border-b border-zinc-100">
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">%</th>
+        <th class="text-left px-3 py-2 font-bold text-indigo-600">Set A: Kitchen Slang</th>
+        <th class="text-left px-3 py-2 font-bold text-emerald-600">Set B: Flavor Profile</th>
+        <th class="text-left px-3 py-2 font-bold text-violet-600">Set C: Critic Quote</th>
+        <th class="text-left px-3 py-2 font-bold text-amber-600">Set D: Chef Energy</th>
+        <th class="text-left px-3 py-2 font-bold text-rose-600">Set E: Spoon Rating</th>
+      </tr>
+    </thead>
+    <tbody class="text-foreground">
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold text-emerald-600">95-100%</td>
+        <td class="px-3 py-2">Chef's Kiss</td>
+        <td class="px-3 py-2">Perfect Umami</td>
+        <td class="px-3 py-2">Instant Classic</td>
+        <td class="px-3 py-2">Absolutely Fire</td>
+        <td class="px-3 py-2">Five Spoons</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold text-indigo-600">80-94%</td>
+        <td class="px-3 py-2">Crowd Favorite</td>
+        <td class="px-3 py-2">Rich & Balanced</td>
+        <td class="px-3 py-2">Highly Recommended</td>
+        <td class="px-3 py-2">Cookin' with Gas</td>
+        <td class="px-3 py-2">Four Spoons</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold text-amber-600">70-79%</td>
+        <td class="px-3 py-2">Solid Recipe</td>
+        <td class="px-3 py-2">Good Bones</td>
+        <td class="px-3 py-2">Worth a Try</td>
+        <td class="px-3 py-2">Getting Warmer</td>
+        <td class="px-3 py-2">Three Spoons</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold text-orange-500">40-69%</td>
+        <td class="px-3 py-2">Acquired Taste</td>
+        <td class="px-3 py-2">Needs Seasoning</td>
+        <td class="px-3 py-2">Divisive</td>
+        <td class="px-3 py-2">Still Simmering</td>
+        <td class="px-3 py-2">Two Spoons</td>
+      </tr>
+      <tr>
+        <td class="px-3 py-2 font-bold text-red-500">&lt;40%</td>
+        <td class="px-3 py-2">Back to the Stove</td>
+        <td class="px-3 py-2">Needs a Rethink</td>
+        <td class="px-3 py-2">Send it Back</td>
+        <td class="px-3 py-2">Burnt Edges</td>
+        <td class="px-3 py-2">One Spoon</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- SET A: Kitchen Slang -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">Set A / Kitchen Slang</div>
+  <p class="sublabel">Casual, punchy, sounds like something a cook would actually say. "Acquired Taste" lives here.</p>
+
+  <div class="space-y-3">
+    <!-- 100% Chef's Kiss -->
+    <div class="rounded-xl bg-card shadow-sm border border-emerald-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400"></div>
+      <div class="px-4 py-3.5 flex items-center gap-5">
+        <div class="relative h-14 w-14 shrink-0 gg">
+          <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#d1fae5" stroke-width="2"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#a1)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0"/><defs><linearGradient id="a1" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient></defs></svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-sm font-black text-emerald-600 leading-none">100<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest text-emerald-400 mt-0.5">approval</span></div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Round 1</span></div>
+          <div class="flex items-center gap-2 border-l-2 border-emerald-300 pl-2.5"><span class="text-xs font-bold text-emerald-600 italic">Chef's Kiss</span></div>
+          <div class="flex items-center gap-4 text-sm"><span class="font-semibold text-emerald-700">+5 approve</span><span class="font-semibold text-red-600">-0 need work</span><span class="text-[11px] ml-auto text-muted-foreground">5 votes</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 85% Crowd Favorite -->
+    <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+      <div class="px-4 py-3.5 flex items-center gap-5">
+        <div class="relative h-14 w-14 shrink-0 gi">
+          <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e0e7ff" stroke-width="2"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#a2)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0"/><defs><linearGradient id="a2" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs></svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-sm font-black text-indigo-600 leading-none">85<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest text-indigo-400 mt-0.5">approval</span></div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span></div>
+          <div class="flex items-center gap-2 border-l-2 border-indigo-300 pl-2.5"><span class="text-xs font-bold text-indigo-600 italic">Crowd Favorite</span></div>
+          <div class="flex items-center gap-4 text-sm"><span class="font-semibold text-emerald-700">+6 approve</span><span class="font-semibold text-red-600">-1 need work</span><span class="text-[11px] ml-auto text-muted-foreground">7 votes</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 75% Solid Recipe -->
+    <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-4 py-3.5 flex items-center gap-5">
+        <div class="relative h-14 w-14 shrink-0 ga">
+          <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#fef3c7" stroke-width="2"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#a3)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="24"/><defs><linearGradient id="a3" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs></svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-sm font-black text-amber-600 leading-none">75<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest text-amber-400 mt-0.5">approval</span></div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Round 2</span></div>
+          <div class="flex items-center gap-2 border-l-2 border-amber-300 pl-2.5"><span class="text-xs font-bold text-amber-600 italic">Solid Recipe</span></div>
+          <div class="flex items-center gap-4 text-sm"><span class="font-semibold text-emerald-700">+3 approve</span><span class="font-semibold text-red-600">-1 need work</span><span class="text-[11px] ml-auto text-muted-foreground">4 votes</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 50% Acquired Taste -->
+    <div class="rounded-xl bg-card shadow-sm border border-orange-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-orange-400 via-amber-400 to-orange-300"></div>
+      <div class="px-4 py-3.5 flex items-center gap-5">
+        <div class="relative h-14 w-14 shrink-0 ga">
+          <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#ffedd5" stroke-width="2"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#a4)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="49"/><defs><linearGradient id="a4" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fb923c"/></linearGradient></defs></svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-sm font-black text-orange-500 leading-none">50<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest text-orange-300 mt-0.5">approval</span></div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">Round 2</span></div>
+          <div class="flex items-center gap-2 border-l-2 border-orange-300 pl-2.5"><span class="text-xs font-bold text-orange-500 italic">Acquired Taste</span></div>
+          <div class="flex items-center gap-4 text-sm"><span class="font-semibold text-emerald-700">+2 approve</span><span class="font-semibold text-red-600">-2 need work</span><span class="text-[11px] ml-auto text-muted-foreground">4 votes</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 33% Back to the Stove -->
+    <div class="rounded-xl bg-card shadow-sm border border-red-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+      <div class="px-4 py-3.5 flex items-center gap-5">
+        <div class="relative h-14 w-14 shrink-0 gr">
+          <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#fee2e2" stroke-width="2"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#a5)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="65"/><defs><linearGradient id="a5" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#f87171"/></linearGradient></defs></svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-sm font-black text-red-500 leading-none">33<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest text-red-300 mt-0.5">approval</span></div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-100 text-red-700">Round 1</span></div>
+          <div class="flex items-center gap-2 border-l-2 border-red-300 pl-2.5"><span class="text-xs font-bold text-red-500 italic">Back to the Stove</span></div>
+          <div class="flex items-center gap-4 text-sm"><span class="font-semibold text-emerald-700">+1 approve</span><span class="font-semibold text-red-600">-2 need work</span><span class="text-[11px] ml-auto text-muted-foreground">3 votes</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="border-black/5 my-10">
+
+<!-- ============================================================ -->
+<!-- SET B: Flavor Profile -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">Set B / Flavor Profile</div>
+  <p class="sublabel">Speaks about the recipe like you'd describe a dish. Treats the score as a tasting note.</p>
+
+  <div class="space-y-3">
+    <div class="rounded-xl bg-card shadow-sm border border-emerald-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400"></div>
+      <div class="px-4 py-3.5 flex items-center gap-5">
+        <div class="relative h-14 w-14 shrink-0 gg"><svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#d1fae5" stroke-width="2"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#a1)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0"/></svg><div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-sm font-black text-emerald-600 leading-none">100<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest text-emerald-400 mt-0.5">approval</span></div></div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Round 1</span></div>
+          <div class="flex items-center gap-2 border-l-2 border-emerald-300 pl-2.5"><span class="text-xs font-bold text-emerald-600 italic">Perfect Umami</span></div>
+          <div class="flex items-center gap-4 text-sm"><span class="font-semibold text-emerald-700">+5 approve</span><span class="font-semibold text-red-600">-0 need work</span><span class="text-[11px] ml-auto text-muted-foreground">5 votes</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+      <div class="px-4 py-3.5 flex items-center gap-5">
+        <div class="relative h-14 w-14 shrink-0 gi"><svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e0e7ff" stroke-width="2"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#a2)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0"/></svg><div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-sm font-black text-indigo-600 leading-none">85<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest text-indigo-400 mt-0.5">approval</span></div></div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span></div>
+          <div class="flex items-center gap-2 border-l-2 border-indigo-300 pl-2.5"><span class="text-xs font-bold text-indigo-600 italic">Rich & Balanced</span></div>
+          <div class="flex items-center gap-4 text-sm"><span class="font-semibold text-emerald-700">+6 approve</span><span class="font-semibold text-red-600">-1 need work</span><span class="text-[11px] ml-auto text-muted-foreground">7 votes</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-4 py-3.5 flex items-center gap-5">
+        <div class="relative h-14 w-14 shrink-0 ga"><svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#fef3c7" stroke-width="2"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#a3)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="24"/></svg><div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-sm font-black text-amber-600 leading-none">75<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest text-amber-400 mt-0.5">approval</span></div></div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Round 2</span></div>
+          <div class="flex items-center gap-2 border-l-2 border-amber-300 pl-2.5"><span class="text-xs font-bold text-amber-600 italic">Good Bones</span></div>
+          <div class="flex items-center gap-4 text-sm"><span class="font-semibold text-emerald-700">+3 approve</span><span class="font-semibold text-red-600">-1 need work</span><span class="text-[11px] ml-auto text-muted-foreground">4 votes</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-card shadow-sm border border-orange-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-orange-400 via-amber-400 to-orange-300"></div>
+      <div class="px-4 py-3.5 flex items-center gap-5">
+        <div class="relative h-14 w-14 shrink-0 ga"><svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#ffedd5" stroke-width="2"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#a4)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="49"/></svg><div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-sm font-black text-orange-500 leading-none">50<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest text-orange-300 mt-0.5">approval</span></div></div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">Round 2</span></div>
+          <div class="flex items-center gap-2 border-l-2 border-orange-300 pl-2.5"><span class="text-xs font-bold text-orange-500 italic">Needs Seasoning</span></div>
+          <div class="flex items-center gap-4 text-sm"><span class="font-semibold text-emerald-700">+2 approve</span><span class="font-semibold text-red-600">-2 need work</span><span class="text-[11px] ml-auto text-muted-foreground">4 votes</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-card shadow-sm border border-red-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+      <div class="px-4 py-3.5 flex items-center gap-5">
+        <div class="relative h-14 w-14 shrink-0 gr"><svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#fee2e2" stroke-width="2"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#a5)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="65"/></svg><div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-sm font-black text-red-500 leading-none">33<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest text-red-300 mt-0.5">approval</span></div></div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center gap-2"><span class="text-sm font-bold text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-100 text-red-700">Round 1</span></div>
+          <div class="flex items-center gap-2 border-l-2 border-red-300 pl-2.5"><span class="text-xs font-bold text-red-500 italic">Needs a Rethink</span></div>
+          <div class="flex items-center gap-4 text-sm"><span class="font-semibold text-emerald-700">+1 approve</span><span class="font-semibold text-red-600">-2 need work</span><span class="text-[11px] ml-auto text-muted-foreground">3 votes</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="border-black/5 my-10">
+
+<!-- ============================================================ -->
+<!-- MIX & MATCH — best-of picks -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">Mix & Match — Author's Picks</div>
+  <p class="sublabel">Cherry-picking the best phrase from each set per tier. These are the ones that feel most "Spoonfury."</p>
+
+  <div class="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-zinc-100 text-xs">
+          <th class="text-left px-4 py-2.5 font-bold text-muted-foreground w-20">%</th>
+          <th class="text-left px-4 py-2.5 font-bold text-foreground">Phrase</th>
+          <th class="text-left px-4 py-2.5 font-bold text-muted-foreground">Source</th>
+          <th class="text-left px-4 py-2.5 font-bold text-muted-foreground">Why it works</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-zinc-50">
+          <td class="px-4 py-2.5 font-bold text-emerald-600">95-100%</td>
+          <td class="px-4 py-2.5 font-bold italic text-emerald-700">Chef's Kiss</td>
+          <td class="px-4 py-2.5 text-xs text-muted-foreground">Kitchen Slang</td>
+          <td class="px-4 py-2.5 text-xs text-muted-foreground">Universal, instantly understood, playful</td>
+        </tr>
+        <tr class="border-b border-zinc-50">
+          <td class="px-4 py-2.5 font-bold text-indigo-600">80-94%</td>
+          <td class="px-4 py-2.5 font-bold italic text-indigo-700">Crowd Favorite</td>
+          <td class="px-4 py-2.5 text-xs text-muted-foreground">Kitchen Slang</td>
+          <td class="px-4 py-2.5 text-xs text-muted-foreground">Social proof energy, matches the community vibe</td>
+        </tr>
+        <tr class="border-b border-zinc-50">
+          <td class="px-4 py-2.5 font-bold text-amber-600">70-79%</td>
+          <td class="px-4 py-2.5 font-bold italic text-amber-700">Good Bones</td>
+          <td class="px-4 py-2.5 text-xs text-muted-foreground">Flavor Profile</td>
+          <td class="px-4 py-2.5 text-xs text-muted-foreground">Encouraging — says "the foundation is there"</td>
+        </tr>
+        <tr class="border-b border-zinc-50">
+          <td class="px-4 py-2.5 font-bold text-orange-500">40-69%</td>
+          <td class="px-4 py-2.5 font-bold italic text-orange-600">Acquired Taste</td>
+          <td class="px-4 py-2.5 text-xs text-muted-foreground">Kitchen Slang</td>
+          <td class="px-4 py-2.5 text-xs text-muted-foreground">Non-judgmental, acknowledges subjectivity</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2.5 font-bold text-red-500">&lt;40%</td>
+          <td class="px-4 py-2.5 font-bold italic text-red-600">Back to the Stove</td>
+          <td class="px-4 py-2.5 text-xs text-muted-foreground">Kitchen Slang</td>
+          <td class="px-4 py-2.5 text-xs text-muted-foreground">Direct but not cruel — implies it's fixable</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</body>
+</html>

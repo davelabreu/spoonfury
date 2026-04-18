@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flaming Spoon — F4 Rising Embers Iterations</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwindcss.config = {
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(40,33%,98%)',
+        foreground: 'hsl(20,14%,8%)',
+        card: 'hsl(0,0%,100%)',
+        muted: { DEFAULT: 'hsl(35,20%,95%)', foreground: 'hsl(20,10%,46%)' },
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background: hsl(40,33%,98%); font-family: system-ui, -apple-system, sans-serif; }
+  .label { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: hsl(20,10%,46%); margin-bottom: 4px; }
+  .sublabel { font-size: 11px; color: hsl(20,10%,56%); margin-bottom: 16px; line-height: 1.5; }
+
+  /* ===== EMBER ANIMATIONS ===== */
+
+  @keyframes ember-rise {
+    0%   { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-14px) scale(0.2); opacity: 0; }
+  }
+
+  @keyframes ember-rise-drift {
+    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+    50%  { transform: translate(3px, -8px) scale(0.6); opacity: 0.7; }
+    100% { transform: translate(-1px, -16px) scale(0.15); opacity: 0; }
+  }
+
+  @keyframes ember-rise-slow {
+    0%   { transform: translateY(0) scale(1); opacity: 0.8; }
+    100% { transform: translateY(-18px) scale(0.1); opacity: 0; }
+  }
+
+  @keyframes ember-rise-swirl {
+    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+    25%  { transform: translate(4px, -5px) scale(0.8); opacity: 0.8; }
+    50%  { transform: translate(-2px, -10px) scale(0.5); opacity: 0.6; }
+    75%  { transform: translate(3px, -14px) scale(0.3); opacity: 0.3; }
+    100% { transform: translate(0, -18px) scale(0.1); opacity: 0; }
+  }
+
+  @keyframes ember-rise-crackle {
+    0%   { transform: translateY(0) scale(1); opacity: 1; }
+    30%  { transform: translateY(-3px) scale(1.3); opacity: 0.9; }
+    100% { transform: translateY(-12px) scale(0.15); opacity: 0; }
+  }
+
+  /* Spoon base transition */
+  .spoon-icon { transition: all 0.3s ease; color: #94a3b8; }
+
+  /* CTA button */
+  .cta-btn {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    border: 1px solid rgba(245,158,11,0.3); background: rgba(255,251,235,0.5);
+    color: #d97706; padding: 4px 12px; border-radius: 6px; backdrop-filter: blur(4px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.3s; cursor: pointer;
+  }
+  .cta-btn:hover { background: #f59e0b; color: white; box-shadow: 0 0 15px rgba(245,158,11,0.4); }
+
+  /* Demo card */
+  .demo-row { display: flex; align-items: center; gap: 12px; padding: 16px 20px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; }
+  .demo-hint { font-size: 10px; color: hsl(20,10%,56%); margin-left: auto; font-style: italic; }
+
+  /* ===== GROUP HOVER — spoon OR button triggers everything ===== */
+  .cta-group { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .cta-group .spoon-area { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  /* Hover triggers on the whole group */
+  .cta-group:hover .spoon-area { transform: scale(1.3); }
+  .cta-group:hover .spoon-icon { color: #d97706; filter: drop-shadow(0 0 5px #f59e0b); }
+  .cta-group:hover .cta-btn { background: #f59e0b; color: white; box-shadow: 0 0 15px rgba(245,158,11,0.4); }
+
+  /* Embers container — hidden until group hover */
+  .ember-bed { position: absolute; top: -2px; left: 0; right: 0; pointer-events: none; }
+  .ember-bed span { position: absolute; border-radius: 50%; opacity: 0; }
+  .cta-group:hover .ember-bed span { animation-play-state: running; }
+
+  /* ===== F4a: Original — straight rise, 4 embers ===== */
+  .f4a .ember-bed span { animation-play-state: paused; }
+  .f4a .ember-bed span:nth-child(1) { left: 5px;  width: 3px; height: 3px; background: #f59e0b; animation: ember-rise 0.8s infinite 0s; }
+  .f4a .ember-bed span:nth-child(2) { left: 12px; width: 3px; height: 3px; background: #f97316; animation: ember-rise 0.8s infinite 0.2s; }
+  .f4a .ember-bed span:nth-child(3) { left: 8px;  width: 2px; height: 2px; background: #ef4444; animation: ember-rise 0.8s infinite 0.4s; }
+  .f4a .ember-bed span:nth-child(4) { left: 2px;  width: 2px; height: 2px; background: #fbbf24; animation: ember-rise 0.8s infinite 0.6s; }
+
+  /* ===== F4b: Drifting — embers curve sideways as they rise ===== */
+  .f4b .ember-bed span { animation-play-state: paused; }
+  .f4b .ember-bed span:nth-child(1) { left: 4px;  width: 3px; height: 3px; background: #f59e0b; animation: ember-rise-drift 1s infinite 0s; }
+  .f4b .ember-bed span:nth-child(2) { left: 14px; width: 3px; height: 3px; background: #f97316; animation: ember-rise-drift 1s infinite 0.25s; }
+  .f4b .ember-bed span:nth-child(3) { left: 9px;  width: 2.5px; height: 2.5px; background: #ef4444; animation: ember-rise-drift 1s infinite 0.5s; }
+  .f4b .ember-bed span:nth-child(4) { left: 1px;  width: 2px; height: 2px; background: #fbbf24; animation: ember-rise-drift 1s infinite 0.75s; }
+  .f4b .ember-bed span:nth-child(5) { left: 11px; width: 2px; height: 2px; background: #fb923c; animation: ember-rise-drift 1s infinite 0.1s; }
+
+  /* ===== F4c: Slow burn — fewer embers, longer float, more spaced ===== */
+  .f4c .ember-bed span { animation-play-state: paused; }
+  .f4c .ember-bed span:nth-child(1) { left: 6px;  width: 3px; height: 3px; background: #f59e0b; animation: ember-rise-slow 1.4s infinite 0s; }
+  .f4c .ember-bed span:nth-child(2) { left: 13px; width: 2.5px; height: 2.5px; background: #f97316; animation: ember-rise-slow 1.4s infinite 0.5s; }
+  .f4c .ember-bed span:nth-child(3) { left: 3px;  width: 2px; height: 2px; background: #fbbf24; animation: ember-rise-slow 1.4s infinite 1s; }
+
+  /* ===== F4d: Swirl — embers take a winding path upward ===== */
+  .f4d .ember-bed span { animation-play-state: paused; }
+  .f4d .ember-bed span:nth-child(1) { left: 4px;  width: 3px; height: 3px; background: #f59e0b; animation: ember-rise-swirl 1.2s infinite 0s; }
+  .f4d .ember-bed span:nth-child(2) { left: 12px; width: 3px; height: 3px; background: #f97316; animation: ember-rise-swirl 1.2s infinite 0.3s; }
+  .f4d .ember-bed span:nth-child(3) { left: 8px;  width: 2.5px; height: 2.5px; background: #ef4444; animation: ember-rise-swirl 1.2s infinite 0.6s; }
+  .f4d .ember-bed span:nth-child(4) { left: 1px;  width: 2px; height: 2px; background: #fbbf24; animation: ember-rise-swirl 1.2s infinite 0.9s; }
+  .f4d .ember-bed span:nth-child(5) { left: 15px; width: 2px; height: 2px; background: #fb923c; animation: ember-rise-swirl 1.2s infinite 0.15s; }
+
+  /* ===== F4e: Crackle — embers pop bigger then shrink as they rise ===== */
+  .f4e .ember-bed span { animation-play-state: paused; }
+  .f4e .ember-bed span:nth-child(1) { left: 5px;  width: 3px; height: 3px; background: #f59e0b; animation: ember-rise-crackle 0.7s infinite 0s; }
+  .f4e .ember-bed span:nth-child(2) { left: 13px; width: 3px; height: 3px; background: #f97316; animation: ember-rise-crackle 0.7s infinite 0.15s; }
+  .f4e .ember-bed span:nth-child(3) { left: 9px;  width: 2.5px; height: 2.5px; background: #ef4444; animation: ember-rise-crackle 0.7s infinite 0.3s; }
+  .f4e .ember-bed span:nth-child(4) { left: 2px;  width: 2px; height: 2px; background: #fbbf24; animation: ember-rise-crackle 0.7s infinite 0.45s; }
+  .f4e .ember-bed span:nth-child(5) { left: 16px; width: 2px; height: 2px; background: #fb923c; animation: ember-rise-crackle 0.7s infinite 0.6s; }
+  .f4e .ember-bed span:nth-child(6) { left: 7px;  width: 2px; height: 2px; background: #fde68a; animation: ember-rise-crackle 0.7s infinite 0.08s; }
+</style>
+</head>
+<body class="p-6 max-w-2xl mx-auto space-y-8">
+
+<h1 class="text-2xl font-bold text-foreground mb-1">F4 Rising Embers — Iterations</h1>
+<p class="text-sm text-muted-foreground mb-2">Hover anywhere on the spoon+button group to trigger the effect. Five ember behaviors.</p>
+<p class="text-xs text-amber-600 font-semibold mb-8">Hovering spoon OR button activates both simultaneously.</p>
+
+<!-- F4a: Original -->
+<div>
+  <div class="label">F4a / Original — Straight Rise</div>
+  <p class="sublabel">4 embers, straight upward, 0.8s cycle. Clean and predictable like bubbles in a pot.</p>
+  <div class="demo-row">
+    <div class="cta-group f4a">
+      <div class="spoon-area">
+        <svg class="spoon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z"/>
+          <path d="M15.5 12L12 22"/>
+        </svg>
+        <div class="ember-bed"><span></span><span></span><span></span><span></span></div>
+      </div>
+      <span class="cta-btn">Cast Your Vote</span>
+    </div>
+    <span class="demo-hint">4 embers, 0.8s, straight up</span>
+  </div>
+</div>
+
+<!-- F4b: Drifting -->
+<div>
+  <div class="label">F4b / Drifting — Sideways Curve</div>
+  <p class="sublabel">5 embers that curve sideways as they float up. Feels like wind catching sparks off a campfire. 1s cycle.</p>
+  <div class="demo-row">
+    <div class="cta-group f4b">
+      <div class="spoon-area">
+        <svg class="spoon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z"/>
+          <path d="M15.5 12L12 22"/>
+        </svg>
+        <div class="ember-bed"><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+      <span class="cta-btn">Cast Your Vote</span>
+    </div>
+    <span class="demo-hint">5 embers, 1s, lateral drift</span>
+  </div>
+</div>
+
+<!-- F4c: Slow Burn -->
+<div>
+  <div class="label">F4c / Slow Burn — Minimal & Long Float</div>
+  <p class="sublabel">Only 3 embers, staggered far apart, rising slowly over 1.4s. Quiet smolder. Less is more.</p>
+  <div class="demo-row">
+    <div class="cta-group f4c">
+      <div class="spoon-area">
+        <svg class="spoon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z"/>
+          <path d="M15.5 12L12 22"/>
+        </svg>
+        <div class="ember-bed"><span></span><span></span><span></span></div>
+      </div>
+      <span class="cta-btn">Cast Your Vote</span>
+    </div>
+    <span class="demo-hint">3 embers, 1.4s, slow &amp; sparse</span>
+  </div>
+</div>
+
+<!-- F4d: Swirl -->
+<div>
+  <div class="label">F4d / Swirl — Winding Path</div>
+  <p class="sublabel">5 embers that take an S-curve path upward, like heat shimmer. Most organic movement. 1.2s cycle.</p>
+  <div class="demo-row">
+    <div class="cta-group f4d">
+      <div class="spoon-area">
+        <svg class="spoon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z"/>
+          <path d="M15.5 12L12 22"/>
+        </svg>
+        <div class="ember-bed"><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+      <span class="cta-btn">Cast Your Vote</span>
+    </div>
+    <span class="demo-hint">5 embers, 1.2s, S-curve path</span>
+  </div>
+</div>
+
+<!-- F4e: Crackle -->
+<div>
+  <div class="label">F4e / Crackle — Pop & Shrink</div>
+  <p class="sublabel">6 embers that briefly expand (pop!) before shrinking and rising. Feels like the spoon is actually crackling with heat. Fastest at 0.7s.</p>
+  <div class="demo-row">
+    <div class="cta-group f4e">
+      <div class="spoon-area">
+        <svg class="spoon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z"/>
+          <path d="M15.5 12L12 22"/>
+        </svg>
+        <div class="ember-bed"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+      <span class="cta-btn">Cast Your Vote</span>
+    </div>
+    <span class="demo-hint">6 embers, 0.7s, pop then shrink</span>
+  </div>
+</div>
+
+<!-- Comparison -->
+<div class="rounded-xl border border-zinc-200 bg-white overflow-hidden mt-8">
+  <table class="w-full text-xs">
+    <thead>
+      <tr class="border-b border-zinc-100">
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground"></th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Count</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Speed</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Path</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Vibe</th>
+      </tr>
+    </thead>
+    <tbody class="text-foreground">
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">F4a Original</td>
+        <td class="px-3 py-2">4</td>
+        <td class="px-3 py-2">0.8s</td>
+        <td class="px-3 py-2">Straight up</td>
+        <td class="px-3 py-2 text-muted-foreground">Clean bubbles</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">F4b Drifting</td>
+        <td class="px-3 py-2">5</td>
+        <td class="px-3 py-2">1.0s</td>
+        <td class="px-3 py-2">Lateral curve</td>
+        <td class="px-3 py-2 text-muted-foreground">Wind-caught sparks</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">F4c Slow Burn</td>
+        <td class="px-3 py-2">3</td>
+        <td class="px-3 py-2">1.4s</td>
+        <td class="px-3 py-2">Straight up</td>
+        <td class="px-3 py-2 text-muted-foreground">Quiet smolder</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">F4d Swirl</td>
+        <td class="px-3 py-2">5</td>
+        <td class="px-3 py-2">1.2s</td>
+        <td class="px-3 py-2">S-curve winding</td>
+        <td class="px-3 py-2 text-muted-foreground">Heat shimmer / organic</td>
+      </tr>
+      <tr>
+        <td class="px-3 py-2 font-bold">F4e Crackle</td>
+        <td class="px-3 py-2">6</td>
+        <td class="px-3 py-2">0.7s</td>
+        <td class="px-3 py-2">Pop then rise</td>
+        <td class="px-3 py-2 text-muted-foreground">Crackling heat</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

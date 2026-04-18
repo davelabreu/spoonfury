@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Banner — B3 Soft Glow Iterations</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwindcss.config = {
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(40,33%,98%)',
+        foreground: 'hsl(20,14%,8%)',
+        card: 'hsl(0,0%,100%)',
+        muted: { DEFAULT: 'hsl(35,20%,95%)', foreground: 'hsl(20,10%,46%)' },
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background: hsl(40,33%,98%); font-family: system-ui, -apple-system, sans-serif; }
+  .label { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: hsl(20,10%,46%); margin-bottom: 4px; }
+  .sublabel { font-size: 11px; color: hsl(20,10%,56%); margin-bottom: 16px; line-height: 1.5; }
+
+  /* Base beam animation */
+  @property --beam-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+  @keyframes beam-rotate {
+    from { --beam-angle: 0deg; }
+    to   { --beam-angle: 360deg; }
+  }
+
+  .beam {
+    position: relative;
+    overflow: visible;
+  }
+  .beam .beam-border {
+    position: absolute;
+    border-radius: 14px;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: beam-rotate var(--beam-speed) linear infinite;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* B3a: Original — wide tail, blurred, 6s */
+  .b3a .beam-border {
+    inset: -2px;
+    padding: 2.5px;
+    background: conic-gradient(from var(--beam-angle), transparent 0%, transparent 60%, var(--beam-color) 75%, var(--beam-color2) 80%, transparent 95%);
+    filter: blur(0.5px);
+    opacity: 0.8;
+  }
+
+  /* B3b: Tighter beam, more contrast — sharper leading edge */
+  .b3b .beam-border {
+    inset: -2px;
+    padding: 2px;
+    background: conic-gradient(from var(--beam-angle), transparent 0%, transparent 70%, var(--beam-color) 82%, var(--beam-color2) 86%, transparent 92%);
+    filter: blur(0.3px);
+    opacity: 0.9;
+  }
+
+  /* B3c: Extra wide comet tail — long fade, dreamy */
+  .b3c .beam-border {
+    inset: -2px;
+    padding: 3px;
+    background: conic-gradient(from var(--beam-angle), transparent 0%, transparent 40%, color-mix(in srgb, var(--beam-color) 20%, transparent) 55%, var(--beam-color) 72%, var(--beam-color2) 78%, transparent 90%);
+    filter: blur(1px);
+    opacity: 0.7;
+  }
+
+  /* B3d: Double glow — beam + faint outer halo */
+  .b3d .beam-border {
+    inset: -2px;
+    padding: 2.5px;
+    background: conic-gradient(from var(--beam-angle), transparent 0%, transparent 60%, var(--beam-color) 75%, var(--beam-color2) 80%, transparent 95%);
+    filter: blur(0.5px);
+    opacity: 0.8;
+  }
+  .b3d .beam-halo {
+    position: absolute;
+    inset: -4px;
+    border-radius: 16px;
+    padding: 4px;
+    background: conic-gradient(from var(--beam-angle), transparent 0%, transparent 55%, color-mix(in srgb, var(--beam-color) 30%, transparent) 70%, color-mix(in srgb, var(--beam-color2) 30%, transparent) 80%, transparent 95%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    filter: blur(3px);
+    opacity: 0.5;
+    animation: beam-rotate var(--beam-speed) linear infinite;
+    pointer-events: none;
+    z-index: 9;
+  }
+
+  /* B3e: Glacial — extremely slow, barely there */
+  .b3e .beam-border {
+    inset: -2px;
+    padding: 2px;
+    background: conic-gradient(from var(--beam-angle), transparent 0%, transparent 50%, color-mix(in srgb, var(--beam-color) 40%, transparent) 65%, var(--beam-color) 76%, var(--beam-color2) 80%, transparent 90%);
+    filter: blur(0.8px);
+    opacity: 0.5;
+  }
+</style>
+</head>
+<body class="p-6 max-w-3xl mx-auto space-y-10">
+
+<h1 class="text-2xl font-bold text-foreground mb-1">B3 Soft Glow — Iterations</h1>
+<p class="text-sm text-muted-foreground mb-8">Five mutations of the soft glow beam. Each shown with indigo (active review) and amber (warming up) states side by side.</p>
+
+<!-- REUSABLE CARD MACRO (via JS template) -->
+<script>
+function cardHTML(tier, pct, pos, neg, phrase, hint, pill, heading) {
+  const tiers = {
+    indigo: { border: 'border-indigo-100', stripe: 'from-indigo-500 via-violet-400 to-purple-400', track: '#e0e7ff', grad: ['#6366f1','#a78bfa'], text: 'text-indigo-600', pillCls: 'bg-indigo-100 text-indigo-700', beamColor: '#6366f1', beamColor2: '#a78bfa' },
+    amber:  { border: 'border-amber-100',  stripe: 'from-amber-400 via-yellow-400 to-amber-300',    track: '#fef3c7', grad: ['#f59e0b','#fbbf24'], text: 'text-amber-600',  pillCls: 'bg-amber-100 text-amber-700',  beamColor: '#f59e0b', beamColor2: '#fbbf24' },
+    emerald:{ border: 'border-emerald-100', stripe: 'from-emerald-500 via-emerald-400 to-teal-400',  track: '#d1fae5', grad: ['#10b981','#14b8a6'], text: 'text-emerald-600',pillCls: 'bg-emerald-100 text-emerald-700', beamColor: '#10b981', beamColor2: '#14b8a6' },
+    orange: { border: 'border-orange-100',  stripe: 'from-orange-400 via-amber-400 to-orange-300',   track: '#ffedd5', grad: ['#f97316','#fb923c'], text: 'text-orange-500', pillCls: 'bg-orange-100 text-orange-700', beamColor: '#f97316', beamColor2: '#fb923c' },
+    red:    { border: 'border-red-100',     stripe: 'from-red-400 via-rose-400 to-red-300',          track: '#fee2e2', grad: ['#ef4444','#f87171'], text: 'text-red-500',    pillCls: 'bg-red-100 text-red-700',    beamColor: '#ef4444', beamColor2: '#f87171' },
+  };
+  const t = tiers[tier];
+  const circ = 97.4;
+  const offset = circ - (circ * pct / 100);
+  const uid = tier + '-' + Math.random().toString(36).slice(2,6);
+  const ringInner = pct > 0
+    ? `<div class="flex flex-col items-center"><span class="text-sm font-black ${t.text}">${pct}<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest mt-0.5 ${t.text} opacity-50">approval</span></div>`
+    : `<div class="flex flex-col items-center"><span class="text-xs font-black ${t.text}">0/3</span><span class="text-[7px] font-bold uppercase tracking-widest mt-0.5 ${t.text} opacity-50">votes</span></div>`;
+  const phraseHTML = phrase ? `<p class="text-base font-semibold italic tracking-tight ${t.text}">${phrase}</p>` : '';
+  const thumbUp = `<svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>`;
+  const thumbDn = `<svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>`;
+
+  return `
+    <div class="rounded-xl bg-card shadow-sm border ${t.border} overflow-hidden">
+      <div class="h-1 bg-gradient-to-r ${t.stripe}"></div>
+      <div class="px-5 py-1.5 flex items-center gap-6">
+        <div class="flex flex-col items-center gap-2 shrink-0 min-w-[80px]">
+          <div class="relative h-14 w-14">
+            <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.5" fill="none" stroke="${t.track}" stroke-width="2"/>
+              <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#${uid})" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
+              <defs><linearGradient id="${uid}"><stop offset="0%" stop-color="${t.grad[0]}"/><stop offset="100%" stop-color="${t.grad[1]}"/></linearGradient></defs>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">${ringInner}</div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5">${thumbUp}<span class="text-[10px] font-bold font-mono">${pos}</span></span>
+            <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5">${thumbDn}<span class="text-[10px] font-bold font-mono">${neg}</span></span>
+          </div>
+        </div>
+        <div class="flex-1 flex flex-col justify-center gap-1">
+          <div class="flex items-center gap-2"><span class="text-base font-bold leading-none text-foreground">${heading}</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full ${t.pillCls}">${pill}</span></div>
+          ${phraseHTML}
+          <p class="text-[11px] text-muted-foreground">${hint}</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+function beamVars(tier) {
+  const map = {
+    indigo: '--beam-color:#6366f1;--beam-color2:#a78bfa',
+    amber:  '--beam-color:#f59e0b;--beam-color2:#fbbf24',
+    emerald:'--beam-color:#10b981;--beam-color2:#14b8a6',
+    orange: '--beam-color:#f97316;--beam-color2:#fb923c',
+    red:    '--beam-color:#ef4444;--beam-color2:#f87171',
+  };
+  return map[tier];
+}
+</script>
+
+<!-- ============================================================ -->
+<!-- B3a: Original (baseline) -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">B3a / Original (baseline)</div>
+  <p class="sublabel">The B3 you picked. 6s, wide tail, blur 0.5px, opacity 0.8. Shown for reference.</p>
+  <div class="flex gap-4">
+    <div class="beam b3a flex-1" style="--beam-color:#6366f1;--beam-color2:#a78bfa;--beam-speed:6s;">
+      <div class="beam-border"></div>
+      <div id="b3a-1"></div>
+    </div>
+    <div class="beam b3a flex-1" style="--beam-color:#f59e0b;--beam-color2:#fbbf24;--beam-speed:6s;">
+      <div class="beam-border"></div>
+      <div id="b3a-2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- B3b: Tighter & brighter -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">B3b / Tighter & Brighter</div>
+  <p class="sublabel">Shorter tail, sharper leading edge, less blur. More precision, less dream. 5s loop.</p>
+  <div class="flex gap-4">
+    <div class="beam b3b flex-1" style="--beam-color:#6366f1;--beam-color2:#a78bfa;--beam-speed:5s;">
+      <div class="beam-border"></div>
+      <div id="b3b-1"></div>
+    </div>
+    <div class="beam b3b flex-1" style="--beam-color:#f59e0b;--beam-color2:#fbbf24;--beam-speed:5s;">
+      <div class="beam-border"></div>
+      <div id="b3b-2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- B3c: Comet Tail -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">B3c / Comet Tail</div>
+  <p class="sublabel">Very long fade-in tail covering almost half the perimeter. Dreamy, slow aurora feel. 8s loop, heavier blur.</p>
+  <div class="flex gap-4">
+    <div class="beam b3c flex-1" style="--beam-color:#6366f1;--beam-color2:#a78bfa;--beam-speed:8s;">
+      <div class="beam-border"></div>
+      <div id="b3c-1"></div>
+    </div>
+    <div class="beam b3c flex-1" style="--beam-color:#f59e0b;--beam-color2:#fbbf24;--beam-speed:8s;">
+      <div class="beam-border"></div>
+      <div id="b3c-2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- B3d: Double Glow (beam + halo) -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">B3d / Double Glow</div>
+  <p class="sublabel">The original B3 beam plus a wider, blurry outer halo that follows it. Feels premium, like a neon sign in fog. 6s loop.</p>
+  <div class="flex gap-4">
+    <div class="beam b3d flex-1" style="--beam-color:#6366f1;--beam-color2:#a78bfa;--beam-speed:6s;">
+      <div class="beam-halo"></div>
+      <div class="beam-border"></div>
+      <div id="b3d-1"></div>
+    </div>
+    <div class="beam b3d flex-1" style="--beam-color:#f59e0b;--beam-color2:#fbbf24;--beam-speed:6s;">
+      <div class="beam-halo"></div>
+      <div class="beam-border"></div>
+      <div id="b3d-2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- B3e: Glacial -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">B3e / Glacial</div>
+  <p class="sublabel">Very slow (10s), half opacity. You barely notice it's moving — then you do. Subtle prestige.</p>
+  <div class="flex gap-4">
+    <div class="beam b3e flex-1" style="--beam-color:#6366f1;--beam-color2:#a78bfa;--beam-speed:10s;">
+      <div class="beam-border"></div>
+      <div id="b3e-1"></div>
+    </div>
+    <div class="beam b3e flex-1" style="--beam-color:#f59e0b;--beam-color2:#fbbf24;--beam-speed:10s;">
+      <div class="beam-border"></div>
+      <div id="b3e-2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- COMPARISON -->
+<!-- ============================================================ -->
+<div class="rounded-xl border border-zinc-200 bg-white overflow-hidden mt-8">
+  <table class="w-full text-xs">
+    <thead>
+      <tr class="border-b border-zinc-100">
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground"></th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Speed</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Tail</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Blur</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Opacity</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Vibe</th>
+      </tr>
+    </thead>
+    <tbody class="text-foreground">
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">B3a Original</td>
+        <td class="px-3 py-2">6s</td>
+        <td class="px-3 py-2">Medium (20%)</td>
+        <td class="px-3 py-2">0.5px</td>
+        <td class="px-3 py-2">80%</td>
+        <td class="px-3 py-2 text-muted-foreground">Soft &amp; ambient</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">B3b Tighter</td>
+        <td class="px-3 py-2">5s</td>
+        <td class="px-3 py-2">Short (12%)</td>
+        <td class="px-3 py-2">0.3px</td>
+        <td class="px-3 py-2">90%</td>
+        <td class="px-3 py-2 text-muted-foreground">Precise &amp; confident</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">B3c Comet</td>
+        <td class="px-3 py-2">8s</td>
+        <td class="px-3 py-2">Long (38%)</td>
+        <td class="px-3 py-2">1px</td>
+        <td class="px-3 py-2">70%</td>
+        <td class="px-3 py-2 text-muted-foreground">Aurora / dreamy</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">B3d Double Glow</td>
+        <td class="px-3 py-2">6s</td>
+        <td class="px-3 py-2">Medium (20%)</td>
+        <td class="px-3 py-2">0.5px + 3px halo</td>
+        <td class="px-3 py-2">80% + 50%</td>
+        <td class="px-3 py-2 text-muted-foreground">Neon in fog / premium</td>
+      </tr>
+      <tr>
+        <td class="px-3 py-2 font-bold">B3e Glacial</td>
+        <td class="px-3 py-2">10s</td>
+        <td class="px-3 py-2">Medium (26%)</td>
+        <td class="px-3 py-2">0.8px</td>
+        <td class="px-3 py-2">50%</td>
+        <td class="px-3 py-2 text-muted-foreground">Barely there / prestige</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+// Inject cards
+const cards = [
+  { id: 'b3a-1', tier: 'indigo', pct: 100, pos: 3, neg: 0, phrase: 'Community Pick', hint: '3 votes in \u2014 needs 80% approval to advance', pill: 'Round 1', heading: 'Community Review' },
+  { id: 'b3a-2', tier: 'amber',  pct: 75,  pos: 3, neg: 1, phrase: 'Warming Up',     hint: '4 votes in \u2014 needs 80% approval to advance', pill: 'Round 2', heading: 'Community Review' },
+  { id: 'b3b-1', tier: 'indigo', pct: 100, pos: 3, neg: 0, phrase: 'Community Pick', hint: '3 votes in \u2014 needs 80% approval to advance', pill: 'Round 1', heading: 'Community Review' },
+  { id: 'b3b-2', tier: 'amber',  pct: 75,  pos: 3, neg: 1, phrase: 'Warming Up',     hint: '4 votes in \u2014 needs 80% approval to advance', pill: 'Round 2', heading: 'Community Review' },
+  { id: 'b3c-1', tier: 'indigo', pct: 100, pos: 3, neg: 0, phrase: 'Community Pick', hint: '3 votes in \u2014 needs 80% approval to advance', pill: 'Round 1', heading: 'Community Review' },
+  { id: 'b3c-2', tier: 'amber',  pct: 75,  pos: 3, neg: 1, phrase: 'Warming Up',     hint: '4 votes in \u2014 needs 80% approval to advance', pill: 'Round 2', heading: 'Community Review' },
+  { id: 'b3d-1', tier: 'indigo', pct: 100, pos: 3, neg: 0, phrase: 'Community Pick', hint: '3 votes in \u2014 needs 80% approval to advance', pill: 'Round 1', heading: 'Community Review' },
+  { id: 'b3d-2', tier: 'amber',  pct: 75,  pos: 3, neg: 1, phrase: 'Warming Up',     hint: '4 votes in \u2014 needs 80% approval to advance', pill: 'Round 2', heading: 'Community Review' },
+  { id: 'b3e-1', tier: 'indigo', pct: 100, pos: 3, neg: 0, phrase: 'Community Pick', hint: '3 votes in \u2014 needs 80% approval to advance', pill: 'Round 1', heading: 'Community Review' },
+  { id: 'b3e-2', tier: 'amber',  pct: 75,  pos: 3, neg: 1, phrase: 'Warming Up',     hint: '4 votes in \u2014 needs 80% approval to advance', pill: 'Round 2', heading: 'Community Review' },
+];
+cards.forEach(c => {
+  document.getElementById(c.id).innerHTML = cardHTML(c.tier, c.pct, c.pos, c.neg, c.phrase, c.hint, c.pill, c.heading);
+});
+</script>
+
+</body>
+</html>

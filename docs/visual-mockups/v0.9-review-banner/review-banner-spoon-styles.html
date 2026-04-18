@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spoon Icon Styles — Skeuomorphic vs Technical</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwindcss.config = {
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(40,33%,98%)',
+        foreground: 'hsl(20,14%,8%)',
+        card: 'hsl(0,0%,100%)',
+        muted: { DEFAULT: 'hsl(35,20%,95%)', foreground: 'hsl(20,10%,46%)' },
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background: hsl(40,33%,98%); font-family: system-ui, -apple-system, sans-serif; }
+  .label { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: hsl(20,10%,46%); margin-bottom: 4px; }
+  .sublabel { font-size: 11px; color: hsl(20,10%,56%); margin-bottom: 16px; line-height: 1.5; }
+
+  /* Ember animation */
+  @keyframes ember-rise-drift {
+    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+    50%  { transform: translate(3px, -8px) scale(0.6); opacity: 0.7; }
+    100% { transform: translate(-1px, -16px) scale(0.15); opacity: 0; }
+  }
+
+  /* Group hover */
+  .cta-group { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .cta-group .spoon-area { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .cta-group:hover .spoon-area { transform: scale(1.3); }
+  .cta-group .ember-bed span { position: absolute; border-radius: 50%; opacity: 0; animation-play-state: paused; }
+  .cta-group:hover .ember-bed span { animation-play-state: running; }
+
+  .cta-btn {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    border: 1px solid rgba(245,158,11,0.3); background: rgba(255,251,235,0.5);
+    color: #d97706; padding: 4px 12px; border-radius: 6px; backdrop-filter: blur(4px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.3s;
+  }
+  .cta-group:hover .cta-btn { background: #f59e0b; color: white; box-shadow: 0 0 15px rgba(245,158,11,0.4); }
+
+  .demo-row { display: flex; align-items: center; gap: 16px; padding: 20px 24px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; }
+  .demo-hint { font-size: 10px; color: hsl(20,10%,56%); margin-left: auto; font-style: italic; }
+
+  /* Spoon hover glow states */
+  .cta-group:hover .spoon-metal { filter: drop-shadow(0 0 5px #f59e0b) brightness(1.1); }
+  .cta-group:hover .spoon-blueprint { filter: drop-shadow(0 0 6px rgba(99,102,241,0.5)); }
+  .cta-group:hover .spoon-blueprint path, .cta-group:hover .spoon-blueprint line { stroke: #818cf8; }
+  .cta-group:hover .spoon-blueprint text { fill: #818cf8; }
+  .cta-group:hover .spoon-heatmap-warm { filter: drop-shadow(0 0 5px #f59e0b); }
+  .cta-group:hover .spoon-heatmap-hot { filter: drop-shadow(0 0 6px #ef4444); }
+  .cta-group:hover .spoon-neon { filter: drop-shadow(0 0 8px rgba(245,158,11,0.6)); }
+  .cta-group:hover .spoon-engraved { filter: drop-shadow(0 0 4px rgba(245,158,11,0.4)); }
+
+  /* Specular shimmer on metal */
+  @keyframes specular-shift {
+    0%, 100% { stop-color: rgba(255,255,255,0.7); }
+    50% { stop-color: rgba(255,255,255,0.3); }
+  }
+</style>
+</head>
+<body class="p-6 max-w-2xl mx-auto space-y-8">
+
+<h1 class="text-2xl font-bold text-foreground mb-1">Spoon Icon Styles</h1>
+<p class="text-sm text-muted-foreground mb-2">Five treatments for the CTA spoon. Each shown at rest and with hover (spoon OR button). All include the F4b drifting embers.</p>
+<p class="text-xs text-amber-600 font-semibold mb-8">Hover anywhere on each row's spoon+button group to see the full effect.</p>
+
+<!-- Shared ember macro -->
+<!-- Each demo reuses the same ember bed -->
+
+<!-- ============================================================ -->
+<!-- S1: MACHINED METAL — brushed steel gradient + specular highlight -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">S1 / Machined Metal</div>
+  <p class="sublabel">Brushed steel gradient (slate-300 → slate-500) with a specular highlight on the bowl. Feels like a premium kitchen utensil. On hover, warms to amber glow.</p>
+  <div class="demo-row">
+    <div style="display:flex;gap:32px;align-items:center;">
+      <!-- At rest -->
+      <div style="text-align:center;">
+        <svg class="spoon-metal" width="22" height="22" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.1));">
+          <defs>
+            <linearGradient id="metal1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#cbd5e1"/>
+              <stop offset="35%" stop-color="#e2e8f0"/>
+              <stop offset="50%" stop-color="#94a3b8"/>
+              <stop offset="100%" stop-color="#475569"/>
+            </linearGradient>
+          </defs>
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#metal1)" stroke="#64748b" stroke-width="0.5"/>
+          <path d="M15.5 12L12 22" stroke="url(#metal1)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <!-- Specular highlight -->
+          <ellipse cx="15" cy="5.5" rx="1.5" ry="2" fill="white" opacity="0.35"/>
+        </svg>
+        <div style="font-size:9px;color:#94a3b8;margin-top:4px;">rest</div>
+      </div>
+
+      <!-- With hover -->
+      <div class="cta-group">
+        <div class="spoon-area">
+          <svg class="spoon-metal" width="18" height="18" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.1));transition:all 0.3s;">
+            <defs>
+              <linearGradient id="metal1b" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#cbd5e1"/>
+                <stop offset="35%" stop-color="#e2e8f0"/>
+                <stop offset="50%" stop-color="#94a3b8"/>
+                <stop offset="100%" stop-color="#475569"/>
+              </linearGradient>
+            </defs>
+            <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#metal1b)" stroke="#64748b" stroke-width="0.5"/>
+            <path d="M15.5 12L12 22" stroke="url(#metal1b)" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <ellipse cx="15" cy="5.5" rx="1.5" ry="2" fill="white" opacity="0.35"/>
+          </svg>
+          <div class="ember-bed absolute pointer-events-none" style="top:4px;left:9px;">
+            <span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s;"></span>
+            <span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s;"></span>
+            <span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s;"></span>
+            <span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s;"></span>
+            <span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s;"></span>
+          </div>
+        </div>
+        <span class="cta-btn">Cast Your Vote</span>
+      </div>
+    </div>
+    <span class="demo-hint">Gradient fill, specular highlight, warm glow on hover</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- S2: VECTOR BLUEPRINT — thin stroke, crosshairs, measurement -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">S2 / Vector Blueprint</div>
+  <p class="sublabel">1px stroke outline with small measurement annotations. CAD drawing aesthetic. On hover, strokes shift to indigo and glow.</p>
+  <div class="demo-row">
+    <div style="display:flex;gap:32px;align-items:center;">
+      <!-- At rest -->
+      <div style="text-align:center;">
+        <svg class="spoon-blueprint" width="28" height="28" viewBox="0 0 30 30" style="transition:all 0.3s;">
+          <path d="M18.5 4C16 4 15 6.5 15 9c0 3 2 5 3.5 5S22 12 22 9c0-2.5-1-5-3.5-5z" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="none"/>
+          <path d="M18.5 14L15 24" fill="none" stroke="#94a3b8" stroke-width="1" stroke-linecap="round"/>
+          <!-- Crosshair on bowl -->
+          <line x1="16.5" y1="8" x2="20.5" y2="8" stroke="#94a3b8" stroke-width="0.4" opacity="0.5"/>
+          <line x1="18.5" y1="5.5" x2="18.5" y2="10.5" stroke="#94a3b8" stroke-width="0.4" opacity="0.5"/>
+          <!-- Measurement label -->
+          <text x="23" y="9.5" font-size="3.5" fill="#94a3b8" font-family="monospace" opacity="0.6">15ml</text>
+          <!-- Dimension line -->
+          <line x1="14" y1="14.5" x2="14" y2="23.5" stroke="#94a3b8" stroke-width="0.3" opacity="0.4"/>
+          <line x1="13.5" y1="14.5" x2="14.5" y2="14.5" stroke="#94a3b8" stroke-width="0.3" opacity="0.4"/>
+          <line x1="13.5" y1="23.5" x2="14.5" y2="23.5" stroke="#94a3b8" stroke-width="0.3" opacity="0.4"/>
+        </svg>
+        <div style="font-size:9px;color:#94a3b8;margin-top:4px;">rest</div>
+      </div>
+
+      <!-- With hover -->
+      <div class="cta-group">
+        <div class="spoon-area" style="width:32px;height:32px;">
+          <svg class="spoon-blueprint" width="24" height="24" viewBox="0 0 30 30" style="transition:all 0.3s;">
+            <path d="M18.5 4C16 4 15 6.5 15 9c0 3 2 5 3.5 5S22 12 22 9c0-2.5-1-5-3.5-5z" fill="none" stroke="#94a3b8" stroke-width="1"/>
+            <path d="M18.5 14L15 24" fill="none" stroke="#94a3b8" stroke-width="1" stroke-linecap="round"/>
+            <line x1="16.5" y1="8" x2="20.5" y2="8" stroke="#94a3b8" stroke-width="0.4" opacity="0.5"/>
+            <line x1="18.5" y1="5.5" x2="18.5" y2="10.5" stroke="#94a3b8" stroke-width="0.4" opacity="0.5"/>
+            <text x="23" y="9.5" font-size="3.5" fill="#94a3b8" font-family="monospace" opacity="0.6">15ml</text>
+          </svg>
+          <div class="ember-bed absolute pointer-events-none" style="top:4px;left:9px;">
+            <span style="left:0;width:4px;height:4px;background:#818cf8;animation:ember-rise-drift 1s infinite 0s;"></span>
+            <span style="left:8px;width:4px;height:4px;background:#6366f1;animation:ember-rise-drift 1s infinite 0.25s;"></span>
+            <span style="left:4px;width:3.5px;height:3.5px;background:#a78bfa;animation:ember-rise-drift 1s infinite 0.5s;"></span>
+            <span style="left:-3px;width:3px;height:3px;background:#c4b5fd;animation:ember-rise-drift 1s infinite 0.75s;"></span>
+            <span style="left:10px;width:3px;height:3px;background:#818cf8;animation:ember-rise-drift 1s infinite 0.1s;"></span>
+          </div>
+        </div>
+        <span class="cta-btn" style="border-color:rgba(99,102,241,0.3);background:rgba(238,242,255,0.5);color:#4f46e5;">Cast Your Vote</span>
+      </div>
+    </div>
+    <span class="demo-hint">1px stroke, crosshairs, "15ml" annotation, indigo embers</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- S3: HEAT MAP — color reflects approval temperature -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">S3 / Heat Map</div>
+  <p class="sublabel">Spoon color is a data visualization: cold slate at low approval, warming through amber to red-hot at high approval. The icon IS the data.</p>
+  <div class="demo-row">
+    <div style="display:flex;gap:20px;align-items:center;">
+      <!-- Cold (25%) -->
+      <div style="text-align:center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.05));">
+          <defs><linearGradient id="heat-cold" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#cbd5e1"/></linearGradient></defs>
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#heat-cold)" stroke="#64748b" stroke-width="0.5"/>
+          <path d="M15.5 12L12 22" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div style="font-size:9px;color:#94a3b8;margin-top:2px;">25%</div>
+      </div>
+      <!-- Warm (50%) -->
+      <div style="text-align:center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" style="filter:drop-shadow(0 0 3px rgba(245,158,11,0.2));">
+          <defs><linearGradient id="heat-warm" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient></defs>
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#heat-warm)" stroke="#d97706" stroke-width="0.5"/>
+          <path d="M15.5 12L12 22" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div style="font-size:9px;color:#f59e0b;margin-top:2px;">50%</div>
+      </div>
+      <!-- Hot (75%) -->
+      <div style="text-align:center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" style="filter:drop-shadow(0 0 4px rgba(249,115,22,0.3));">
+          <defs><linearGradient id="heat-hot" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#fb923c"/><stop offset="100%" stop-color="#f97316"/></linearGradient></defs>
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#heat-hot)" stroke="#ea580c" stroke-width="0.5"/>
+          <path d="M15.5 12L12 22" stroke="#f97316" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div style="font-size:9px;color:#f97316;margin-top:2px;">75%</div>
+      </div>
+      <!-- Red hot (95%) -->
+      <div style="text-align:center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" style="filter:drop-shadow(0 0 6px rgba(239,68,68,0.4));">
+          <defs><linearGradient id="heat-red" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#fca5a5"/><stop offset="40%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient></defs>
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#heat-red)" stroke="#b91c1c" stroke-width="0.5"/>
+          <path d="M15.5 12L12 22" stroke="#ef4444" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div style="font-size:9px;color:#ef4444;margin-top:2px;">95%</div>
+      </div>
+
+      <div style="width:1px;height:32px;background:#e5e7eb;margin:0 8px;"></div>
+
+      <!-- Hover demo at 50% warm -->
+      <div class="cta-group">
+        <div class="spoon-area">
+          <svg class="spoon-heatmap-warm" width="18" height="18" viewBox="0 0 24 24" style="transition:all 0.3s;">
+            <defs><linearGradient id="heat-warm2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient></defs>
+            <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#heat-warm2)" stroke="#d97706" stroke-width="0.5"/>
+            <path d="M15.5 12L12 22" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <div class="ember-bed absolute pointer-events-none" style="top:4px;left:9px;">
+            <span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s;"></span>
+            <span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s;"></span>
+            <span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s;"></span>
+            <span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s;"></span>
+            <span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s;"></span>
+          </div>
+        </div>
+        <span class="cta-btn">Cast Your Vote</span>
+      </div>
+    </div>
+    <span class="demo-hint">Color = approval %, spoon IS the data</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- S4: NEON OUTLINE — glowing wireframe -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">S4 / Neon Outline</div>
+  <p class="sublabel">Empty spoon with a bright stroke and ambient neon glow. Minimal, electric. On hover, glow intensifies like a sign powering up.</p>
+  <div class="demo-row">
+    <div style="display:flex;gap:32px;align-items:center;">
+      <!-- At rest -->
+      <div style="text-align:center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" style="filter:drop-shadow(0 0 3px rgba(245,158,11,0.3));">
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M15.5 12L12 22" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div style="font-size:9px;color:#f59e0b;margin-top:4px;">rest</div>
+      </div>
+
+      <!-- With hover -->
+      <div class="cta-group">
+        <div class="spoon-area">
+          <svg class="spoon-neon" width="18" height="18" viewBox="0 0 24 24" style="filter:drop-shadow(0 0 3px rgba(245,158,11,0.3));transition:all 0.3s;">
+            <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M15.5 12L12 22" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <div class="ember-bed absolute pointer-events-none" style="top:4px;left:9px;">
+            <span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s;"></span>
+            <span style="left:8px;width:4px;height:4px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.25s;"></span>
+            <span style="left:4px;width:3.5px;height:3.5px;background:#f97316;animation:ember-rise-drift 1s infinite 0.5s;"></span>
+            <span style="left:-3px;width:3px;height:3px;background:#fde68a;animation:ember-rise-drift 1s infinite 0.75s;"></span>
+            <span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s;"></span>
+          </div>
+        </div>
+        <span class="cta-btn">Cast Your Vote</span>
+      </div>
+    </div>
+    <span class="demo-hint">Empty outline, ambient glow, intensifies on hover</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- S5: ENGRAVED — debossed with inner shadow illusion -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">S5 / Engraved</div>
+  <p class="sublabel">Filled spoon with a darker inner edge and lighter top, like it's stamped into metal. Subtle bevel effect. On hover, gains an amber warmth.</p>
+  <div class="demo-row">
+    <div style="display:flex;gap:32px;align-items:center;">
+      <!-- At rest -->
+      <div style="text-align:center;">
+        <svg width="22" height="22" viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="engrave1" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#e2e8f0"/>
+              <stop offset="100%" stop-color="#64748b"/>
+            </linearGradient>
+          </defs>
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#engrave1)" stroke="#475569" stroke-width="0.8"/>
+          <path d="M15.5 12L12 22" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <!-- Inner bevel highlight -->
+          <path d="M15.5 3.5C14 3.5 13 5.5 13 7.5c0 1.5 0.8 2.5 1.5 3" fill="none" stroke="white" stroke-width="0.6" opacity="0.4"/>
+        </svg>
+        <div style="font-size:9px;color:#94a3b8;margin-top:4px;">rest</div>
+      </div>
+
+      <!-- With hover -->
+      <div class="cta-group">
+        <div class="spoon-area">
+          <svg class="spoon-engraved" width="18" height="18" viewBox="0 0 24 24" style="transition:all 0.3s;">
+            <defs>
+              <linearGradient id="engrave1b" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#e2e8f0"/>
+                <stop offset="100%" stop-color="#64748b"/>
+              </linearGradient>
+            </defs>
+            <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#engrave1b)" stroke="#475569" stroke-width="0.8"/>
+            <path d="M15.5 12L12 22" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M15.5 3.5C14 3.5 13 5.5 13 7.5c0 1.5 0.8 2.5 1.5 3" fill="none" stroke="white" stroke-width="0.6" opacity="0.4"/>
+          </svg>
+          <div class="ember-bed absolute pointer-events-none" style="top:4px;left:9px;">
+            <span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s;"></span>
+            <span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s;"></span>
+            <span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s;"></span>
+            <span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s;"></span>
+            <span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s;"></span>
+          </div>
+        </div>
+        <span class="cta-btn">Cast Your Vote</span>
+      </div>
+    </div>
+    <span class="demo-hint">Bevel gradient, inner highlight, stamped-metal feel</span>
+  </div>
+</div>
+
+<!-- Comparison -->
+<div class="rounded-xl border border-zinc-200 bg-white overflow-hidden mt-8">
+  <table class="w-full text-xs">
+    <thead>
+      <tr class="border-b border-zinc-100">
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground"></th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Technique</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Fill</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Hover</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Vibe</th>
+      </tr>
+    </thead>
+    <tbody class="text-foreground">
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">S1 Metal</td>
+        <td class="px-3 py-2">Gradient + specular</td>
+        <td class="px-3 py-2">Brushed steel</td>
+        <td class="px-3 py-2">Amber glow</td>
+        <td class="px-3 py-2 text-muted-foreground">Premium kitchenware</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">S2 Blueprint</td>
+        <td class="px-3 py-2">Thin stroke + annotations</td>
+        <td class="px-3 py-2">Hollow</td>
+        <td class="px-3 py-2">Indigo glow</td>
+        <td class="px-3 py-2 text-muted-foreground">CAD / engineering</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">S3 Heat Map</td>
+        <td class="px-3 py-2">Approval-driven gradient</td>
+        <td class="px-3 py-2">Dynamic</td>
+        <td class="px-3 py-2">Intensify</td>
+        <td class="px-3 py-2 text-muted-foreground">Data visualization</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">S4 Neon</td>
+        <td class="px-3 py-2">Bright stroke + glow</td>
+        <td class="px-3 py-2">Hollow</td>
+        <td class="px-3 py-2">Glow intensifies</td>
+        <td class="px-3 py-2 text-muted-foreground">Electric signage</td>
+      </tr>
+      <tr>
+        <td class="px-3 py-2 font-bold">S5 Engraved</td>
+        <td class="px-3 py-2">Bevel gradient + highlight</td>
+        <td class="px-3 py-2">Stamped metal</td>
+        <td class="px-3 py-2">Amber warmth</td>
+        <td class="px-3 py-2 text-muted-foreground">Debossed / tactile</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

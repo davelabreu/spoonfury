@@ -109,6 +109,7 @@ export interface KitchenResponse {
 export interface RecipeReviewItem {
   reviewer: string;
   is_positive: boolean;
+  rating?: number | null;
   comment: string;
   round: number;
   created_at: string;
@@ -128,6 +129,9 @@ export interface ReviewsResponse {
   positive_votes: number;
   threshold_met: boolean;
   has_voted: boolean;
+  average_rating?: number | null;
+  rating_distribution?: Record<string, number>;
+  rated_count?: number;
   reviews?: RecipeReviewItem[];
   /** All reviews across all rounds — only present for the recipe owner */
   all_rounds?: RecipeReviewItem[];

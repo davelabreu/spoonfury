@@ -81,3 +81,84 @@ body {
   border-color: #c4b5fd;
   background: rgba(255, 255, 255, 0.85);
 }
+
+/* Flaming spoon — drifting embers */
+@keyframes ember-rise-drift {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  50%  { transform: translate(3px, -8px) scale(0.6); opacity: 0.7; }
+  100% { transform: translate(-1px, -16px) scale(0.15); opacity: 0; }
+}
+
+.cta-group:hover .spoon-icon {
+  color: #d97706;
+  filter: drop-shadow(0 0 5px #f59e0b);
+}
+.cta-group:hover .spoon-area {
+  transform: scale(1.3);
+}
+.cta-group .ember-bed span {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  animation-play-state: paused;
+}
+.cta-group:hover .ember-bed span {
+  animation-play-state: running;
+}
+.cta-group:hover .cta-vote-btn {
+  background: var(--cta-color);
+  color: white;
+  border-color: var(--cta-color);
+}
+
+/* Vote slot pulse */
+@keyframes slot-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 0.7; }
+}
+
+/* CTA breathe glow — uses --cta-color from inline style */
+@keyframes breathe-glow {
+  0%, 100% { box-shadow: 0 0 8px color-mix(in srgb, var(--cta-color) 20%, transparent); }
+  50%      { box-shadow: 0 0 20px color-mix(in srgb, var(--cta-color) 45%, transparent); }
+}
+
+/* CTA sparks */
+@keyframes spark-float {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0.8; }
+  100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; }
+}
+
+/* Review banner border beam */
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes beam-rotate {
+  from { --beam-angle: 0deg; }
+  to   { --beam-angle: 360deg; }
+}
+
+.review-beam {
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  padding: 2.5px;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0%, transparent 60%,
+    var(--beam-color) 75%, var(--beam-color2) 80%,
+    transparent 95%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  filter: blur(0.5px);
+  opacity: 0.8;
+  animation: beam-rotate 6s linear infinite;
+  pointer-events: none;
+  z-index: 10;
+}

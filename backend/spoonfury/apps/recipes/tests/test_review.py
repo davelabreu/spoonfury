@@ -82,8 +82,7 @@ def test_submit_from_revision_requested(auth_client, reviewable_recipe):
     url = reverse("recipe-submit-review", kwargs={"slug": reviewable_recipe.slug})
     response = auth_client.post(url)
     assert response.status_code == 200
-    assert response.data["status"] == "in_review"
-    assert response.data["review_round"] == 2
+    assert response.data["status"] == "mod_queue"
 
 
 @pytest.mark.django_db
@@ -136,18 +135,21 @@ def invited_setup(user, other_user, invitee_user, in_review_recipe):
 
 @pytest.mark.django_db
 def test_vote_positive(other_auth_client, invited_setup):
-    """An invitee can submit a positive vote."""
+    """An invitee can submit a spoon rating vote."""
     url = reverse("recipe-review-vote", kwargs={"slug": invited_setup.slug})
-    response = other_auth_client.post(url, {"is_positive": True}, format="json")
+    response = other_auth_client.post(url, {"rating": 5}, format="json")
     assert response.status_code == 201
     assert RecipeReview.objects.count() == 1
+    review = RecipeReview.objects.first()
+    assert review.rating == 5
+    assert review.is_positive is True
 
 
 @pytest.mark.django_db
 def test_vote_not_invitee(auth_client, user, in_review_recipe):
     """The recipe author cannot vote on their own recipe."""
     url = reverse("recipe-review-vote", kwargs={"slug": in_review_recipe.slug})
-    response = auth_client.post(url, {"is_positive": True}, format="json")
+    response = auth_client.post(url, {"rating": 5}, format="json")
     assert response.status_code == 403
 
 
@@ -155,7 +157,7 @@ def test_vote_not_invitee(auth_client, user, in_review_recipe):
 def test_vote_creates_notification(other_auth_client, user, invited_setup):
     """Voting sends a notification to the recipe author."""
     url = reverse("recipe-review-vote", kwargs={"slug": invited_setup.slug})
-    other_auth_client.post(url, {"is_positive": True}, format="json")
+    other_auth_client.post(url, {"rating": 4}, format="json")
     assert Notification.objects.filter(
         recipient=user, notification_type="review_received",
     ).count() == 1
@@ -163,37 +165,42 @@ def test_vote_creates_notification(other_auth_client, user, invited_setup):
 
 @pytest.mark.django_db
 def test_vote_duplicate_blocked(other_auth_client, invited_setup):
-    """Same reviewer cannot vote twice in the same round."""
+    """Same reviewer cannot vote twice."""
     url = reverse("recipe-review-vote", kwargs={"slug": invited_setup.slug})
-    other_auth_client.post(url, {"is_positive": True}, format="json")
-    response = other_auth_client.post(url, {"is_positive": False}, format="json")
+    other_auth_client.post(url, {"rating": 5}, format="json")
+    response = other_auth_client.post(url, {"rating": 3}, format="json")
     assert response.status_code == 400
 
 
 @pytest.mark.django_db
 def test_threshold_auto_promotion(other_auth_client, invitee_client, invited_setup, invitee_user, staff_user):
-    """Recipe auto-transitions to mod_queue when 3+ votes at 80%+ positive."""
+    """Recipe auto-transitions to mod_queue when 5+ reviews with avg >= 4.0."""
     from rest_framework.test import APIClient
-    third = User.objects.create_user(username="third", email="t@t.com", password="testpass123")
-    TestKitchenInvite.objects.create(owner=invited_setup.author, invitee=third)
-    third_client = APIClient()
-    third_client.force_authenticate(user=third)
+
+    extra_users = []
+    for i in range(3):
+        u = User.objects.create_user(username=f"voter{i}", email=f"v{i}@t.com", password="testpass123")
+        TestKitchenInvite.objects.create(owner=invited_setup.author, invitee=u)
+        extra_users.append(u)
 
     url = reverse("recipe-review-vote", kwargs={"slug": invited_setup.slug})
-    other_auth_client.post(url, {"is_positive": True}, format="json")
-    invitee_client.post(url, {"is_positive": True}, format="json")
-    third_client.post(url, {"is_positive": True}, format="json")
+    other_auth_client.post(url, {"rating": 5}, format="json")
+    invitee_client.post(url, {"rating": 4}, format="json")
+    for u in extra_users:
+        c = APIClient()
+        c.force_authenticate(user=u)
+        c.post(url, {"rating": 4}, format="json")
 
     invited_setup.refresh_from_db()
     assert invited_setup.status == "mod_queue"
 
 
 @pytest.mark.django_db
-def test_threshold_not_met_below_3(other_auth_client, invitee_client, invited_setup):
-    """Recipe stays in_review with only 2 votes even at 100% positive."""
+def test_threshold_not_met_below_5(other_auth_client, invitee_client, invited_setup):
+    """Recipe stays in_review with only 2 reviews even with perfect 5.0 avg."""
     url = reverse("recipe-review-vote", kwargs={"slug": invited_setup.slug})
-    other_auth_client.post(url, {"is_positive": True}, format="json")
-    invitee_client.post(url, {"is_positive": True}, format="json")
+    other_auth_client.post(url, {"rating": 5}, format="json")
+    invitee_client.post(url, {"rating": 5}, format="json")
 
     invited_setup.refresh_from_db()
     assert invited_setup.status == "in_review"
@@ -213,7 +220,7 @@ def test_list_reviews_before_voting(other_auth_client, invited_setup):
 def test_list_reviews_after_voting(other_auth_client, invited_setup):
     """After voting, invitee sees all reviews with comments."""
     vote_url = reverse("recipe-review-vote", kwargs={"slug": invited_setup.slug})
-    other_auth_client.post(vote_url, {"is_positive": True, "comment": "Nice!"}, format="json")
+    other_auth_client.post(vote_url, {"rating": 4, "comment": "Nice!"}, format="json")
     list_url = reverse("recipe-reviews-list", kwargs={"slug": invited_setup.slug})
     response = other_auth_client.get(list_url)
     assert response.status_code == 200
@@ -254,10 +261,10 @@ def test_check_threshold_is_cumulative_across_rounds():
         instructions="stir vigorously for a full minute and taste carefully",
         author=author, status="in_review", review_round=2,
     )
-    # Three positive votes cast in an earlier round (round=1), recipe is now in round=2.
-    for i in range(3):
+    # Five 4+ spoon votes cast in an earlier round (round=1), recipe is now in round=2.
+    for i in range(5):
         r = User.objects.create_user(username=f"cum_r{i}", password="x")
-        RecipeReview.objects.create(recipe=recipe, reviewer=r, review_round=1, is_positive=True)
+        RecipeReview.objects.create(recipe=recipe, reviewer=r, review_round=1, is_positive=True, rating=4)
 
     assert _check_threshold(recipe) is True
     recipe.refresh_from_db()
@@ -278,12 +285,12 @@ def test_review_vote_rejects_duplicate_reviewer_any_round():
         author=author, status="in_review", review_round=2,
     )
     # Prior vote from round 1
-    RecipeReview.objects.create(recipe=recipe, reviewer=reviewer, review_round=1, is_positive=True)
+    RecipeReview.objects.create(recipe=recipe, reviewer=reviewer, review_round=1, is_positive=True, rating=5)
 
     c = APIClient()
     c.force_authenticate(reviewer)
     url = reverse("recipe-review-vote", kwargs={"slug": recipe.slug})
-    resp = c.post(url, {"is_positive": False}, format="json")
+    resp = c.post(url, {"rating": 2}, format="json")
     assert resp.status_code == 400
     assert "already voted on this recipe" in resp.data["detail"].lower()
 

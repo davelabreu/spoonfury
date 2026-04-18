@@ -1,30 +1,43 @@
 import { useState, useEffect } from "react";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { api } from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { ReviewsResponse } from "@/types";
+import type { ReviewsResponse, RecipeStatus } from "@/types";
 
 interface ReviewPanelProps {
   recipeSlug: string;
   token: string;
-  /** Shared review data from parent — if provided, panel won't fetch its own. */
+  recipeStatus: RecipeStatus;
   reviewData?: ReviewsResponse | null;
-  /** Called after voting so the parent (and ReviewBanner) can update. */
   onReviewData?: (data: ReviewsResponse) => void;
-  /** When true, hide the voting affordance and render reviews read-only. */
   readOnly?: boolean;
 }
 
-export function ReviewPanel({ recipeSlug, token, reviewData: externalData, onReviewData, readOnly = false }: ReviewPanelProps) {
+function SpoonIcon({ fill, prefix, index, size = 16 }: { fill: number; prefix: string; index: number; size?: number }) {
+  return (
+    <svg className="shrink-0" width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <defs>
+        <linearGradient id={`${prefix}-${index}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset={`${fill * 100}%`} stopColor="#f59e0b" />
+          <stop offset={`${fill * 100}%`} stopColor="#e2e8f0" />
+        </linearGradient>
+      </defs>
+      <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill={`url(#${prefix}-${index})`} stroke="#94a3b8" strokeWidth="0.5" />
+      <path d="M15.5 12L12 22" stroke={fill > 0 ? "#f59e0b" : "#cbd5e1"} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function ReviewPanel({ recipeSlug, token, recipeStatus, reviewData: externalData, onReviewData, readOnly = false }: ReviewPanelProps) {
   const [localData, setLocalData] = useState<ReviewsResponse | null>(null);
   const reviewData = externalData !== undefined ? externalData : localData;
-  const [vote, setVote] = useState<boolean | null>(null);
+  const [selectedRating, setSelectedRating] = useState<number | null>(null);
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  const isPublished = recipeStatus === "published";
 
   const updateReviewData = (data: ReviewsResponse) => {
     setLocalData(data);
@@ -32,22 +45,19 @@ export function ReviewPanel({ recipeSlug, token, reviewData: externalData, onRev
   };
 
   useEffect(() => {
-    if (externalData !== undefined) return; // parent is managing this data
+    if (externalData !== undefined) return;
     api.get(`/recipes/${recipeSlug}/reviews/`, token)
       .then((data: ReviewsResponse) => setLocalData(data))
       .catch(() => {});
   }, [recipeSlug, token]);
 
   const handleSubmit = async () => {
-    if (vote === null) return;
+    if (selectedRating === null) return;
     setSubmitting(true);
     setError("");
     try {
-      await api.post(
-        `/recipes/${recipeSlug}/review/`,
-        { is_positive: vote, comment },
-        token
-      );
+      const body = { rating: selectedRating, comment };
+      await api.post(`/recipes/${recipeSlug}/review/`, body, token);
       const updated = await api.get(`/recipes/${recipeSlug}/reviews/`, token) as ReviewsResponse;
       updateReviewData(updated);
     } catch (err: unknown) {
@@ -59,90 +69,270 @@ export function ReviewPanel({ recipeSlug, token, reviewData: externalData, onRev
 
   if (!reviewData) return null;
 
+  const displayRating = reviewData.average_rating != null
+    ? reviewData.average_rating
+    : 0;
+
+  const canVote = !readOnly && !!token && !reviewData.has_voted;
+  const submitDisabled = selectedRating === null || submitting;
+
+  const dist = reviewData.rating_distribution ?? {};
+  const ratedCount = reviewData.rated_count ?? 0;
+
   return (
-    <Card className="border-indigo-200 bg-indigo-50/30">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base flex items-center gap-2">
-          Community Review
-          <Badge variant="outline" className="text-[10px]">
-            Round {reviewData.review_round}
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Vote summary */}
-        <div className="flex items-center gap-3 text-sm">
-          <span className="text-muted-foreground">
-            {reviewData.total_votes} vote{reviewData.total_votes !== 1 ? "s" : ""}
-          </span>
-          {reviewData.total_votes > 0 && (
-            <span className="text-muted-foreground">
-              ({reviewData.positive_votes} positive)
-            </span>
-          )}
-          {reviewData.threshold_met && (
-            <Badge className="bg-green-100 text-green-700 border-green-200">Threshold met</Badge>
-          )}
-        </div>
+    <div className="relative overflow-hidden rounded-2xl border border-amber-200/30 bg-white/60 backdrop-blur-xl p-6 shadow-[0_0_24px_rgba(249,115,22,0.08),0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)]">
+      {/* Top accent beam */}
+      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-50" />
 
-        {/* Vote form — only if user hasn't voted yet and panel isn't read-only */}
-        {readOnly ? null : !reviewData.has_voted ? (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Button
-                variant={vote === true ? "default" : "outline"}
-                size="sm"
-                onClick={() => setVote(true)}
-                className={vote === true ? "bg-green-600 hover:bg-green-700" : ""}
-              >
-                <ThumbsUp className="w-4 h-4 mr-1" /> Approve
-              </Button>
-              <Button
-                variant={vote === false ? "default" : "outline"}
-                size="sm"
-                onClick={() => setVote(false)}
-                className={vote === false ? "bg-red-600 hover:bg-red-700" : ""}
-              >
-                <ThumbsDown className="w-4 h-4 mr-1" /> Needs work
-              </Button>
+      <h3 className="text-sm font-black uppercase tracking-widest text-foreground mb-4">Community Review</h3>
+
+      {/* ── PUBLISHED: 3-column Micro Center layout ── */}
+      {isPublished ? (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4">
+            {/* COL 1: Rating Snapshot */}
+            <div>
+              <p className="text-[10px] font-mono font-semibold text-muted-foreground uppercase tracking-widest mb-2">Rating Snapshot</p>
+              <div className="space-y-1">
+                {[5, 4, 3, 2, 1].map((stars) => {
+                  const count = dist[String(stars)] ?? 0;
+                  const pct = ratedCount > 0 ? (count / ratedCount) * 100 : 0;
+                  return (
+                    <div key={stars} className="flex items-center gap-2">
+                      <span className="text-[11px] font-mono font-bold text-slate-500 w-[52px] shrink-0">{stars} spoon{stars !== 1 ? "s" : ""}</span>
+                      <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-amber-500 rounded-full transition-all duration-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="text-[11px] font-mono font-bold text-slate-400 w-6 text-right">{count}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-            <Textarea
-              placeholder="Optional comment..."
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              rows={2}
-            />
-            <Button
-              onClick={handleSubmit}
-              disabled={vote === null || submitting}
-              size="sm"
-            >
-              {submitting ? "Submitting..." : "Submit Review"}
-            </Button>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">You've submitted your review.</p>
-        )}
 
-        {/* Revealed reviews (after voting) */}
-        {reviewData.reviews && reviewData.reviews.length > 0 && (
-          <div className="space-y-2 pt-2 border-t">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">All reviews</p>
-            {reviewData.reviews.map((r, i) => (
-              <div key={i} className="flex items-start gap-2 text-sm">
-                <span>{r.is_positive ? "👍" : "👎"}</span>
-                <div>
-                  <span className="font-medium">@{r.reviewer}</span>
-                  {r.comment && (
-                    <p className="text-muted-foreground mt-0.5">{r.comment}</p>
+            {/* COL 2: Overall Rating */}
+            <div className="flex flex-col items-center justify-center">
+              <p className="text-[10px] font-mono font-semibold text-muted-foreground uppercase tracking-widest mb-2">Overall Rating</p>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-4xl font-black text-foreground leading-none">
+                  {reviewData.average_rating != null ? reviewData.average_rating : "—"}
+                </span>
+              </div>
+              <div className="flex gap-0.5 mt-1.5">
+                {Array.from({ length: 5 }, (_, i) => {
+                  const fill = i + 1 <= displayRating ? 1 : i + 0.5 <= displayRating ? 0.5 : 0;
+                  return <SpoonIcon key={i} fill={fill} prefix="spoon-overall" index={i} size={18} />;
+                })}
+              </div>
+              <p className="text-[11px] font-mono text-muted-foreground mt-1.5">
+                {ratedCount} review{ratedCount !== 1 ? "s" : ""}
+              </p>
+            </div>
+
+            {/* COL 3: Rate this Recipe (or voted confirmation) */}
+            <div>
+              <p className="text-[10px] font-mono font-semibold text-muted-foreground uppercase tracking-widest mb-2">
+                {canVote ? "Rate this Recipe" : reviewData.has_voted && token ? "Your Review" : ""}
+              </p>
+              {canVote ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: 5 }, (_, i) => {
+                      const spoonValue = i + 1;
+                      const active = (hoverRating ?? selectedRating ?? 0) >= spoonValue;
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setSelectedRating(spoonValue)}
+                          onMouseEnter={() => setHoverRating(spoonValue)}
+                          onMouseLeave={() => setHoverRating(null)}
+                          className="cursor-pointer transition-transform duration-150 hover:scale-110 p-0.5"
+                        >
+                          <SpoonIcon fill={active ? 1 : 0} prefix="spoon-input" index={i} size={32} />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {selectedRating && (
+                    <span className="text-xs font-bold text-amber-600">{selectedRating} / 5 spoons</span>
                   )}
                 </div>
-              </div>
-            ))}
+              ) : reviewData.has_voted && token ? (
+                <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+                  <CheckCircle2 className="h-3.5 w-3.5" /> You've submitted your review
+                </span>
+              ) : !token ? (
+                <p className="text-[11px] text-muted-foreground">Log in to rate this recipe</p>
+              ) : null}
+            </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+
+          {/* Comment + Submit — below the 3-column grid when voting */}
+          {canVote && (
+            <div className="mt-4 space-y-3">
+              <textarea
+                placeholder="Optional comment..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows={2}
+                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-4 text-[11px] font-mono tracking-wide outline-none resize-none transition-all duration-300 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"
+              />
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={submitDisabled}
+                className="w-full py-3 bg-amber-500 text-white font-black uppercase tracking-wide rounded-xl shadow-[0_4px_14px_rgba(245,158,11,0.2)] hover:bg-amber-600 active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              >
+                {submitting ? "Submitting..." : "Submit Review"}
+              </button>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+            </div>
+          )}
+        </>
+      ) : (
+        /* ── IN-REVIEW: existing gate layout ── */
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4">
+            {/* COL 1: Rating Snapshot */}
+            <div>
+              <p className="text-[10px] font-mono font-semibold text-muted-foreground uppercase tracking-widest mb-2">Rating Snapshot</p>
+              <div className="space-y-1">
+                {[5, 4, 3, 2, 1].map((stars) => {
+                  const count = dist[String(stars)] ?? 0;
+                  const pct = ratedCount > 0 ? (count / ratedCount) * 100 : 0;
+                  return (
+                    <div key={stars} className="flex items-center gap-2">
+                      <span className="text-[11px] font-mono font-bold text-slate-500 w-[52px] shrink-0">{stars} spoon{stars !== 1 ? "s" : ""}</span>
+                      <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-amber-500 rounded-full transition-all duration-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="text-[11px] font-mono font-bold text-slate-400 w-6 text-right">{count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* COL 2: Overall Rating + Gate Progress */}
+            <div className="flex flex-col items-center justify-center">
+              <p className="text-[10px] font-mono font-semibold text-muted-foreground uppercase tracking-widest mb-2">Overall Rating</p>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-4xl font-black text-foreground leading-none">
+                  {reviewData.average_rating != null ? reviewData.average_rating : "—"}
+                </span>
+              </div>
+              <div className="flex gap-0.5 mt-1.5">
+                {Array.from({ length: 5 }, (_, i) => {
+                  const fill = i + 1 <= displayRating ? 1 : i + 0.5 <= displayRating ? 0.5 : 0;
+                  return <SpoonIcon key={i} fill={fill} prefix="spoon-gate" index={i} size={18} />;
+                })}
+              </div>
+              <p className="text-[11px] font-mono text-muted-foreground mt-1.5">
+                {ratedCount} review{ratedCount !== 1 ? "s" : ""}
+              </p>
+              {/* Gate status — only while still accumulating votes */}
+              {recipeStatus === "in_review" && !reviewData.threshold_met && (
+                <p className="text-[10px] font-mono text-amber-600 mt-2">
+                  Needs {Math.max(0, 5 - ratedCount)} more review{Math.max(0, 5 - ratedCount) !== 1 ? "s" : ""} &amp; ≥4.0 avg
+                </p>
+              )}
+            </div>
+
+            {/* COL 3: Rate this Recipe (or voted confirmation) */}
+            <div>
+              <p className="text-[10px] font-mono font-semibold text-muted-foreground uppercase tracking-widest mb-2">
+                {canVote ? "Rate this Recipe" : reviewData.has_voted && token ? "Your Review" : ""}
+              </p>
+              {canVote ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: 5 }, (_, i) => {
+                      const spoonValue = i + 1;
+                      const active = (hoverRating ?? selectedRating ?? 0) >= spoonValue;
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setSelectedRating(spoonValue)}
+                          onMouseEnter={() => setHoverRating(spoonValue)}
+                          onMouseLeave={() => setHoverRating(null)}
+                          className="cursor-pointer transition-transform duration-150 hover:scale-110 p-0.5"
+                        >
+                          <SpoonIcon fill={active ? 1 : 0} prefix="spoon-gate-input" index={i} size={32} />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {selectedRating && (
+                    <span className="text-xs font-bold text-amber-600">{selectedRating} / 5 spoons</span>
+                  )}
+                </div>
+              ) : reviewData.has_voted && token ? (
+                <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+                  <CheckCircle2 className="h-3.5 w-3.5" /> You've submitted your review
+                </span>
+              ) : !token ? (
+                <p className="text-[11px] text-muted-foreground">Log in to rate this recipe</p>
+              ) : null}
+            </div>
+          </div>
+
+          {/* Comment + Submit — below the 3-column grid when voting */}
+          {canVote && (
+            <div className="mt-4 space-y-3">
+              <textarea
+                placeholder="Optional comment..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows={2}
+                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-4 text-[11px] font-mono tracking-wide outline-none resize-none transition-all duration-300 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"
+              />
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={submitDisabled}
+                className="w-full py-3 bg-amber-500 text-white font-black uppercase tracking-wide rounded-xl shadow-[0_4px_14px_rgba(245,158,11,0.2)] hover:bg-amber-600 active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              >
+                {submitting ? "Submitting..." : "Submit Review"}
+              </button>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Revealed reviews */}
+      {reviewData.reviews && reviewData.reviews.length > 0 && (
+        <div className={`space-y-2.5 mt-4 pt-3 border-t border-slate-200/60`}>
+          <p className="text-[10px] font-mono font-semibold text-muted-foreground uppercase tracking-widest">All Reviews</p>
+          {reviewData.reviews.map((r, i) => (
+            <div key={i} className="flex items-start gap-2 text-sm">
+              {r.rating != null ? (
+                <div className="flex gap-px shrink-0 mt-0.5">
+                  {Array.from({ length: 5 }, (_, j) => (
+                    <SpoonIcon key={j} fill={j + 1 <= r.rating! ? 1 : 0} prefix={`rev-${i}`} index={j} size={12} />
+                  ))}
+                </div>
+              ) : (
+                <span>{r.is_positive ? "👍" : "👎"}</span>
+              )}
+              <div>
+                <span className="font-medium">@{r.reviewer}</span>
+                {r.comment && (
+                  <p className="text-muted-foreground mt-0.5 text-[12px]">{r.comment}</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

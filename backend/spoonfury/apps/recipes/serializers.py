@@ -46,10 +46,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             "image_url", "tags", "vouch_count",
             "author_username", "author_display_name",
             "parent_recipe_slug", "parent_recipe_title", "parent_recipe_author",
-            "fork_count", "created_at", "status", "published_at", "review_round",
+            "fork_count", "created_at", "updated_at", "status", "published_at", "review_round",
         ]
         read_only_fields = [
-            "slug", "fork_count", "created_at", "author_username",
+            "slug", "fork_count", "created_at", "updated_at", "author_username",
             "status", "published_at", "review_round", "vouch_count",
         ]
 

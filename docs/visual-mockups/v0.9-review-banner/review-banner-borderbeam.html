@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Banner — Border Beam Variations</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwindcss.config = {
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(40,33%,98%)',
+        foreground: 'hsl(20,14%,8%)',
+        card: 'hsl(0,0%,100%)',
+        muted: { DEFAULT: 'hsl(35,20%,95%)', foreground: 'hsl(20,10%,46%)' },
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background: hsl(40,33%,98%); font-family: system-ui, -apple-system, sans-serif; }
+  .label { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: hsl(20,10%,46%); margin-bottom: 4px; }
+  .sublabel { font-size: 11px; color: hsl(20,10%,56%); margin-bottom: 16px; line-height: 1.5; }
+
+  /* ===== BORDER BEAM ANIMATION ===== */
+
+  /* B1: Single beam — travels the full perimeter */
+  @keyframes beam-travel {
+    0%   { offset-distance: 0%; }
+    100% { offset-distance: 100%; }
+  }
+
+  .beam-container { position: relative; }
+  .beam-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* B1: CSS conic-gradient beam */
+  @property --beam-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+  @keyframes beam-rotate {
+    from { --beam-angle: 0deg; }
+    to   { --beam-angle: 360deg; }
+  }
+
+  .beam-b1 {
+    position: relative;
+    overflow: visible;
+  }
+  .beam-b1 .beam-border {
+    position: absolute;
+    inset: -1px;
+    border-radius: 13px;
+    padding: 1.5px;
+    background: conic-gradient(from var(--beam-angle), transparent 0%, transparent 75%, var(--beam-color) 85%, transparent 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: beam-rotate var(--beam-speed, 4s) linear infinite;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* B2: Dual beam — two beams 180 degrees apart */
+  .beam-b2 .beam-border {
+    background: conic-gradient(
+      from var(--beam-angle),
+      transparent 0%, transparent 35%,
+      var(--beam-color) 42%, transparent 50%,
+      transparent 85%, var(--beam-color2, var(--beam-color)) 92%, transparent 100%
+    );
+  }
+
+  /* B3: Soft glow beam — wider, more diffuse */
+  .beam-b3 .beam-border {
+    inset: -2px;
+    padding: 2.5px;
+    border-radius: 14px;
+    background: conic-gradient(from var(--beam-angle), transparent 0%, transparent 60%, var(--beam-color) 75%, var(--beam-color2, var(--beam-color)) 80%, transparent 95%);
+    filter: blur(0.5px);
+    opacity: 0.8;
+  }
+
+  /* B4: Pulse beam — beam + subtle border pulse */
+  @keyframes border-pulse {
+    0%, 100% { opacity: 0.3; }
+    50%      { opacity: 0.6; }
+  }
+  .beam-b4 .beam-glow {
+    position: absolute;
+    inset: -1px;
+    border-radius: 13px;
+    border: 1px solid var(--beam-color);
+    opacity: 0.3;
+    animation: border-pulse 3s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 9;
+  }
+</style>
+</head>
+<body class="p-6 max-w-3xl mx-auto space-y-10">
+
+<h1 class="text-2xl font-bold text-foreground mb-1">Border Beam Variations</h1>
+<p class="text-sm text-muted-foreground mb-8">A light beam that traces the card's border. Four speeds and styles shown across different tier states. All use the tier's accent color.</p>
+
+<!-- ============================================================ -->
+<!-- B1: SINGLE BEAM — clean, minimal -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">B1 / Single Beam</div>
+  <p class="sublabel">One beam travels the perimeter. Clean and focused. 4-second loop.</p>
+
+  <div class="flex gap-4">
+    <!-- Indigo 100% -->
+    <div class="beam-b1 flex-1" style="--beam-color: #6366f1; --beam-speed: 4s;">
+      <div class="beam-border"></div>
+      <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+        <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+        <div class="px-5 py-1.5 flex items-center gap-6">
+          <div class="flex flex-col items-center gap-2 shrink-0 min-w-[80px]">
+            <div class="relative h-14 w-14">
+              <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e0e7ff" stroke-width="2"/>
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#g-indigo)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0"/>
+                <defs><linearGradient id="g-indigo"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="flex flex-col items-center"><span class="text-sm font-black text-indigo-600">100<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest mt-0.5 text-indigo-600 opacity-50">approval</span></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg><span class="text-[10px] font-bold font-mono">3</span></span>
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg><span class="text-[10px] font-bold font-mono">0</span></span>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col justify-center gap-1">
+            <div class="flex items-center gap-2"><span class="text-base font-bold leading-none text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span></div>
+            <p class="text-base font-semibold italic tracking-tight text-indigo-600">Community Pick</p>
+            <p class="text-[11px] text-muted-foreground">3 votes in &mdash; needs 80% approval to advance</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Amber 75% -->
+    <div class="beam-b1 flex-1" style="--beam-color: #f59e0b; --beam-speed: 4s;">
+      <div class="beam-border"></div>
+      <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden">
+        <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+        <div class="px-5 py-1.5 flex items-center gap-6">
+          <div class="flex flex-col items-center gap-2 shrink-0 min-w-[80px]">
+            <div class="relative h-14 w-14">
+              <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#fef3c7" stroke-width="2"/>
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#g-amber)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="24.35"/>
+                <defs><linearGradient id="g-amber"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="flex flex-col items-center"><span class="text-sm font-black text-amber-600">75<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest mt-0.5 text-amber-600 opacity-50">approval</span></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg><span class="text-[10px] font-bold font-mono">3</span></span>
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg><span class="text-[10px] font-bold font-mono">1</span></span>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col justify-center gap-1">
+            <div class="flex items-center gap-2"><span class="text-base font-bold leading-none text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Round 2</span></div>
+            <p class="text-base font-semibold italic tracking-tight text-amber-600">Warming Up</p>
+            <p class="text-[11px] text-muted-foreground">4 votes in &mdash; needs 80% approval to advance</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- B2: DUAL BEAM — two beams 180 apart -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">B2 / Dual Beam</div>
+  <p class="sublabel">Two beams chase each other 180 degrees apart. Feels more energetic, like a scanning radar. 5-second loop.</p>
+
+  <div class="flex gap-4">
+    <!-- Indigo -->
+    <div class="beam-b1 beam-b2 flex-1" style="--beam-color: #6366f1; --beam-color2: #a78bfa; --beam-speed: 5s;">
+      <div class="beam-border"></div>
+      <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+        <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+        <div class="px-5 py-1.5 flex items-center gap-6">
+          <div class="flex flex-col items-center gap-2 shrink-0 min-w-[80px]">
+            <div class="relative h-14 w-14">
+              <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e0e7ff" stroke-width="2"/>
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#g-indigo2)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0"/>
+                <defs><linearGradient id="g-indigo2"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="flex flex-col items-center"><span class="text-sm font-black text-indigo-600">100<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest mt-0.5 text-indigo-600 opacity-50">approval</span></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg><span class="text-[10px] font-bold font-mono">3</span></span>
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg><span class="text-[10px] font-bold font-mono">0</span></span>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col justify-center gap-1">
+            <div class="flex items-center gap-2"><span class="text-base font-bold leading-none text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span></div>
+            <p class="text-base font-semibold italic tracking-tight text-indigo-600">Community Pick</p>
+            <p class="text-[11px] text-muted-foreground">3 votes in &mdash; needs 80% approval to advance</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Red 25% -->
+    <div class="beam-b1 beam-b2 flex-1" style="--beam-color: #ef4444; --beam-color2: #f87171; --beam-speed: 5s;">
+      <div class="beam-border"></div>
+      <div class="rounded-xl bg-card shadow-sm border border-red-100 overflow-hidden">
+        <div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+        <div class="px-5 py-1.5 flex items-center gap-6">
+          <div class="flex flex-col items-center gap-2 shrink-0 min-w-[80px]">
+            <div class="relative h-14 w-14">
+              <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#fee2e2" stroke-width="2"/>
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#g-red)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="73.05"/>
+                <defs><linearGradient id="g-red"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#f87171"/></linearGradient></defs>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="flex flex-col items-center"><span class="text-sm font-black text-red-500">25<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest mt-0.5 text-red-500 opacity-50">approval</span></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg><span class="text-[10px] font-bold font-mono">1</span></span>
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg><span class="text-[10px] font-bold font-mono">3</span></span>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col justify-center gap-1">
+            <div class="flex items-center gap-2"><span class="text-base font-bold leading-none text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-100 text-red-700">Round 1</span></div>
+            <p class="text-base font-semibold italic tracking-tight text-red-500">Potluck Surprise</p>
+            <p class="text-[11px] text-muted-foreground">4 votes in &mdash; needs 80% approval to advance</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- B3: SOFT GLOW BEAM — wider, diffuse -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">B3 / Soft Glow Beam</div>
+  <p class="sublabel">Wider, slightly blurred beam. Feels ambient and luxurious rather than technical. 6-second loop (slowest).</p>
+
+  <div class="flex gap-4">
+    <!-- Emerald threshold -->
+    <div class="beam-b1 beam-b3 flex-1" style="--beam-color: #10b981; --beam-color2: #14b8a6; --beam-speed: 6s;">
+      <div class="beam-border"></div>
+      <div class="rounded-xl bg-card shadow-sm border border-emerald-100 overflow-hidden">
+        <div class="h-1 bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400"></div>
+        <div class="px-5 py-1.5 flex items-center gap-6">
+          <div class="flex flex-col items-center gap-2 shrink-0 min-w-[80px]">
+            <div class="relative h-14 w-14">
+              <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#d1fae5" stroke-width="2"/>
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#g-emerald)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0"/>
+                <defs><linearGradient id="g-emerald"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient></defs>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg><span class="text-[10px] font-bold font-mono">5</span></span>
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg><span class="text-[10px] font-bold font-mono">0</span></span>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col justify-center gap-1">
+            <div class="flex items-center gap-2"><span class="text-base font-bold leading-none text-foreground">Threshold reached</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Passed</span></div>
+            <p class="text-base font-semibold italic tracking-tight text-emerald-600">Chef's Kiss</p>
+            <p class="text-[11px] text-muted-foreground">80% approval reached &mdash; awaiting moderator review</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orange 50% -->
+    <div class="beam-b1 beam-b3 flex-1" style="--beam-color: #f97316; --beam-color2: #fb923c; --beam-speed: 6s;">
+      <div class="beam-border"></div>
+      <div class="rounded-xl bg-card shadow-sm border border-orange-100 overflow-hidden">
+        <div class="h-1 bg-gradient-to-r from-orange-400 via-amber-400 to-orange-300"></div>
+        <div class="px-5 py-1.5 flex items-center gap-6">
+          <div class="flex flex-col items-center gap-2 shrink-0 min-w-[80px]">
+            <div class="relative h-14 w-14">
+              <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#ffedd5" stroke-width="2"/>
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#g-orange)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="48.7"/>
+                <defs><linearGradient id="g-orange"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fb923c"/></linearGradient></defs>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="flex flex-col items-center"><span class="text-sm font-black text-orange-500">50<span class="text-[8px]">%</span></span><span class="text-[7px] font-bold uppercase tracking-widest mt-0.5 text-orange-500 opacity-50">approval</span></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg><span class="text-[10px] font-bold font-mono">2</span></span>
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg><span class="text-[10px] font-bold font-mono">2</span></span>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col justify-center gap-1">
+            <div class="flex items-center gap-2"><span class="text-base font-bold leading-none text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">Round 1</span></div>
+            <p class="text-base font-semibold italic tracking-tight text-orange-500">Acquired Taste</p>
+            <p class="text-[11px] text-muted-foreground">4 votes in &mdash; needs 80% approval to advance</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- B4: BEAM + PULSE — beam travels + border breathes -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">B4 / Beam + Pulse</div>
+  <p class="sublabel">Single beam plus a faint pulsing border glow underneath. The beam says "scanning", the pulse says "alive." 4s beam + 3s pulse.</p>
+
+  <div class="flex gap-4">
+    <!-- Violet mod queue -->
+    <div class="beam-b1 beam-b4 flex-1" style="--beam-color: #8b5cf6; --beam-speed: 4s;">
+      <div class="beam-border"></div>
+      <div class="beam-glow"></div>
+      <div class="rounded-xl bg-card shadow-sm border border-violet-100 overflow-hidden">
+        <div class="h-1 bg-gradient-to-r from-violet-500 via-purple-400 to-fuchsia-400"></div>
+        <div class="px-5 py-1.5 flex items-center gap-6">
+          <div class="flex flex-col items-center gap-2 shrink-0 min-w-[80px]">
+            <div class="relative h-14 w-14">
+              <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#ede9fe" stroke-width="2"/>
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#g-violet)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0"/>
+                <defs><linearGradient id="g-violet"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="h-5 w-5 text-violet-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg><span class="text-[10px] font-bold font-mono">4</span></span>
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg><span class="text-[10px] font-bold font-mono">1</span></span>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col justify-center gap-1">
+            <div class="flex items-center gap-2"><span class="text-base font-bold leading-none text-foreground">Your recipe is in the moderator queue</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">Mod queue</span></div>
+            <p class="text-[11px] text-muted-foreground">Passed community review &mdash; a moderator will take a look soon</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indigo 0 votes -->
+    <div class="beam-b1 beam-b4 flex-1" style="--beam-color: #6366f1; --beam-speed: 4s;">
+      <div class="beam-border"></div>
+      <div class="beam-glow"></div>
+      <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+        <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+        <div class="px-5 py-1.5 flex items-center gap-6">
+          <div class="flex flex-col items-center gap-2 shrink-0 min-w-[80px]">
+            <div class="relative h-14 w-14">
+              <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e0e7ff" stroke-width="2"/>
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#g-indigo3)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="97.4"/>
+                <defs><linearGradient id="g-indigo3"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="flex flex-col items-center"><span class="text-xs font-black text-indigo-600">0/3</span><span class="text-[7px] font-bold uppercase tracking-widest mt-0.5 text-indigo-600 opacity-50">votes</span></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg><span class="text-[10px] font-bold font-mono">0</span></span>
+              <span class="flex items-center gap-1 text-slate-400 bg-slate-100 rounded-full px-2 py-0.5"><svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg><span class="text-[10px] font-bold font-mono">0</span></span>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col justify-center gap-1">
+            <div class="flex items-center gap-2"><span class="text-base font-bold leading-none text-foreground">Community Review</span><span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span></div>
+            <p class="text-[11px] text-muted-foreground">Needs 3 more votes (min 3) and 80% approval to advance</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- COMPARISON TABLE -->
+<!-- ============================================================ -->
+<div class="rounded-xl border border-zinc-200 bg-white overflow-hidden mt-8">
+  <table class="w-full text-xs">
+    <thead>
+      <tr class="border-b border-zinc-100">
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground"></th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Speed</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Beam Width</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Extra</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Vibe</th>
+      </tr>
+    </thead>
+    <tbody class="text-foreground">
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">B1 Single</td>
+        <td class="px-3 py-2">4s</td>
+        <td class="px-3 py-2">Thin (1.5px)</td>
+        <td class="px-3 py-2 text-muted-foreground">&mdash;</td>
+        <td class="px-3 py-2 text-muted-foreground">Clean &amp; minimal</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">B2 Dual</td>
+        <td class="px-3 py-2">5s</td>
+        <td class="px-3 py-2">Thin (1.5px)</td>
+        <td class="px-3 py-2 text-muted-foreground">Second beam opposite</td>
+        <td class="px-3 py-2 text-muted-foreground">Radar / scanning</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">B3 Soft Glow</td>
+        <td class="px-3 py-2">6s</td>
+        <td class="px-3 py-2">Wide (2.5px + blur)</td>
+        <td class="px-3 py-2 text-muted-foreground">Diffuse glow</td>
+        <td class="px-3 py-2 text-muted-foreground">Ambient / luxurious</td>
+      </tr>
+      <tr>
+        <td class="px-3 py-2 font-bold">B4 Beam + Pulse</td>
+        <td class="px-3 py-2">4s</td>
+        <td class="px-3 py-2">Thin (1.5px)</td>
+        <td class="px-3 py-2 text-muted-foreground">Border glow pulse</td>
+        <td class="px-3 py-2 text-muted-foreground">Alive / heartbeat</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

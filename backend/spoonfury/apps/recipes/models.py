@@ -167,6 +167,11 @@ class RecipeReview(models.Model):
     )
     review_round = models.PositiveIntegerField()
     is_positive = models.BooleanField()
+    rating = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text="1-5 spoon rating. Only used for published recipes.",
+    )
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

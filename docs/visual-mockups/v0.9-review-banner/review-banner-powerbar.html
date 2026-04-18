@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Review Banner — Power Bar & Vote Slots</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: hsl(40 33% 98%);
+    color: hsl(20 14% 8%);
+    padding: 32px 24px;
+  }
+  h1 { font-size: 22px; font-weight: 800; text-align: center; margin-bottom: 8px; }
+  .subtitle { text-align: center; font-size: 13px; color: #64748b; margin-bottom: 40px; }
+
+  .section-label {
+    font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+    color: #94a3b8; margin: 40px 0 14px; padding-left: 10px;
+    border-left: 3px solid #10b981;
+  }
+
+  .banner-wrap {
+    max-width: 700px; margin: 0 auto 24px; position: relative;
+  }
+  .label-tag {
+    position: absolute; top: -10px; left: 16px;
+    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+    background: #1e293b; color: white; padding: 2px 10px; border-radius: 4px; z-index: 20;
+  }
+  .diff-note {
+    font-size: 11px; color: #64748b; padding: 6px 12px; margin-top: 4px;
+    background: #f8fafc; border-left: 2px solid #e2e8f0; border-radius: 0 4px 4px 0;
+    max-width: 700px; margin-left: auto; margin-right: auto;
+  }
+  .diff-note strong { color: #334155; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ---- BEAM ---- */
+  @property --beam-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+  @keyframes beam-rotate { from { --beam-angle: 0deg; } to { --beam-angle: 360deg; } }
+  .review-beam {
+    position: absolute; inset: -2px; border-radius: 14px; padding: 2.5px;
+    background: conic-gradient(from var(--beam-angle), transparent 0%, transparent 60%, var(--beam-c1) 75%, var(--beam-c2) 80%, transparent 95%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    filter: blur(0.5px); opacity: 0.8;
+    animation: beam-rotate 6s linear infinite;
+    pointer-events: none; z-index: 10;
+  }
+
+  /* ---- EMBERS ---- */
+  @keyframes ember-rise-drift {
+    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+    50%  { transform: translate(3px, -8px) scale(0.6); opacity: 0.7; }
+    100% { transform: translate(-1px, -16px) scale(0.15); opacity: 0; }
+  }
+  .cta-group:hover .spoon-icon { filter: drop-shadow(0 0 5px #f59e0b); }
+  .cta-group:hover .spoon-area { transform: scale(1.3); }
+  .cta-group .ember-bed span { position: absolute; border-radius: 50%; opacity: 0; animation-play-state: paused; }
+  .cta-group:hover .ember-bed span { animation-play-state: running; }
+  .cta-group:hover .cta-vote-btn { background: var(--cta-color); color: white; border-color: var(--cta-color); }
+
+  /* ---- PULSE ---- */
+  @keyframes gentle-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+  @keyframes slot-pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+  @keyframes breathe-glow {
+    0%,100% { box-shadow: 0 0 8px rgba(16,185,129,0.2); }
+    50% { box-shadow: 0 0 20px rgba(16,185,129,0.45); }
+  }
+  @keyframes spark-float {
+    0% { transform: translate(0,0) scale(1); opacity: 0.8; }
+    100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; }
+  }
+
+  /* ---- SHARED BANNER ---- */
+  .card {
+    border-radius: 12px; overflow: hidden; position: relative;
+    background: rgba(255,255,255,0.6); backdrop-filter: blur(16px);
+  }
+  .stripe { height: 4px; }
+  .ring-wrap { position: relative; flex-shrink: 0; width: 56px; height: 56px; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-interior {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column;
+  }
+  .vote-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 10px; font-weight: 700; font-family: 'Courier New', monospace;
+    padding: 2px 8px; border-radius: 4px;
+    color: #94a3b8; background: rgba(241,245,249,0.5); border: 1px solid rgba(226,232,240,0.6);
+  }
+  .vote-badge svg { width: 10px; height: 10px; }
+  .chip { font-family: 'Courier New', monospace; font-weight: 700; color: #1e293b; background: rgba(0,0,0,0.04); border-radius: 3px; padding: 0 4px; }
+  .spoon-area {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .ember-bed { position: absolute; pointer-events: none; top: 4px; left: 12px; }
+
+  /* ---- VOTE SLOTS ---- */
+  .slot { width: 16px; height: 8px; border-radius: 9999px; transition: all 0.3s; }
+  .slot-filled { box-shadow: 0 0 8px currentColor; }
+  .slot-empty { background: #e2e8f0; }
+  .slot-pulse { animation: slot-pulse 2s ease-in-out infinite; }
+
+  /* ---- SPARKS ---- */
+  .spark {
+    position: absolute; width: 3px; height: 3px; border-radius: 50%;
+    animation: spark-float 1.5s ease-out infinite;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>Power Bar & Vote Coercion</h1>
+<p class="subtitle">A — Current Hint Text &nbsp;|&nbsp; B — Vote Slots &nbsp;|&nbsp; C — Slots + Breathe Glow &nbsp;|&nbsp; D — Slots + Sparks + Copy</p>
+
+<!-- ============================================================ -->
+<!-- HELPER: Full banner shell (reused) -->
+<!-- ============================================================ -->
+
+<!-- A: CURRENT (emerald tier, 100%, 1 vote) -->
+<div class="section-label">A — Current: Text-only hint at 100% / 1 vote (emerald)</div>
+<div class="banner-wrap" style="--beam-c1: #10b981; --beam-c2: #14b8a6; --cta-color: #10b981;">
+  <span class="label-tag">A: Current</span>
+  <div class="review-beam"></div>
+  <div class="card" style="border: 1px solid rgba(16,185,129,0.3); box-shadow: 0 0 24px rgba(16,185,129,0.12), 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);">
+    <div class="stripe" style="background: linear-gradient(to right, #10b981, #14b8a6, #10b981);"></div>
+    <div style="padding: 6px 32px; display: flex; align-items: center; gap: 24px;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 90px;">
+        <div class="ring-wrap" style="filter: drop-shadow(0 0 6px rgba(16,185,129,0.4));">
+          <svg width="56" height="56" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#d1fae5" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0"/>
+          </svg>
+          <div class="ring-interior">
+            <span style="font-size:14px;font-weight:900;color:#10b981;">100<small style="font-size:8px;">%</small></span>
+            <span style="font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#10b981;opacity:0.5;margin-top:2px;">approval</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <span class="vote-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>1</span>
+          <span class="vote-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 15V19a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/></svg>0</span>
+        </div>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 16px; font-weight: 700;">Community Review</span>
+          <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 9999px; background: rgba(16,185,129,0.1); color: #047857;">Round 1</span>
+        </div>
+        <p style="font-size: 16px; font-weight: 700; font-style: italic; color: #10b981; animation: gentle-pulse 3s infinite;">Chef's Kiss</p>
+        <p style="font-size: 11px; color: #475569;">Needs <span class="chip">2</span> more votes (min <span class="chip">3</span>) and <span class="chip">80%</span> approval to advance</p>
+      </div>
+      <a href="#" class="cta-group" style="display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0;">
+        <div class="spoon-area">
+          <svg class="spoon-icon" width="27" height="27" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 1px 2px rgba(0,0,0,0.06));">
+            <defs><linearGradient id="sa" x1="20%" y1="0%" x2="80%" y2="100%"><stop offset="0%" stop-color="#f1f5f9"/><stop offset="50%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs>
+            <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#sa)" stroke="#94a3b8" stroke-width="0.4"/>
+            <path d="M15.5 12L12 22" stroke="#b0b8c4" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="14.8" cy="5.8" rx="1.2" ry="2.5" fill="white" opacity="0.3" transform="rotate(-15 14.8 5.8)"/>
+          </svg>
+          <div class="ember-bed">
+            <span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s"></span>
+            <span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s"></span>
+            <span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s"></span>
+            <span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s"></span>
+            <span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s"></span>
+          </div>
+        </div>
+        <span class="cta-vote-btn" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#10b981;border:1px solid rgba(16,185,129,0.3);background:rgba(236,253,245,0.5);padding:6px 16px;border-radius:6px;backdrop-filter:blur(4px);box-shadow:0 1px 2px rgba(0,0,0,0.05);transition:all 0.3s;">Cast Your Vote</span>
+      </a>
+    </div>
+  </div>
+</div>
+<div class="diff-note">100% approval with only 1 vote. The green ring + "Chef's Kiss" makes it feel <strong>done</strong> — no urgency to vote.</div>
+
+<!-- B: VOTE SLOTS (replaces hint text) -->
+<div class="section-label">B — Vote Slots: Visual progress replacing text hint</div>
+<div class="banner-wrap" style="--beam-c1: #10b981; --beam-c2: #14b8a6; --cta-color: #10b981;">
+  <span class="label-tag" style="background: #7c3aed;">B: Vote Slots</span>
+  <div class="review-beam"></div>
+  <div class="card" style="border: 1px solid rgba(16,185,129,0.3); box-shadow: 0 0 24px rgba(16,185,129,0.12), 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);">
+    <div class="stripe" style="background: linear-gradient(to right, #10b981, #14b8a6, #10b981);"></div>
+    <div style="padding: 6px 32px; display: flex; align-items: center; gap: 24px;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 90px;">
+        <div class="ring-wrap" style="filter: drop-shadow(0 0 6px rgba(16,185,129,0.4));">
+          <svg width="56" height="56" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#d1fae5" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0"/>
+          </svg>
+          <div class="ring-interior">
+            <span style="font-size:14px;font-weight:900;color:#10b981;">100<small style="font-size:8px;">%</small></span>
+            <span style="font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#10b981;opacity:0.5;margin-top:2px;">approval</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <span class="vote-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>1</span>
+          <span class="vote-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 15V19a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/></svg>0</span>
+        </div>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 16px; font-weight: 700;">Community Review</span>
+          <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 9999px; background: rgba(16,185,129,0.1); color: #047857;">Round 1</span>
+        </div>
+        <p style="font-size: 16px; font-weight: 700; font-style: italic; color: #10b981; animation: gentle-pulse 3s infinite;">Chef's Kiss</p>
+        <!-- VOTE SLOTS -->
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <div class="slot slot-filled" style="background: #10b981; color: #10b981;"></div>
+          <div class="slot slot-empty slot-pulse"></div>
+          <div class="slot slot-empty"></div>
+          <span class="mono" style="margin-left: 4px; font-size: 10px; font-weight: 700; color: #94a3b8;">2 MORE</span>
+        </div>
+      </div>
+      <a href="#" class="cta-group" style="display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0;">
+        <div class="spoon-area">
+          <svg class="spoon-icon" width="27" height="27" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 1px 2px rgba(0,0,0,0.06));">
+            <defs><linearGradient id="sb" x1="20%" y1="0%" x2="80%" y2="100%"><stop offset="0%" stop-color="#f1f5f9"/><stop offset="50%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs>
+            <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#sb)" stroke="#94a3b8" stroke-width="0.4"/>
+            <path d="M15.5 12L12 22" stroke="#b0b8c4" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="14.8" cy="5.8" rx="1.2" ry="2.5" fill="white" opacity="0.3" transform="rotate(-15 14.8 5.8)"/>
+          </svg>
+          <div class="ember-bed">
+            <span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s"></span>
+            <span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s"></span>
+            <span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s"></span>
+            <span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s"></span>
+            <span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s"></span>
+          </div>
+        </div>
+        <span class="cta-vote-btn" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#10b981;border:1px solid rgba(16,185,129,0.3);background:rgba(236,253,245,0.5);padding:6px 16px;border-radius:6px;backdrop-filter:blur(4px);box-shadow:0 1px 2px rgba(0,0,0,0.05);transition:all 0.3s;">Cast Your Vote</span>
+      </a>
+    </div>
+  </div>
+</div>
+<div class="diff-note"><strong>Changed:</strong> Hint text replaced with 3 vote slots — 1 filled (glowing green), 2 empty (first pulsing). Mono "2 MORE" label. Creates incomplete-pattern itch.</div>
+
+<!-- C: SLOTS + BREATHE GLOW BUTTON -->
+<div class="section-label">C — Vote Slots + Breathing Glow on CTA Button</div>
+<div class="banner-wrap" style="--beam-c1: #10b981; --beam-c2: #14b8a6; --cta-color: #10b981;">
+  <span class="label-tag" style="background: #0891b2;">C: Breathe Glow</span>
+  <div class="review-beam"></div>
+  <div class="card" style="border: 1px solid rgba(16,185,129,0.3); box-shadow: 0 0 24px rgba(16,185,129,0.12), 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);">
+    <div class="stripe" style="background: linear-gradient(to right, #10b981, #14b8a6, #10b981);"></div>
+    <div style="padding: 6px 32px; display: flex; align-items: center; gap: 24px;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 90px;">
+        <div class="ring-wrap" style="filter: drop-shadow(0 0 6px rgba(16,185,129,0.4));">
+          <svg width="56" height="56" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#d1fae5" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0"/>
+          </svg>
+          <div class="ring-interior">
+            <span style="font-size:14px;font-weight:900;color:#10b981;">100<small style="font-size:8px;">%</small></span>
+            <span style="font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#10b981;opacity:0.5;margin-top:2px;">approval</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <span class="vote-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>1</span>
+          <span class="vote-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 15V19a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/></svg>0</span>
+        </div>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 16px; font-weight: 700;">Community Review</span>
+          <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 9999px; background: rgba(16,185,129,0.1); color: #047857;">Round 1</span>
+        </div>
+        <p style="font-size: 16px; font-weight: 700; font-style: italic; color: #10b981; animation: gentle-pulse 3s infinite;">Chef's Kiss</p>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <div class="slot slot-filled" style="background: #10b981; color: #10b981;"></div>
+          <div class="slot slot-empty slot-pulse"></div>
+          <div class="slot slot-empty"></div>
+          <span class="mono" style="margin-left: 4px; font-size: 10px; font-weight: 700; color: #94a3b8;">2 MORE</span>
+        </div>
+      </div>
+      <a href="#" class="cta-group" style="display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0;">
+        <div class="spoon-area">
+          <svg class="spoon-icon" width="27" height="27" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 1px 2px rgba(0,0,0,0.06));">
+            <defs><linearGradient id="sc" x1="20%" y1="0%" x2="80%" y2="100%"><stop offset="0%" stop-color="#f1f5f9"/><stop offset="50%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs>
+            <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#sc)" stroke="#94a3b8" stroke-width="0.4"/>
+            <path d="M15.5 12L12 22" stroke="#b0b8c4" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="14.8" cy="5.8" rx="1.2" ry="2.5" fill="white" opacity="0.3" transform="rotate(-15 14.8 5.8)"/>
+          </svg>
+          <div class="ember-bed">
+            <span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s"></span>
+            <span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s"></span>
+            <span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s"></span>
+            <span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s"></span>
+            <span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s"></span>
+          </div>
+        </div>
+        <!-- BREATHING GLOW BUTTON -->
+        <span class="cta-vote-btn" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#10b981;border:1px solid rgba(16,185,129,0.3);background:rgba(236,253,245,0.5);padding:6px 16px;border-radius:6px;backdrop-filter:blur(4px);transition:all 0.3s;animation:breathe-glow 3s ease-in-out infinite;">Cast Your Vote</span>
+      </a>
+    </div>
+  </div>
+</div>
+<div class="diff-note"><strong>Changed:</strong> CTA button pulses with a breathing emerald glow shadow (3s cycle). Combined with vote slots. Button feels "alive" — beckoning the click.</div>
+
+<!-- D: FULL TREATMENT — SLOTS + BREATHE + SPARKS + COPY -->
+<div class="section-label">D — Full Treatment: Slots + Breathe + Sparks</div>
+<div class="banner-wrap" style="--beam-c1: #10b981; --beam-c2: #14b8a6; --cta-color: #10b981;">
+  <span class="label-tag" style="background: #059669;">D: Full Power</span>
+  <div class="review-beam"></div>
+  <div class="card" style="border: 1px solid rgba(16,185,129,0.3); box-shadow: 0 0 24px rgba(16,185,129,0.12), 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);">
+    <div class="stripe" style="background: linear-gradient(to right, #10b981, #14b8a6, #10b981);"></div>
+    <div style="padding: 6px 32px; display: flex; align-items: center; gap: 24px;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 90px;">
+        <div class="ring-wrap" style="filter: drop-shadow(0 0 6px rgba(16,185,129,0.4));">
+          <svg width="56" height="56" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#d1fae5" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0"/>
+          </svg>
+          <div class="ring-interior">
+            <span style="font-size:14px;font-weight:900;color:#10b981;">100<small style="font-size:8px;">%</small></span>
+            <span style="font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#10b981;opacity:0.5;margin-top:2px;">approval</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <span class="vote-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>1</span>
+          <span class="vote-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 15V19a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/></svg>0</span>
+        </div>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 16px; font-weight: 700;">Community Review</span>
+          <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 9999px; background: rgba(16,185,129,0.1); color: #047857;">Round 1</span>
+        </div>
+        <p style="font-size: 16px; font-weight: 700; font-style: italic; color: #10b981; animation: gentle-pulse 3s infinite;">Chef's Kiss</p>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <div class="slot slot-filled" style="background: #10b981; color: #10b981;"></div>
+          <div class="slot slot-empty slot-pulse"></div>
+          <div class="slot slot-empty"></div>
+          <span class="mono" style="margin-left: 4px; font-size: 10px; font-weight: 700; color: #94a3b8;">2 MORE</span>
+        </div>
+      </div>
+      <a href="#" class="cta-group" style="display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0;">
+        <div class="spoon-area">
+          <svg class="spoon-icon" width="27" height="27" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 1px 2px rgba(0,0,0,0.06));">
+            <defs><linearGradient id="sd" x1="20%" y1="0%" x2="80%" y2="100%"><stop offset="0%" stop-color="#f1f5f9"/><stop offset="50%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs>
+            <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#sd)" stroke="#94a3b8" stroke-width="0.4"/>
+            <path d="M15.5 12L12 22" stroke="#b0b8c4" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="14.8" cy="5.8" rx="1.2" ry="2.5" fill="white" opacity="0.3" transform="rotate(-15 14.8 5.8)"/>
+          </svg>
+          <div class="ember-bed">
+            <span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s"></span>
+            <span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s"></span>
+            <span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s"></span>
+            <span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s"></span>
+            <span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s"></span>
+          </div>
+        </div>
+        <!-- BREATHING + SPARKS BUTTON -->
+        <span class="cta-vote-btn" style="position:relative;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#10b981;border:1px solid rgba(16,185,129,0.3);background:rgba(236,253,245,0.5);padding:6px 16px;border-radius:6px;backdrop-filter:blur(4px);transition:all 0.3s;animation:breathe-glow 3s ease-in-out infinite;overflow:visible;">
+          Cast Your Vote
+          <!-- Sparks -->
+          <span class="spark" style="background:#10b981;top:-2px;right:8px;--sx:6px;--sy:-10px;animation-delay:0s;"></span>
+          <span class="spark" style="background:#34d399;top:4px;right:-2px;--sx:10px;--sy:-4px;animation-delay:0.5s;"></span>
+          <span class="spark" style="background:#6ee7b7;bottom:-1px;right:14px;--sx:4px;--sy:8px;animation-delay:1s;"></span>
+          <span class="spark" style="background:#10b981;top:8px;left:-1px;--sx:-8px;--sy:-6px;animation-delay:0.3s;"></span>
+        </span>
+      </a>
+    </div>
+  </div>
+</div>
+<div class="diff-note"><strong>All combined:</strong> Vote slots (incomplete pattern), breathing glow button (3s pulse), green sparks drifting off the CTA. Maximum "almost there — seal it" energy.</div>
+
+<!-- E: SAME BUT ORANGE TIER (50% approval, 2 votes) -->
+<div class="section-label">E — Orange Tier Comparison (50%, 2 votes — needs 1 more)</div>
+<div class="banner-wrap" style="--beam-c1: #f97316; --beam-c2: #fb923c; --cta-color: #f97316;">
+  <span class="label-tag" style="background: #ea580c;">E: Orange Tier</span>
+  <div class="review-beam"></div>
+  <div class="card" style="border: 1px solid rgba(249,115,22,0.3); box-shadow: 0 0 24px rgba(249,115,22,0.12), 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);">
+    <div class="stripe" style="background: linear-gradient(to right, #fb923c, #fbbf24, #fb923c);"></div>
+    <div style="padding: 6px 32px; display: flex; align-items: center; gap: 24px;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 90px;">
+        <div class="ring-wrap" style="filter: drop-shadow(0 0 6px rgba(249,115,22,0.4));">
+          <svg width="56" height="56" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#ffedd5" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="48.7"/>
+          </svg>
+          <div class="ring-interior">
+            <span style="font-size:14px;font-weight:900;color:#f97316;">50<small style="font-size:8px;">%</small></span>
+            <span style="font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#f97316;opacity:0.5;margin-top:2px;">approval</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <span class="vote-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>1</span>
+          <span class="vote-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 15V19a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/></svg>1</span>
+        </div>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 16px; font-weight: 700;">Community Review</span>
+          <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 9999px; background: rgba(249,115,22,0.1); color: #c2410c;">Round 5</span>
+        </div>
+        <p style="font-size: 16px; font-weight: 700; font-style: italic; color: #f97316; animation: gentle-pulse 3s infinite;">Acquired Taste</p>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <div class="slot slot-filled" style="background: #f97316; color: #f97316;"></div>
+          <div class="slot slot-filled" style="background: #f97316; color: #f97316;"></div>
+          <div class="slot slot-empty slot-pulse"></div>
+          <span class="mono" style="margin-left: 4px; font-size: 10px; font-weight: 700; color: #94a3b8;">1 MORE</span>
+        </div>
+      </div>
+      <a href="#" class="cta-group" style="display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0;">
+        <div class="spoon-area">
+          <svg class="spoon-icon" width="27" height="27" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 1px 2px rgba(0,0,0,0.06));">
+            <defs><linearGradient id="se" x1="20%" y1="0%" x2="80%" y2="100%"><stop offset="0%" stop-color="#f1f5f9"/><stop offset="50%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs>
+            <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#se)" stroke="#94a3b8" stroke-width="0.4"/>
+            <path d="M15.5 12L12 22" stroke="#b0b8c4" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="14.8" cy="5.8" rx="1.2" ry="2.5" fill="white" opacity="0.3" transform="rotate(-15 14.8 5.8)"/>
+          </svg>
+          <div class="ember-bed">
+            <span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s"></span>
+            <span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s"></span>
+            <span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s"></span>
+            <span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s"></span>
+            <span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s"></span>
+          </div>
+        </div>
+        <span class="cta-vote-btn" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#f97316;border:1px solid rgba(249,115,22,0.3);background:rgba(255,247,237,0.5);padding:6px 16px;border-radius:6px;backdrop-filter:blur(4px);transition:all 0.3s;">Cast Your Vote</span>
+      </a>
+    </div>
+  </div>
+</div>
+<div class="diff-note"><strong>Orange tier with slots:</strong> 2/3 filled (orange), 1 pulsing empty, "1 MORE". No breathe glow (only added at high approval). Shows slots work across tiers.</div>
+
+<!-- SUMMARY -->
+<div style="max-width: 700px; margin: 48px auto 0; padding: 16px 20px; background: #f1f5f9; border-radius: 8px; font-size: 12px; color: #475569;">
+  <strong style="color: #1e293b;">Feature Summary</strong>
+  <table style="width: 100%; margin-top: 8px; border-collapse: collapse; font-size: 11px;">
+    <tr style="border-bottom: 1px solid #e2e8f0;">
+      <td style="padding: 4px 8px; font-weight: 700; color: #1e293b; width: 28%;">Vote Slots</td>
+      <td style="padding: 4px 8px;">3 pill slots — filled = tier color + glow, empty = slate, next-empty = pulse. Replaces text hint.</td>
+      <td style="padding: 4px 8px; color: #94a3b8;">B, C, D, E</td>
+    </tr>
+    <tr style="border-bottom: 1px solid #e2e8f0;">
+      <td style="padding: 4px 8px; font-weight: 700; color: #1e293b;">Breathe Glow</td>
+      <td style="padding: 4px 8px;">CTA button shadow pulses (3s cycle) — "alive" energy, beckons the click.</td>
+      <td style="padding: 4px 8px; color: #94a3b8;">C, D</td>
+    </tr>
+    <tr style="border-bottom: 1px solid #e2e8f0;">
+      <td style="padding: 4px 8px; font-weight: 700; color: #1e293b;">Sparks</td>
+      <td style="padding: 4px 8px;">Tiny tier-colored dots drift off the button — hints at reward for clicking.</td>
+      <td style="padding: 4px 8px; color: #94a3b8;">D</td>
+    </tr>
+    <tr>
+      <td style="padding: 4px 8px; font-weight: 700; color: #1e293b;">Cross-Tier</td>
+      <td style="padding: 4px 8px;">Slots + glow + sparks all use tier color. Works for emerald, orange, any tier.</td>
+      <td style="padding: 4px 8px; color: #94a3b8;">E</td>
+    </tr>
+  </table>
+</div>
+
+</body>
+</html>

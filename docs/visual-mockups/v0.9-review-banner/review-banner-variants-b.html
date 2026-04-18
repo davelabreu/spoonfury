@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Banner — Variant B Explorations</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwindcss.config = {
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(40,33%,98%)',
+        foreground: 'hsl(20,14%,8%)',
+        card: 'hsl(0,0%,100%)',
+        muted: { DEFAULT: 'hsl(35,20%,95%)', foreground: 'hsl(20,10%,46%)' },
+        saffron: { DEFAULT: 'hsl(24,80%,50%)', dark: 'hsl(24,80%,42%)' },
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background: hsl(40,33%,98%); font-family: system-ui, -apple-system, sans-serif; }
+  .label { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: hsl(20,10%,46%); margin-bottom: 8px; }
+  .sublabel { font-size: 11px; color: hsl(20,10%,56%); margin-bottom: 12px; }
+
+  @keyframes shimmer-stripe {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  @keyframes progress-glow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.3); }
+  }
+</style>
+</head>
+<body class="p-6 max-w-2xl mx-auto space-y-10">
+
+<h1 class="text-2xl font-bold text-foreground mb-1">Variant B — Explorations</h1>
+<p class="text-sm text-muted-foreground mb-8">All spawn from the "card + top stripe" DNA. Differences in stripe weight, icon treatment, progress bar character, and information density.</p>
+
+<!-- ============================================================ -->
+<!-- B1: Original B (reference) -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">B1 / Baseline (from round 1)</div>
+  <p class="sublabel">Thin 4px stripe, circular icon badge, standard progress bar.</p>
+  <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+    <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+    <div class="px-4 py-3 space-y-2.5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="h-6 w-6 rounded-full bg-indigo-100 flex items-center justify-center">
+            <svg class="h-3.5 w-3.5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <span class="text-sm font-bold text-foreground">Community Review</span>
+          <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span>
+        </div>
+        <a href="#" class="text-xs font-semibold text-indigo-500 underline underline-offset-2">Cast your vote</a>
+      </div>
+      <div class="space-y-1.5">
+        <div class="flex items-center gap-4 text-sm">
+          <span class="font-semibold text-emerald-700">+2 approve</span>
+          <span class="font-semibold text-red-600">-0 need work</span>
+          <span class="text-xs ml-auto font-semibold text-indigo-600">100%</span>
+        </div>
+        <div class="relative h-1.5 rounded-full overflow-hidden bg-indigo-100">
+          <div class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-indigo-500 to-violet-400" style="width:66%"></div>
+        </div>
+        <p class="text-[11px] text-muted-foreground">Needs 1 more vote (min 3) and 80% approval to advance</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- B2: Thicker stripe + segmented progress -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">B2 / Bold Stripe + Segmented Votes</div>
+  <p class="sublabel">2px&rarr;3px stripe, no icon circle, vote count as discrete dots instead of a bar.</p>
+  <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+    <div class="h-[3px] bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+    <div class="px-4 py-3 space-y-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-bold text-foreground">Community Review</span>
+          <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span>
+        </div>
+        <a href="#" class="text-xs font-semibold text-indigo-500 underline underline-offset-2">Cast your vote</a>
+      </div>
+      <!-- Segmented vote dots -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5">
+          <div class="h-3 w-3 rounded-full bg-emerald-500"></div>
+          <div class="h-3 w-3 rounded-full bg-emerald-500"></div>
+          <div class="h-3 w-3 rounded-full bg-zinc-200"></div>
+        </div>
+        <span class="text-xs text-muted-foreground">2 of 3 minimum votes</span>
+        <span class="text-xs ml-auto font-semibold text-indigo-600">100% approval</span>
+      </div>
+      <p class="text-[11px] text-muted-foreground">Needs 1 more vote (min 3) and 80% approval to advance</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- B3: Shimmer stripe + warm tones -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">B3 / Shimmer Stripe + Warm Indigo</div>
+  <p class="sublabel">Animated shimmer on the top stripe. Warmer background tint. Icon uses saffron ring.</p>
+  <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+    <div class="h-1" style="background: linear-gradient(90deg, #6366f1, #a78bfa, #c084fc, #a78bfa, #6366f1); background-size: 200% 100%; animation: shimmer-stripe 3s ease-in-out infinite;"></div>
+    <div class="px-4 py-3 space-y-2.5" style="background: linear-gradient(135deg, hsl(40,33%,98%) 0%, hsl(240,30%,97%) 100%);">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="h-6 w-6 rounded-full border-2 border-indigo-300 bg-white flex items-center justify-center">
+            <svg class="h-3 w-3 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <span class="text-sm font-bold text-foreground">Community Review</span>
+          <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span>
+        </div>
+        <a href="#" class="text-xs font-semibold text-indigo-500 underline underline-offset-2">Cast your vote</a>
+      </div>
+      <div class="space-y-1.5">
+        <div class="flex items-center gap-4 text-sm">
+          <span class="font-semibold text-emerald-700">+2 approve</span>
+          <span class="font-semibold text-red-600">-0 need work</span>
+          <span class="text-xs ml-auto font-semibold text-indigo-600">100%</span>
+        </div>
+        <div class="relative h-1.5 rounded-full overflow-hidden bg-indigo-100">
+          <div class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-indigo-500 to-violet-400" style="width:66%"></div>
+        </div>
+        <p class="text-[11px] text-muted-foreground">Needs 1 more vote (min 3) and 80% approval to advance</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- B4: Split layout — stats sidebar -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">B4 / Split Layout — Stats Sidebar</div>
+  <p class="sublabel">Percentage gets its own left column. More editorial, magazine-like feel.</p>
+  <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+    <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+    <div class="flex">
+      <!-- Stats column -->
+      <div class="flex flex-col items-center justify-center px-5 py-4 border-r border-indigo-50 min-w-[80px]">
+        <span class="text-2xl font-black text-indigo-600">100<span class="text-base">%</span></span>
+        <span class="text-[9px] font-bold uppercase tracking-widest text-indigo-400 mt-0.5">approval</span>
+      </div>
+      <!-- Content -->
+      <div class="flex-1 px-4 py-3 space-y-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-foreground">Community Review</span>
+            <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span>
+          </div>
+          <a href="#" class="text-xs font-semibold text-indigo-500 underline underline-offset-2">Cast your vote</a>
+        </div>
+        <div class="flex items-center gap-4 text-sm">
+          <span class="font-semibold text-emerald-700">+2 approve</span>
+          <span class="font-semibold text-red-600">-0 need work</span>
+        </div>
+        <div class="relative h-1.5 rounded-full overflow-hidden bg-indigo-100">
+          <div class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-indigo-500 to-violet-400" style="width:66%"></div>
+        </div>
+        <p class="text-[11px] text-muted-foreground">Needs 1 more vote (min 3) and 80% approval to advance</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- B5: Minimal + progress ring -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">B5 / Minimal + Progress Ring</div>
+  <p class="sublabel">Circular progress ring replaces the bar. Ultra-clean, icon-forward.</p>
+  <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+    <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+    <div class="px-4 py-3 flex items-center gap-4">
+      <!-- Progress ring -->
+      <div class="relative h-12 w-12 shrink-0">
+        <svg class="h-12 w-12 -rotate-90" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e0e7ff" stroke-width="3"/>
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#ring-gradient)" stroke-width="3" stroke-linecap="round"
+            stroke-dasharray="97.4" stroke-dashoffset="33" style="transition: stroke-dashoffset 0.6s ease;"/>
+          <defs>
+            <linearGradient id="ring-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#a78bfa"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="text-xs font-black text-indigo-600">2/3</span>
+        </div>
+      </div>
+      <!-- Content -->
+      <div class="flex-1 space-y-1">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-foreground">Community Review</span>
+            <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span>
+          </div>
+          <a href="#" class="text-xs font-semibold text-indigo-500 underline underline-offset-2">Cast your vote</a>
+        </div>
+        <div class="flex items-center gap-4 text-sm">
+          <span class="font-semibold text-emerald-700">+2 approve</span>
+          <span class="font-semibold text-red-600">-0 need work</span>
+          <span class="text-xs ml-auto font-semibold text-indigo-600">100%</span>
+        </div>
+        <p class="text-[11px] text-muted-foreground">Needs 1 more vote (min 3) and 80% approval to advance</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- B6: Dense compact — single row -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">B6 / Dense Compact — Single Row</div>
+  <p class="sublabel">Everything on one line. Bar runs full-width underneath. Least visual weight.</p>
+  <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+    <div class="h-[2px] bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+    <div class="px-4 py-2.5 space-y-2">
+      <div class="flex items-center gap-2 flex-wrap">
+        <div class="h-5 w-5 rounded-full bg-indigo-100 flex items-center justify-center">
+          <svg class="h-3 w-3 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        <span class="text-sm font-bold text-foreground">Community Review</span>
+        <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span>
+        <span class="text-xs text-muted-foreground">&middot;</span>
+        <span class="text-xs font-semibold text-emerald-700">+2</span>
+        <span class="text-xs font-semibold text-red-600">-0</span>
+        <span class="text-xs text-muted-foreground">&middot;</span>
+        <span class="text-xs font-semibold text-indigo-600">100%</span>
+        <a href="#" class="text-xs font-semibold text-indigo-500 underline underline-offset-2 ml-auto">Cast your vote</a>
+      </div>
+      <div class="relative h-1 rounded-full overflow-hidden bg-indigo-50">
+        <div class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-indigo-500 to-violet-400" style="width:66%"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- B7: Luxury — gradient tint + glowing bar -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">B7 / Luxury — Tinted Card + Glowing Bar</div>
+  <p class="sublabel">Subtle indigo-to-white gradient body. Progress bar has a soft glow. Premium feel.</p>
+  <div class="rounded-xl shadow-sm border border-indigo-100 overflow-hidden" style="background: linear-gradient(180deg, hsl(235,40%,97%) 0%, white 60%);">
+    <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+    <div class="px-4 py-3 space-y-2.5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="h-6 w-6 rounded-full bg-white/80 border border-indigo-200 flex items-center justify-center shadow-sm">
+            <svg class="h-3.5 w-3.5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <span class="text-sm font-bold text-foreground">Community Review</span>
+          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-indigo-200 text-indigo-600 bg-white/60">Round 1</span>
+        </div>
+        <a href="#" class="text-xs font-semibold text-indigo-500 underline underline-offset-2">Cast your vote</a>
+      </div>
+      <div class="space-y-1.5">
+        <div class="flex items-center gap-4 text-sm">
+          <span class="font-semibold text-emerald-700">+2 approve</span>
+          <span class="font-semibold text-red-600">-0 need work</span>
+          <span class="text-xs ml-auto font-semibold text-indigo-600">100%</span>
+        </div>
+        <!-- Glowing progress bar -->
+        <div class="relative h-1.5 rounded-full overflow-hidden bg-indigo-100">
+          <div class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-indigo-500 to-violet-400" style="width:66%; animation: progress-glow 2s ease-in-out infinite; box-shadow: 0 0 8px rgba(99,102,241,0.4);"></div>
+        </div>
+        <p class="text-[11px] text-muted-foreground">Needs 1 more vote (min 3) and 80% approval to advance</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- B8: Two-tone stripe + outlined pill -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">B8 / Two-Tone Stripe + Outlined Pill</div>
+  <p class="sublabel">Stripe splits into approval (green) and remaining (gray). Pill uses outline style with live dot. Feels like a status dashboard.</p>
+  <div class="rounded-xl bg-card shadow-sm border border-zinc-200 overflow-hidden">
+    <!-- Two-tone stripe: green = approval %, gray = remaining -->
+    <div class="flex h-1">
+      <div class="bg-emerald-500" style="width:66%"></div>
+      <div class="bg-zinc-200 flex-1"></div>
+    </div>
+    <div class="px-4 py-3 space-y-2.5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-sm font-bold text-foreground">Community Review</span>
+          <span class="inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-indigo-200 text-indigo-600">
+            <span class="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+            Round 1
+          </span>
+        </div>
+        <a href="#" class="text-xs font-semibold text-indigo-500 underline underline-offset-2">Cast your vote</a>
+      </div>
+      <div class="flex items-center gap-4 text-sm">
+        <span class="font-semibold text-emerald-700">+2 approve</span>
+        <span class="font-semibold text-red-600">-0 need work</span>
+        <span class="text-xs ml-auto font-semibold text-muted-foreground">2 of 3 min votes &middot; <span class="text-indigo-600">100%</span></span>
+      </div>
+      <p class="text-[11px] text-muted-foreground">Needs 1 more vote (min 3) and 80% approval to advance</p>
+    </div>
+  </div>
+</section>
+
+<hr class="border-black/5 my-10">
+
+<!-- ============================================================ -->
+<!-- STATE COMPARISONS — B5 and B7 across all three states -->
+<!-- ============================================================ -->
+<h2 class="text-lg font-bold text-foreground mb-1">State Matrix</h2>
+<p class="text-xs text-muted-foreground mb-6">B5 (ring) and B7 (luxury) shown across all three lifecycle states so you can see how they age.</p>
+
+<!-- B5 states -->
+<div class="space-y-4 mb-10">
+  <div class="label">B5 / In Review &rarr; Threshold Met &rarr; Mod Queue</div>
+
+  <!-- B5 threshold met -->
+  <div class="rounded-xl bg-card shadow-sm border border-emerald-100 overflow-hidden">
+    <div class="h-1 bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400"></div>
+    <div class="px-4 py-3 flex items-center gap-4">
+      <div class="relative h-12 w-12 shrink-0">
+        <svg class="h-12 w-12 -rotate-90" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="#d1fae5" stroke-width="3"/>
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#ring-green)" stroke-width="3" stroke-linecap="round"
+            stroke-dasharray="97.4" stroke-dashoffset="0"/>
+          <defs><linearGradient id="ring-green" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient></defs>
+        </svg>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <svg class="h-4 w-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </div>
+      </div>
+      <div class="flex-1 space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-bold text-foreground">Threshold reached</span>
+          <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Passed</span>
+        </div>
+        <div class="flex items-center gap-4 text-sm">
+          <span class="font-semibold text-emerald-700">+4 approve</span>
+          <span class="font-semibold text-red-600">-1 need work</span>
+          <span class="text-xs ml-auto font-semibold text-emerald-600">80%</span>
+        </div>
+        <p class="text-[11px] text-muted-foreground">80% approval reached &mdash; awaiting moderator review</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- B5 mod queue -->
+  <div class="rounded-xl bg-card shadow-sm border border-violet-100 overflow-hidden">
+    <div class="h-1 bg-gradient-to-r from-violet-500 via-purple-400 to-fuchsia-400"></div>
+    <div class="px-4 py-3 flex items-center gap-4">
+      <div class="relative h-12 w-12 shrink-0">
+        <svg class="h-12 w-12 -rotate-90" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="#ede9fe" stroke-width="3"/>
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#ring-violet)" stroke-width="3" stroke-linecap="round"
+            stroke-dasharray="97.4" stroke-dashoffset="0"/>
+          <defs><linearGradient id="ring-violet" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+        </svg>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <svg class="h-4 w-4 text-violet-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+      </div>
+      <div class="flex-1 space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-bold text-foreground">In the moderator queue</span>
+          <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">Mod queue</span>
+        </div>
+        <div class="flex items-center gap-4 text-sm">
+          <span class="font-semibold text-emerald-700">+5 approve</span>
+          <span class="font-semibold text-red-600">-0 need work</span>
+          <span class="text-xs ml-auto font-semibold text-violet-600">100%</span>
+        </div>
+        <p class="text-[11px] text-muted-foreground">Passed community review &mdash; a moderator will take a look soon</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- B7 states -->
+<div class="space-y-4">
+  <div class="label">B7 / In Review &rarr; Threshold Met &rarr; Mod Queue</div>
+
+  <!-- B7 threshold met -->
+  <div class="rounded-xl shadow-sm border border-emerald-100 overflow-hidden" style="background: linear-gradient(180deg, hsl(152,40%,97%) 0%, white 60%);">
+    <div class="h-1 bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400"></div>
+    <div class="px-4 py-3 space-y-2.5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="h-6 w-6 rounded-full bg-white/80 border border-emerald-200 flex items-center justify-center shadow-sm">
+            <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <span class="text-sm font-bold text-foreground">Threshold reached &mdash; heading to moderation</span>
+          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-emerald-200 text-emerald-600 bg-white/60">Passed</span>
+        </div>
+      </div>
+      <div class="space-y-1.5">
+        <div class="flex items-center gap-4 text-sm">
+          <span class="font-semibold text-emerald-700">+4 approve</span>
+          <span class="font-semibold text-red-600">-1 need work</span>
+          <span class="text-xs ml-auto font-semibold text-emerald-600">80%</span>
+        </div>
+        <div class="relative h-1.5 rounded-full overflow-hidden bg-emerald-100">
+          <div class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400" style="width:100%; box-shadow: 0 0 8px rgba(16,185,129,0.4);"></div>
+        </div>
+        <p class="text-[11px] text-muted-foreground">80% approval reached &mdash; awaiting moderator review</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- B7 mod queue -->
+  <div class="rounded-xl shadow-sm border border-violet-100 overflow-hidden" style="background: linear-gradient(180deg, hsl(270,40%,97%) 0%, white 60%);">
+    <div class="h-1 bg-gradient-to-r from-violet-500 via-purple-400 to-fuchsia-400"></div>
+    <div class="px-4 py-3 space-y-2.5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="h-6 w-6 rounded-full bg-white/80 border border-violet-200 flex items-center justify-center shadow-sm">
+            <svg class="h-3.5 w-3.5 text-violet-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <span class="text-sm font-bold text-foreground">Your recipe is in the moderator queue</span>
+          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-violet-200 text-violet-600 bg-white/60">Mod queue</span>
+        </div>
+      </div>
+      <div class="space-y-1.5">
+        <div class="flex items-center gap-4 text-sm">
+          <span class="font-semibold text-emerald-700">+5 approve</span>
+          <span class="font-semibold text-red-600">-0 need work</span>
+          <span class="text-xs ml-auto font-semibold text-violet-600">100%</span>
+        </div>
+        <div class="relative h-1.5 rounded-full overflow-hidden bg-violet-100">
+          <div class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-violet-500 to-purple-400" style="width:100%; box-shadow: 0 0 8px rgba(139,92,246,0.4);"></div>
+        </div>
+        <p class="text-[11px] text-muted-foreground">Passed community review &mdash; a moderator will take a look soon</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spoon — Metal Iterations (S1 + S5)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwindcss.config = {
+  theme: { extend: { colors: {
+    background: 'hsl(40,33%,98%)', foreground: 'hsl(20,14%,8%)',
+    card: 'hsl(0,0%,100%)', muted: { DEFAULT: 'hsl(35,20%,95%)', foreground: 'hsl(20,10%,46%)' },
+  }}}
+}
+</script>
+<style>
+  body { background: hsl(40,33%,98%); font-family: system-ui, -apple-system, sans-serif; }
+  .label { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: hsl(20,10%,46%); margin-bottom: 4px; }
+  .sublabel { font-size: 11px; color: hsl(20,10%,56%); margin-bottom: 16px; line-height: 1.5; }
+
+  @keyframes ember-rise-drift {
+    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+    50%  { transform: translate(3px, -8px) scale(0.6); opacity: 0.7; }
+    100% { transform: translate(-1px, -16px) scale(0.15); opacity: 0; }
+  }
+
+  .cta-group { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .cta-group .spoon-area { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .cta-group:hover .spoon-area { transform: scale(1.3); }
+  .cta-group .ember-bed span { position: absolute; border-radius: 50%; opacity: 0; animation-play-state: paused; }
+  .cta-group:hover .ember-bed span { animation-play-state: running; }
+
+  .cta-btn {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    border: 1px solid rgba(245,158,11,0.3); background: rgba(255,251,235,0.5);
+    color: #d97706; padding: 4px 12px; border-radius: 6px; backdrop-filter: blur(4px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.3s;
+  }
+  .cta-group:hover .cta-btn { background: #f59e0b; color: white; box-shadow: 0 0 15px rgba(245,158,11,0.4); }
+
+  .demo-row { display: flex; align-items: center; gap: 16px; padding: 20px 24px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; }
+  .demo-hint { font-size: 10px; color: hsl(20,10%,56%); margin-left: auto; font-style: italic; }
+
+  /* Hover glow variants */
+  .cta-group:hover .sv-warm { filter: drop-shadow(0 0 5px #f59e0b) brightness(1.1); }
+  .cta-group:hover .sv-hot  { filter: drop-shadow(0 0 6px #f97316) brightness(1.15); }
+  .cta-group:hover .sv-soft { filter: drop-shadow(0 0 4px rgba(245,158,11,0.35)); }
+</style>
+</head>
+<body class="p-6 max-w-2xl mx-auto space-y-8">
+
+<h1 class="text-2xl font-bold text-foreground mb-1">Metal Spoon — Deep Iterations</h1>
+<p class="text-sm text-muted-foreground mb-2">Spawning from S1 (Machined Metal) and S5 (Engraved). Six mutations exploring gradient direction, highlight placement, stroke weight, and warmth.</p>
+<p class="text-xs text-amber-600 font-semibold mb-8">Each shows rest state (left) and hover state (right, with embers).</p>
+
+<!-- EMBER TEMPLATE (reused) -->
+<!-- Pasted inline per variant for self-containment -->
+
+<!-- ============================================================ -->
+<!-- M1: Brushed Steel — diagonal gradient, sharp specular dot -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">M1 / Brushed Steel</div>
+  <p class="sublabel">Original S1 refined. Diagonal gradient slate-200→slate-500. Small sharp specular dot on the bowl. Thin 0.5px stroke. Clean chrome.</p>
+  <div class="demo-row">
+    <div style="text-align:center;">
+      <svg width="26" height="26" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.08));">
+        <defs><linearGradient id="m1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="40%" stop-color="#cbd5e1"/><stop offset="70%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#475569"/></linearGradient></defs>
+        <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#m1)" stroke="#64748b" stroke-width="0.5"/>
+        <path d="M15.5 12L12 22" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <circle cx="14.5" cy="5" r="1" fill="white" opacity="0.45"/>
+      </svg>
+      <div style="font-size:9px;color:#94a3b8;margin-top:4px;">rest</div>
+    </div>
+    <div class="cta-group">
+      <div class="spoon-area">
+        <svg class="sv-warm" width="18" height="18" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.08));transition:all 0.3s;">
+          <defs><linearGradient id="m1b" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="40%" stop-color="#cbd5e1"/><stop offset="70%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#475569"/></linearGradient></defs>
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#m1b)" stroke="#64748b" stroke-width="0.5"/>
+          <path d="M15.5 12L12 22" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="14.5" cy="5" r="1" fill="white" opacity="0.45"/>
+        </svg>
+        <div class="ember-bed absolute pointer-events-none" style="top:4px;left:9px;"><span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s;"></span><span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s;"></span><span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s;"></span><span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s;"></span><span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s;"></span></div>
+      </div>
+      <span class="cta-btn">Cast Your Vote</span>
+    </div>
+    <span class="demo-hint">Diagonal, specular dot, chrome</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- M2: Warm Pewter — amber-tinted metal, softer gradient -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">M2 / Warm Pewter</div>
+  <p class="sublabel">Metal with amber undertones baked in. The spoon already looks warm at rest. On hover it intensifies, like metal heating up. No specular — just soft warmth.</p>
+  <div class="demo-row">
+    <div style="text-align:center;">
+      <svg width="26" height="26" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.06));">
+        <defs><linearGradient id="m2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fef3c7"/><stop offset="30%" stop-color="#d6cfc0"/><stop offset="60%" stop-color="#a89f91"/><stop offset="100%" stop-color="#78716c"/></linearGradient></defs>
+        <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#m2)" stroke="#78716c" stroke-width="0.5"/>
+        <path d="M15.5 12L12 22" stroke="#a8a29e" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div style="font-size:9px;color:#a8a29e;margin-top:4px;">rest</div>
+    </div>
+    <div class="cta-group">
+      <div class="spoon-area">
+        <svg class="sv-hot" width="18" height="18" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.06));transition:all 0.3s;">
+          <defs><linearGradient id="m2b" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fef3c7"/><stop offset="30%" stop-color="#d6cfc0"/><stop offset="60%" stop-color="#a89f91"/><stop offset="100%" stop-color="#78716c"/></linearGradient></defs>
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#m2b)" stroke="#78716c" stroke-width="0.5"/>
+          <path d="M15.5 12L12 22" stroke="#a8a29e" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div class="ember-bed absolute pointer-events-none" style="top:4px;left:9px;"><span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s;"></span><span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s;"></span><span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s;"></span><span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s;"></span><span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s;"></span></div>
+      </div>
+      <span class="cta-btn">Cast Your Vote</span>
+    </div>
+    <span class="demo-hint">Amber-tinted metal, heats up on hover</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- M3: Deep Stamp — S5 with heavier bevel, darker base -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">M3 / Deep Stamp</div>
+  <p class="sublabel">S5 Engraved taken further. Darker base (slate-600→slate-800), stronger top highlight, thicker stroke. Feels pressed into heavy steel.</p>
+  <div class="demo-row">
+    <div style="text-align:center;">
+      <svg width="26" height="26" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 3px rgba(0,0,0,0.15));">
+        <defs><linearGradient id="m3" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#cbd5e1"/><stop offset="20%" stop-color="#94a3b8"/><stop offset="80%" stop-color="#475569"/><stop offset="100%" stop-color="#334155"/></linearGradient></defs>
+        <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#m3)" stroke="#334155" stroke-width="0.8"/>
+        <path d="M15.5 12L12 22" stroke="#475569" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M15.5 3.5C14 3.5 13 5.5 13 7.5c0 1.5 0.8 2.5 1.5 3" fill="none" stroke="white" stroke-width="0.7" opacity="0.5"/>
+      </svg>
+      <div style="font-size:9px;color:#94a3b8;margin-top:4px;">rest</div>
+    </div>
+    <div class="cta-group">
+      <div class="spoon-area">
+        <svg class="sv-warm" width="18" height="18" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 3px rgba(0,0,0,0.15));transition:all 0.3s;">
+          <defs><linearGradient id="m3b" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#cbd5e1"/><stop offset="20%" stop-color="#94a3b8"/><stop offset="80%" stop-color="#475569"/><stop offset="100%" stop-color="#334155"/></linearGradient></defs>
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#m3b)" stroke="#334155" stroke-width="0.8"/>
+          <path d="M15.5 12L12 22" stroke="#475569" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M15.5 3.5C14 3.5 13 5.5 13 7.5c0 1.5 0.8 2.5 1.5 3" fill="none" stroke="white" stroke-width="0.7" opacity="0.5"/>
+        </svg>
+        <div class="ember-bed absolute pointer-events-none" style="top:4px;left:9px;"><span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s;"></span><span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s;"></span><span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s;"></span><span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s;"></span><span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s;"></span></div>
+      </div>
+      <span class="cta-btn">Cast Your Vote</span>
+    </div>
+    <span class="demo-hint">Heavy bevel, dark base, industrial stamp</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- M4: Satin Silver — soft gradient, elongated oval highlight -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">M4 / Satin Silver</div>
+  <p class="sublabel">Softer than chrome, no harsh edges. Long oval specular highlight like a satin-finished utensil. Gentle gradient. Elegant and understated.</p>
+  <div class="demo-row">
+    <div style="text-align:center;">
+      <svg width="26" height="26" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.06));">
+        <defs>
+          <linearGradient id="m4" x1="20%" y1="0%" x2="80%" y2="100%"><stop offset="0%" stop-color="#f1f5f9"/><stop offset="50%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient>
+        </defs>
+        <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#m4)" stroke="#94a3b8" stroke-width="0.4"/>
+        <path d="M15.5 12L12 22" stroke="#b0b8c4" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <ellipse cx="14.8" cy="5.8" rx="1.2" ry="2.5" fill="white" opacity="0.3" transform="rotate(-15 14.8 5.8)"/>
+      </svg>
+      <div style="font-size:9px;color:#94a3b8;margin-top:4px;">rest</div>
+    </div>
+    <div class="cta-group">
+      <div class="spoon-area">
+        <svg class="sv-soft" width="18" height="18" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.06));transition:all 0.3s;">
+          <defs><linearGradient id="m4b" x1="20%" y1="0%" x2="80%" y2="100%"><stop offset="0%" stop-color="#f1f5f9"/><stop offset="50%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs>
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#m4b)" stroke="#94a3b8" stroke-width="0.4"/>
+          <path d="M15.5 12L12 22" stroke="#b0b8c4" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <ellipse cx="14.8" cy="5.8" rx="1.2" ry="2.5" fill="white" opacity="0.3" transform="rotate(-15 14.8 5.8)"/>
+        </svg>
+        <div class="ember-bed absolute pointer-events-none" style="top:4px;left:9px;"><span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s;"></span><span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s;"></span><span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s;"></span><span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s;"></span><span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s;"></span></div>
+      </div>
+      <span class="cta-btn">Cast Your Vote</span>
+    </div>
+    <span class="demo-hint">Soft gradient, oval highlight, satin finish</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- M5: Cast Iron — dark matte with subtle grain texture -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">M5 / Cast Iron</div>
+  <p class="sublabel">Nearly flat dark fill (slate-600→slate-700) with a subtle top-edge highlight. Matte, heavy, no shine. Like a cast iron utensil. Maximum weight.</p>
+  <div class="demo-row">
+    <div style="text-align:center;">
+      <svg width="26" height="26" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.12));">
+        <defs><linearGradient id="m5" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#94a3b8"/><stop offset="15%" stop-color="#64748b"/><stop offset="100%" stop-color="#475569"/></linearGradient></defs>
+        <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#m5)" stroke="#334155" stroke-width="0.6"/>
+        <path d="M15.5 12L12 22" stroke="#475569" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <!-- Subtle rim highlight only -->
+        <path d="M13.5 3C13 3.5 12.5 5 12.5 7" fill="none" stroke="white" stroke-width="0.4" opacity="0.25"/>
+      </svg>
+      <div style="font-size:9px;color:#94a3b8;margin-top:4px;">rest</div>
+    </div>
+    <div class="cta-group">
+      <div class="spoon-area">
+        <svg class="sv-warm" width="18" height="18" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.12));transition:all 0.3s;">
+          <defs><linearGradient id="m5b" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#94a3b8"/><stop offset="15%" stop-color="#64748b"/><stop offset="100%" stop-color="#475569"/></linearGradient></defs>
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#m5b)" stroke="#334155" stroke-width="0.6"/>
+          <path d="M15.5 12L12 22" stroke="#475569" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M13.5 3C13 3.5 12.5 5 12.5 7" fill="none" stroke="white" stroke-width="0.4" opacity="0.25"/>
+        </svg>
+        <div class="ember-bed absolute pointer-events-none" style="top:4px;left:9px;"><span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s;"></span><span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s;"></span><span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s;"></span><span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s;"></span><span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s;"></span></div>
+      </div>
+      <span class="cta-btn">Cast Your Vote</span>
+    </div>
+    <span class="demo-hint">Dark matte, minimal highlight, heavy weight</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- M6: Polished Chrome — bright reflections, high contrast -->
+<!-- ============================================================ -->
+<div>
+  <div class="label">M6 / Polished Chrome</div>
+  <p class="sublabel">High-contrast chrome. Very bright specular band across the bowl, sharp dark edges. Mirror finish. Maximum shine, maximum "kitchen flex."</p>
+  <div class="demo-row">
+    <div style="text-align:center;">
+      <svg width="26" height="26" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.1));">
+        <defs>
+          <linearGradient id="m6" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#e2e8f0"/>
+            <stop offset="25%" stop-color="#f8fafc"/>
+            <stop offset="45%" stop-color="#cbd5e1"/>
+            <stop offset="65%" stop-color="#f1f5f9"/>
+            <stop offset="100%" stop-color="#64748b"/>
+          </linearGradient>
+        </defs>
+        <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#m6)" stroke="#475569" stroke-width="0.5"/>
+        <path d="M15.5 12L12 22" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <!-- Bright specular band -->
+        <path d="M14 4C13.5 5 13.5 7 14.5 9" fill="none" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
+      </svg>
+      <div style="font-size:9px;color:#94a3b8;margin-top:4px;">rest</div>
+    </div>
+    <div class="cta-group">
+      <div class="spoon-area">
+        <svg class="sv-warm" width="18" height="18" viewBox="0 0 24 24" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.1));transition:all 0.3s;">
+          <defs><linearGradient id="m6b" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="25%" stop-color="#f8fafc"/><stop offset="45%" stop-color="#cbd5e1"/><stop offset="65%" stop-color="#f1f5f9"/><stop offset="100%" stop-color="#64748b"/></linearGradient></defs>
+          <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill="url(#m6b)" stroke="#475569" stroke-width="0.5"/>
+          <path d="M15.5 12L12 22" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M14 4C13.5 5 13.5 7 14.5 9" fill="none" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
+        </svg>
+        <div class="ember-bed absolute pointer-events-none" style="top:4px;left:9px;"><span style="left:0;width:4px;height:4px;background:#f59e0b;animation:ember-rise-drift 1s infinite 0s;"></span><span style="left:8px;width:4px;height:4px;background:#f97316;animation:ember-rise-drift 1s infinite 0.25s;"></span><span style="left:4px;width:3.5px;height:3.5px;background:#ef4444;animation:ember-rise-drift 1s infinite 0.5s;"></span><span style="left:-3px;width:3px;height:3px;background:#fbbf24;animation:ember-rise-drift 1s infinite 0.75s;"></span><span style="left:10px;width:3px;height:3px;background:#fb923c;animation:ember-rise-drift 1s infinite 0.1s;"></span></div>
+      </div>
+      <span class="cta-btn">Cast Your Vote</span>
+    </div>
+    <span class="demo-hint">Mirror finish, bright band, high contrast</span>
+  </div>
+</div>
+
+<!-- Comparison -->
+<div class="rounded-xl border border-zinc-200 bg-white overflow-hidden mt-8">
+  <table class="w-full text-xs">
+    <thead>
+      <tr class="border-b border-zinc-100">
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground"></th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Gradient</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Highlight</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Stroke</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Vibe</th>
+      </tr>
+    </thead>
+    <tbody class="text-foreground">
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">M1 Brushed</td>
+        <td class="px-3 py-2">Diagonal, 4-stop</td>
+        <td class="px-3 py-2">Small dot</td>
+        <td class="px-3 py-2">0.5px</td>
+        <td class="px-3 py-2 text-muted-foreground">Clean chrome</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">M2 Pewter</td>
+        <td class="px-3 py-2">Diagonal, amber-tinted</td>
+        <td class="px-3 py-2">None</td>
+        <td class="px-3 py-2">0.5px</td>
+        <td class="px-3 py-2 text-muted-foreground">Warm antique</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">M3 Deep Stamp</td>
+        <td class="px-3 py-2">Vertical, dark</td>
+        <td class="px-3 py-2">Inner curve</td>
+        <td class="px-3 py-2">0.8px</td>
+        <td class="px-3 py-2 text-muted-foreground">Industrial press</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">M4 Satin</td>
+        <td class="px-3 py-2">Soft diagonal</td>
+        <td class="px-3 py-2">Oval, rotated</td>
+        <td class="px-3 py-2">0.4px</td>
+        <td class="px-3 py-2 text-muted-foreground">Elegant utensil</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">M5 Cast Iron</td>
+        <td class="px-3 py-2">Vertical, dark matte</td>
+        <td class="px-3 py-2">Rim only</td>
+        <td class="px-3 py-2">0.6px</td>
+        <td class="px-3 py-2 text-muted-foreground">Heavy &amp; matte</td>
+      </tr>
+      <tr>
+        <td class="px-3 py-2 font-bold">M6 Chrome</td>
+        <td class="px-3 py-2">Diagonal, 5-stop mirror</td>
+        <td class="px-3 py-2">Bright band</td>
+        <td class="px-3 py-2">0.5px</td>
+        <td class="px-3 py-2 text-muted-foreground">Mirror finish</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

@@ -177,6 +177,10 @@ export function RecipePage() {
       {!isOwner && (recipe.status === "in_review" || recipe.status === "mod_queue") && token && reviewData && (
         <ReviewBanner reviewData={reviewData} hasVoted={reviewData.has_voted} />
       )}
+      {/* Same banner for the owner — shows gate progress on their own recipe */}
+      {isOwner && (recipe.status === "in_review" || recipe.status === "mod_queue") && reviewData && (
+        <ReviewBanner reviewData={reviewData} hasVoted={false} isOwner status={recipe.status} />
+      )}
 
       {/* Editorial header — full width above the split grid */}
       <div className="space-y-2">
@@ -186,7 +190,9 @@ export function RecipePage() {
         <h1 className="text-4xl font-bold leading-tight tracking-tight">{recipe.title}</h1>
         <div className="flex items-center gap-3 flex-wrap text-sm text-muted-foreground">
           <span>by @{recipe.author_username}</span>
-          {recipe.serves && <span>· Serves {recipe.serves}</span>}
+          {recipe.updated_at && (
+            <span>· Updated on {new Date(recipe.updated_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
+          )}
           {recipe.parent_recipe_slug && (
             <span>
               · Forked from{" "}
@@ -201,14 +207,56 @@ export function RecipePage() {
             </Badge>
           )}
         </div>
-        {recipe.status === "published" && recipe.vouch_count > 0 && (
-          <p className="text-sm text-violet-700 flex items-center gap-1.5 mt-1">
-            <span>✨</span>
-            <span>
-              Vouched for by {recipe.vouch_count} {recipe.vouch_count === 1 ? "cook" : "cooks"} in the test kitchen
+        {recipe.status === "published" && reviewData && reviewData.average_rating != null && (
+          <div className="flex items-center gap-2 mt-1">
+            <div className="flex gap-0.5">
+              {Array.from({ length: 5 }, (_, i) => {
+                const avg = reviewData.average_rating!;
+                const fill = i + 1 <= avg ? 1 : i + 0.5 <= avg ? 0.5 : 0;
+                return (
+                  <svg key={i} className="shrink-0" width={21} height={21} viewBox="0 0 24 24" fill="none">
+                    <defs>
+                      <linearGradient id={`hero-spoon-${i}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset={`${fill * 100}%`} stopColor="#f59e0b" />
+                        <stop offset={`${fill * 100}%`} stopColor="#e2e8f0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z" fill={`url(#hero-spoon-${i})`} stroke="#94a3b8" strokeWidth="0.5" />
+                    <path d="M15.5 12L12 22" stroke={fill > 0 ? "#f59e0b" : "#cbd5e1"} strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                );
+              })}
+            </div>
+            <span className="text-sm font-bold text-amber-600">{reviewData.average_rating}</span>
+            <span className="text-sm font-medium text-muted-foreground">·</span>
+            <span className="text-sm font-semibold italic text-amber-600">
+              {reviewData.average_rating >= 4.8 ? "Chef's Kiss" : reviewData.average_rating >= 4.0 ? "Community Pick" : reviewData.average_rating >= 3.5 ? "Warming Up" : reviewData.average_rating >= 2.0 ? "Acquired Taste" : "Potluck Surprise"}
             </span>
-          </p>
+          </div>
         )}
+        {recipe.description && (
+          <p className="text-sm text-muted-foreground mt-2">{recipe.description}</p>
+        )}
+        <div className="flex flex-wrap gap-2 mt-2">
+          {recipe.serves && (
+            <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5 text-xs font-medium">
+              <span>🍽️</span>
+              <span>Serves {recipe.serves}</span>
+            </div>
+          )}
+          {recipe.prep_time && (
+            <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5 text-xs font-medium">
+              <Clock className="w-3.5 h-3.5" />
+              <span>{recipe.prep_time} min</span>
+            </div>
+          )}
+          {!recipe.prep_time && (
+            <div className="flex items-center gap-1.5 rounded-full border border-dashed border-border/40 bg-muted/20 px-3 py-1.5 text-xs text-muted-foreground/50 italic">
+              <Clock className="w-3.5 h-3.5" />
+              <span>Cook time TBD</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Split grid — starts here so right column aligns with the image top */}
@@ -425,33 +473,32 @@ export function RecipePage() {
             </div>
           </div>
 
-          {/* Community review panel — non-owners vote here */}
+          {/* Community review panel — non-owners vote during review, everyone votes on published */}
           {!isOwner && recipe.status === "in_review" && token && (
             <div id="review-panel">
               <ReviewPanel
                 recipeSlug={recipe.slug}
                 token={token}
+                recipeStatus={recipe.status}
                 reviewData={reviewData}
                 onReviewData={setReviewData}
               />
             </div>
           )}
-
-          {/* Public reviews on published recipes — read-only vouches */}
-          {recipe.status === "published" && reviewData && (reviewData.reviews?.length ?? 0) > 0 && (
+          {recipe.status === "published" && reviewData && (
             <div id="review-panel">
               <ReviewPanel
                 recipeSlug={recipe.slug}
                 token={token ?? ""}
+                recipeStatus={recipe.status}
                 reviewData={reviewData}
                 onReviewData={setReviewData}
-                readOnly
               />
             </div>
           )}
 
           {/* Owner review history — read-only, all rounds */}
-          {(isOwner || (isStaff && recipe.status === "mod_queue")) && reviewData && (reviewData.all_rounds?.length ?? 0) > 0 && (
+          {(isOwner || (isStaff && recipe.status === "mod_queue")) && recipe.status !== "published" && reviewData && (reviewData.all_rounds?.length ?? 0) > 0 && (
             <div className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Community Votes</h2>
@@ -515,26 +562,6 @@ export function RecipePage() {
               )}
             </AnimatePresence>
 
-            {/* About this recipe */}
-            <div className={`rounded-xl border border-border/60 bg-card p-5 space-y-4 transition-opacity duration-300 ${cookNow.active ? "opacity-40" : ""}`}>
-              <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">About</h2>
-              <p className="text-sm leading-relaxed text-muted-foreground">{recipe.description}</p>
-
-              {/* Quick-stat pills */}
-              <div className="flex flex-wrap gap-2 pt-1">
-                {recipe.serves && (
-                  <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5 text-xs font-medium">
-                    <span>🍽️</span>
-                    <span>Serves {recipe.serves}</span>
-                  </div>
-                )}
-                {/* Cook time — placeholder for future field */}
-                <div className="flex items-center gap-1.5 rounded-full border border-dashed border-border/40 bg-muted/20 px-3 py-1.5 text-xs text-muted-foreground/50 italic">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>Cook time TBD</span>
-                </div>
-              </div>
-            </div>
 
             {/* Notes */}
             {recipe.notes && (

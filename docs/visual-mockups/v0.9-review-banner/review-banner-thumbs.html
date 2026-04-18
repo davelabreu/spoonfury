@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Banner — Thumbs Color Treatments</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwindcss.config = {
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(40,33%,98%)',
+        foreground: 'hsl(20,14%,8%)',
+        card: 'hsl(0,0%,100%)',
+        muted: { DEFAULT: 'hsl(35,20%,95%)', foreground: 'hsl(20,10%,46%)' },
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background: hsl(40,33%,98%); font-family: system-ui, -apple-system, sans-serif; }
+  .label { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: hsl(20,10%,46%); margin-bottom: 4px; }
+  .sublabel { font-size: 11px; color: hsl(20,10%,56%); margin-bottom: 12px; }
+  /* Thumbs up icon path */
+  .thu { d: path("M7.5 15h2.25m8.024-9.75c.011.05.028.1.05.148.593 1.2.925 2.55.925 3.977 0 1.45-.373 2.825-.993 4.02a.061.061 0 01-.067.03A9.956 9.956 0 0112 15.75c-2.257 0-4.334.75-6.005 2.013a.06.06 0 01-.067-.032A9.958 9.958 0 014.925 13.7c0-1.427.332-2.777.925-3.977a.227.227 0 00.05-.148c0-.088-.013-.175-.04-.26-.22-.689-.348-1.42-.348-2.18 0-3.665 2.685-6.68 6.188-6.888a6.86 6.86 0 011.6 0c3.503.208 6.188 3.223 6.188 6.888 0 .76-.128 1.491-.349 2.18a.723.723 0 00-.039.26z"); }
+</style>
+</head>
+<body class="p-6 max-w-2xl mx-auto space-y-8">
+
+<h1 class="text-2xl font-bold text-foreground mb-1">Thumbs Color Treatments</h1>
+<p class="text-sm text-muted-foreground mb-8">Same metrics column, different color strategies for the vote icons. Shown at three data points: all positive, mixed, mostly negative.</p>
+
+<!-- Helper: reusable ring SVG -->
+<!-- I'll inline minimal rings to keep it focused on the thumbs -->
+
+<!-- ============================================================ -->
+<!-- T1: Current — green always, slate always -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">T1 / Current — Static Colors</div>
+  <p class="sublabel">Thumbs up always emerald, thumbs down always slate. Clean but the down count doesn't "activate" when it has votes.</p>
+
+  <div class="flex gap-6">
+    <!-- All positive -->
+    <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+      <div class="px-3 py-3 flex flex-col items-center gap-2">
+        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">+3 / -0</p>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-emerald-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+            <span class="text-xs font-bold">3</span>
+          </div>
+          <div class="flex items-center gap-1 text-slate-400">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+            <span class="text-xs font-bold">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mixed -->
+    <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-3 py-3 flex flex-col items-center gap-2">
+        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">+3 / -1</p>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-emerald-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+            <span class="text-xs font-bold">3</span>
+          </div>
+          <div class="flex items-center gap-1 text-slate-400">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+            <span class="text-xs font-bold">1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mostly negative -->
+    <div class="rounded-xl bg-card shadow-sm border border-red-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+      <div class="px-3 py-3 flex flex-col items-center gap-2">
+        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">+1 / -3</p>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-emerald-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+            <span class="text-xs font-bold">1</span>
+          </div>
+          <div class="flex items-center gap-1 text-slate-400">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+            <span class="text-xs font-bold">3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="border-black/5 my-8">
+
+<!-- ============================================================ -->
+<!-- T2: Activate on count — slate when 0, red when > 0 -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">T2 / Activate on Count</div>
+  <p class="sublabel">Thumbs down stays slate at 0, turns rose/red the moment it gets a vote. Thumbs up always emerald. The down "wakes up" when it matters.</p>
+
+  <div class="flex gap-6">
+    <!-- All positive -->
+    <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+      <div class="px-3 py-3 flex flex-col items-center gap-2">
+        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">+3 / -0</p>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-emerald-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+            <span class="text-xs font-bold">3</span>
+          </div>
+          <div class="flex items-center gap-1 text-slate-300">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+            <span class="text-xs font-bold">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mixed -->
+    <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-3 py-3 flex flex-col items-center gap-2">
+        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">+3 / -1</p>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-emerald-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+            <span class="text-xs font-bold">3</span>
+          </div>
+          <div class="flex items-center gap-1 text-rose-500">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+            <span class="text-xs font-bold">1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mostly negative -->
+    <div class="rounded-xl bg-card shadow-sm border border-red-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+      <div class="px-3 py-3 flex flex-col items-center gap-2">
+        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">+1 / -3</p>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-emerald-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+            <span class="text-xs font-bold">1</span>
+          </div>
+          <div class="flex items-center gap-1 text-rose-500">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+            <span class="text-xs font-bold">3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="border-black/5 my-8">
+
+<!-- ============================================================ -->
+<!-- T3: Both activate — muted when 0, colored when > 0 -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">T3 / Both Activate</div>
+  <p class="sublabel">Both icons start muted (slate-300). Each "turns on" only when it has votes. Symmetrical logic.</p>
+
+  <div class="flex gap-6">
+    <!-- All positive -->
+    <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+      <div class="px-3 py-3 flex flex-col items-center gap-2">
+        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">+3 / -0</p>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-emerald-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+            <span class="text-xs font-bold">3</span>
+          </div>
+          <div class="flex items-center gap-1 text-slate-300">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+            <span class="text-xs font-bold">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mixed -->
+    <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-3 py-3 flex flex-col items-center gap-2">
+        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">+3 / -1</p>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-emerald-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+            <span class="text-xs font-bold">3</span>
+          </div>
+          <div class="flex items-center gap-1 text-rose-500">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+            <span class="text-xs font-bold">1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mostly negative -->
+    <div class="rounded-xl bg-card shadow-sm border border-red-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+      <div class="px-3 py-3 flex flex-col items-center gap-2">
+        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">+1 / -3</p>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-emerald-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+            <span class="text-xs font-bold">1</span>
+          </div>
+          <div class="flex items-center gap-1 text-rose-500">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+            <span class="text-xs font-bold">3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="border-black/5 my-8">
+
+<!-- ============================================================ -->
+<!-- T4: Always colored — emerald + rose permanently -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">T4 / Always Colored</div>
+  <p class="sublabel">Both always have their colors regardless of count. Green up, rose down. Straightforward, YouTube-style.</p>
+
+  <div class="flex gap-6">
+    <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+      <div class="px-3 py-3 flex flex-col items-center gap-2">
+        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">+3 / -0</p>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-emerald-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+            <span class="text-xs font-bold">3</span>
+          </div>
+          <div class="flex items-center gap-1 text-rose-400">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+            <span class="text-xs font-bold">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-3 py-3 flex flex-col items-center gap-2">
+        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">+3 / -1</p>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-emerald-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+            <span class="text-xs font-bold">3</span>
+          </div>
+          <div class="flex items-center gap-1 text-rose-500">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+            <span class="text-xs font-bold">1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl bg-card shadow-sm border border-red-100 overflow-hidden flex-1">
+      <div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+      <div class="px-3 py-3 flex flex-col items-center gap-2">
+        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">+1 / -3</p>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-emerald-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 01-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665 8.97 8.97 0 00.654 3.375z"/></svg>
+            <span class="text-xs font-bold">1</span>
+          </div>
+          <div class="flex items-center gap-1 text-rose-500">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715A12.137 12.137 0 012.25 12.25c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"/></svg>
+            <span class="text-xs font-bold">3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="border-black/5 my-8">
+
+<!-- ============================================================ -->
+<!-- SUMMARY TABLE -->
+<!-- ============================================================ -->
+<div class="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+  <table class="w-full text-xs">
+    <thead>
+      <tr class="border-b border-zinc-100">
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground"></th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Thumbs Up</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Thumbs Down (0 votes)</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Thumbs Down (&gt;0 votes)</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Vibe</th>
+      </tr>
+    </thead>
+    <tbody class="text-foreground">
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">T1 (current)</td>
+        <td class="px-3 py-2 text-emerald-600 font-semibold">Always emerald</td>
+        <td class="px-3 py-2 text-slate-400 font-semibold">Slate-400</td>
+        <td class="px-3 py-2 text-slate-400 font-semibold">Slate-400</td>
+        <td class="px-3 py-2 text-muted-foreground">Neutral &mdash; down never draws attention</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">T2 (activate)</td>
+        <td class="px-3 py-2 text-emerald-600 font-semibold">Always emerald</td>
+        <td class="px-3 py-2 text-slate-300 font-semibold">Slate-300 (dimmer)</td>
+        <td class="px-3 py-2 text-rose-500 font-semibold">Rose-500</td>
+        <td class="px-3 py-2 text-muted-foreground">Down "wakes up" when it matters</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">T3 (both activate)</td>
+        <td class="px-3 py-2 font-semibold"><span class="text-slate-300">Slate-300</span> &rarr; <span class="text-emerald-600">emerald</span></td>
+        <td class="px-3 py-2 text-slate-300 font-semibold">Slate-300</td>
+        <td class="px-3 py-2 text-rose-500 font-semibold">Rose-500</td>
+        <td class="px-3 py-2 text-muted-foreground">Symmetrical &mdash; both earn their color</td>
+      </tr>
+      <tr>
+        <td class="px-3 py-2 font-bold">T4 (always colored)</td>
+        <td class="px-3 py-2 text-emerald-600 font-semibold">Always emerald</td>
+        <td class="px-3 py-2 text-rose-400 font-semibold">Rose-400 (lighter)</td>
+        <td class="px-3 py-2 text-rose-500 font-semibold">Rose-500</td>
+        <td class="px-3 py-2 text-muted-foreground">YouTube-style &mdash; always obvious what each is</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

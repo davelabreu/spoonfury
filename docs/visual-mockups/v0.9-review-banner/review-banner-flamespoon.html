@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flaming Spoon CTA — Variations</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwindcss.config = {
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(40,33%,98%)',
+        foreground: 'hsl(20,14%,8%)',
+        card: 'hsl(0,0%,100%)',
+        muted: { DEFAULT: 'hsl(35,20%,95%)', foreground: 'hsl(20,10%,46%)' },
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background: hsl(40,33%,98%); font-family: system-ui, -apple-system, sans-serif; }
+  .label { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: hsl(20,10%,46%); margin-bottom: 4px; }
+  .sublabel { font-size: 11px; color: hsl(20,10%,56%); margin-bottom: 16px; line-height: 1.5; }
+
+  /* ===== FLAME ANIMATIONS ===== */
+
+  @keyframes flicker-fast {
+    0%, 100% { opacity: 1; transform: scaleY(1); }
+    25% { opacity: 0.8; transform: scaleY(0.95); }
+    50% { opacity: 0.6; transform: scaleY(1.05); }
+    75% { opacity: 0.9; transform: scaleY(0.98); }
+  }
+
+  @keyframes flicker-slow {
+    0%, 100% { opacity: 0.7; transform: scaleY(1) rotate(0deg); }
+    33% { opacity: 0.5; transform: scaleY(1.08) rotate(-2deg); }
+    66% { opacity: 0.8; transform: scaleY(0.94) rotate(2deg); }
+  }
+
+  @keyframes flame-dance {
+    0%, 100% { transform: translateY(0) scaleX(1); }
+    25% { transform: translateY(-1px) scaleX(0.95); }
+    50% { transform: translateY(-2px) scaleX(1.05); }
+    75% { transform: translateY(-1px) scaleX(0.97); }
+  }
+
+  @keyframes ember-float {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-12px) scale(0.3); opacity: 0; }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { filter: drop-shadow(0 0 3px rgba(245,158,11,0.3)); }
+    50% { filter: drop-shadow(0 0 8px rgba(245,158,11,0.6)); }
+  }
+
+  /* Shared spoon base */
+  .spoon-icon {
+    transition: all 0.3s ease;
+  }
+
+  /* ===== F1: Layered SVG Tendrils ===== */
+  .f1-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .f1-wrap:hover { transform: scale(1.3); }
+  .f1-wrap .flame-layer { position: absolute; pointer-events: none; opacity: 0; transition: opacity 0.2s ease; }
+  .f1-wrap:hover .flame-layer { opacity: 1; }
+  .f1-wrap:hover .spoon-icon { color: #d97706; filter: drop-shadow(0 0 5px #f59e0b); }
+  .f1-inner { animation: flicker-fast 0.3s infinite; transform-origin: bottom center; }
+  .f1-outer { animation: flicker-slow 0.5s infinite; transform-origin: bottom center; }
+
+  /* ===== F2: Emoji Flames + Scale ===== */
+  .f2-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .f2-wrap:hover { transform: scale(1.35); }
+  .f2-flames { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); pointer-events: none; opacity: 0; transition: opacity 0.15s ease; font-size: 14px; line-height: 1; }
+  .f2-wrap:hover .f2-flames { opacity: 1; animation: flame-dance 0.4s infinite; }
+  .f2-wrap:hover .spoon-icon { color: #d97706; filter: drop-shadow(0 0 6px #f59e0b); }
+
+  /* ===== F3: Gradient Glow Aura ===== */
+  .f3-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .f3-wrap:hover { transform: scale(1.25); }
+  .f3-aura { position: absolute; inset: -6px; border-radius: 50%; background: radial-gradient(circle, rgba(249,115,22,0.4) 0%, rgba(245,158,11,0.2) 40%, transparent 70%); pointer-events: none; opacity: 0; transition: opacity 0.3s ease; }
+  .f3-wrap:hover .f3-aura { opacity: 1; animation: glow-pulse 1s infinite; }
+  .f3-wrap:hover .spoon-icon { color: #ea580c; filter: drop-shadow(0 0 4px #f97316); }
+
+  /* ===== F4: Rising Embers ===== */
+  .f4-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .f4-wrap:hover { transform: scale(1.3); }
+  .f4-embers { position: absolute; top: -4px; pointer-events: none; }
+  .f4-embers span { position: absolute; width: 3px; height: 3px; border-radius: 50%; opacity: 0; }
+  .f4-wrap:hover .f4-embers span { animation: ember-float 0.8s infinite; }
+  .f4-wrap:hover .f4-embers span:nth-child(1) { left: 4px; background: #f59e0b; animation-delay: 0s; }
+  .f4-wrap:hover .f4-embers span:nth-child(2) { left: 10px; background: #f97316; animation-delay: 0.2s; }
+  .f4-wrap:hover .f4-embers span:nth-child(3) { left: 7px; background: #ef4444; animation-delay: 0.4s; width: 2px; height: 2px; }
+  .f4-wrap:hover .f4-embers span:nth-child(4) { left: 2px; background: #fbbf24; animation-delay: 0.6s; width: 2px; height: 2px; }
+  .f4-wrap:hover .spoon-icon { color: #d97706; filter: drop-shadow(0 0 5px #f59e0b); }
+
+  /* ===== F5: Full Combo (Tendrils + Embers + Glow) ===== */
+  .f5-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .f5-wrap:hover { transform: scale(1.35); }
+  .f5-wrap .flame-layer { position: absolute; pointer-events: none; opacity: 0; transition: opacity 0.2s ease; }
+  .f5-wrap:hover .flame-layer { opacity: 1; }
+  .f5-wrap .f5-aura { position: absolute; inset: -8px; border-radius: 50%; background: radial-gradient(circle, rgba(249,115,22,0.35) 0%, rgba(245,158,11,0.15) 50%, transparent 70%); pointer-events: none; opacity: 0; transition: opacity 0.3s ease; }
+  .f5-wrap:hover .f5-aura { opacity: 1; }
+  .f5-wrap:hover .spoon-icon { color: #d97706; filter: drop-shadow(0 0 6px #f59e0b); }
+
+  /* CTA button shared */
+  .cta-btn {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    border: 1px solid rgba(245,158,11,0.3); background: rgba(255,251,235,0.5);
+    color: #d97706; padding: 4px 12px; border-radius: 6px; backdrop-filter: blur(4px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.3s;
+  }
+  .cta-btn:hover { background: #f59e0b; color: white; box-shadow: 0 0 15px rgba(245,158,11,0.4); }
+
+  /* Demo card container */
+  .demo-row { display: flex; align-items: center; gap: 12px; padding: 16px 20px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; }
+  .demo-hint { font-size: 10px; color: hsl(20,10%,56%); margin-left: auto; font-style: italic; }
+</style>
+</head>
+<body class="p-6 max-w-2xl mx-auto space-y-8">
+
+<h1 class="text-2xl font-bold text-foreground mb-1">Flaming Spoon CTA</h1>
+<p class="text-sm text-muted-foreground mb-2">Hover each spoon to see the flame effect. Five variations from subtle to full combo.</p>
+<p class="text-xs text-amber-600 font-semibold mb-8">Hover the spoon area &mdash; not the button &mdash; to see the flame animation.</p>
+
+<!-- F1: Layered SVG Tendrils -->
+<div>
+  <div class="label">F1 / Layered SVG Tendrils</div>
+  <p class="sublabel">Two flame paths at different speeds wrap around the spoon. Inner flame flickers fast, outer flame dances slow. Scale 1.3x on hover.</p>
+  <div class="demo-row">
+    <div class="f1-wrap" style="width:36px;height:36px;">
+      <!-- Spoon -->
+      <svg class="spoon-icon" style="color:#94a3b8;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z"/>
+        <path d="M15.5 12L12 22"/>
+      </svg>
+      <!-- Inner flame -->
+      <div class="flame-layer f1-inner" style="top:-6px;left:50%;transform:translateX(-50%);">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C12 2 10 5 10 7.5C10 10 11.5 11 12 11.5C12.5 11 14 10 14 7.5C14 5 12 2 12 2Z" fill="#f97316" opacity="0.9"/>
+          <path d="M10 8C10 8 9 10 9.5 12C10 14 12 15 12 15C12 15 14 14 14.5 12C15 10 14 8 14 8" fill="#fbbf24" opacity="0.7"/>
+        </svg>
+      </div>
+      <!-- Outer flame -->
+      <div class="flame-layer f1-outer" style="top:-10px;left:50%;transform:translateX(-50%);">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+          <path d="M12 1C12 1 8 5 8 9C8 13 12 16 12 16C12 16 16 13 16 9C16 5 12 1 12 1Z" fill="#ef4444" opacity="0.35"/>
+        </svg>
+      </div>
+    </div>
+    <span class="cta-btn">Cast Your Vote</span>
+    <span class="demo-hint">SVG paths, flicker keyframes</span>
+  </div>
+</div>
+
+<!-- F2: Emoji Flames + Scale -->
+<div>
+  <div class="label">F2 / Emoji Flames + Dance</div>
+  <p class="sublabel">Uses the actual fire emoji floating above the spoon with a dancing wobble. Dead simple, surprisingly effective. Scale 1.35x.</p>
+  <div class="demo-row">
+    <div class="f2-wrap" style="width:36px;height:36px;">
+      <svg class="spoon-icon" style="color:#94a3b8;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z"/>
+        <path d="M15.5 12L12 22"/>
+      </svg>
+      <div class="f2-flames">🔥</div>
+    </div>
+    <span class="cta-btn">Cast Your Vote</span>
+    <span class="demo-hint">Native emoji, CSS dance</span>
+  </div>
+</div>
+
+<!-- F3: Gradient Glow Aura -->
+<div>
+  <div class="label">F3 / Radial Glow Aura</div>
+  <p class="sublabel">No visible flames. Just a pulsing radial gradient that makes the spoon look like it's radiating heat. Understated but premium. Scale 1.25x.</p>
+  <div class="demo-row">
+    <div class="f3-wrap" style="width:36px;height:36px;">
+      <div class="f3-aura"></div>
+      <svg class="spoon-icon" style="color:#94a3b8;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z"/>
+        <path d="M15.5 12L12 22"/>
+      </svg>
+    </div>
+    <span class="cta-btn">Cast Your Vote</span>
+    <span class="demo-hint">Radial gradient, pulsing glow</span>
+  </div>
+</div>
+
+<!-- F4: Rising Embers -->
+<div>
+  <div class="label">F4 / Rising Embers</div>
+  <p class="sublabel">Tiny colored dots float upward like sparks off the spoon. Feels alive without being loud. Scale 1.3x.</p>
+  <div class="demo-row">
+    <div class="f4-wrap" style="width:36px;height:36px;">
+      <svg class="spoon-icon" style="color:#94a3b8;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z"/>
+        <path d="M15.5 12L12 22"/>
+      </svg>
+      <div class="f4-embers">
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+    <span class="cta-btn">Cast Your Vote</span>
+    <span class="demo-hint">Floating dots, staggered delay</span>
+  </div>
+</div>
+
+<!-- F5: Full Combo -->
+<div>
+  <div class="label">F5 / Full Combo</div>
+  <p class="sublabel">Everything: SVG tendrils + radial glow aura + rising embers. Maximum "this spoon is on fire" energy. Scale 1.35x.</p>
+  <div class="demo-row">
+    <div class="f5-wrap" style="width:36px;height:36px;">
+      <div class="f5-aura"></div>
+      <svg class="spoon-icon" style="color:#94a3b8;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15.5 2C13 2 12 4.5 12 7c0 3 2 5 3.5 5S19 10 19 7c0-2.5-1-5-3.5-5z"/>
+        <path d="M15.5 12L12 22"/>
+      </svg>
+      <!-- Inner flame -->
+      <div class="flame-layer f1-inner" style="top:-6px;left:50%;transform:translateX(-50%);">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C12 2 10 5 10 7.5C10 10 11.5 11 12 11.5C12.5 11 14 10 14 7.5C14 5 12 2 12 2Z" fill="#f97316" opacity="0.9"/>
+          <path d="M10 8C10 8 9 10 9.5 12C10 14 12 15 12 15C12 15 14 14 14.5 12C15 10 14 8 14 8" fill="#fbbf24" opacity="0.7"/>
+        </svg>
+      </div>
+      <!-- Outer flame -->
+      <div class="flame-layer f1-outer" style="top:-10px;left:50%;transform:translateX(-50%);">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+          <path d="M12 1C12 1 8 5 8 9C8 13 12 16 12 16C12 16 16 13 16 9C16 5 12 1 12 1Z" fill="#ef4444" opacity="0.3"/>
+        </svg>
+      </div>
+      <!-- Embers -->
+      <div class="f4-embers" style="top:-4px;">
+        <span style="left:4px;background:#f59e0b;width:3px;height:3px;border-radius:50%;position:absolute;opacity:0;animation:ember-float 0.8s infinite 0s;"></span>
+        <span style="left:10px;background:#f97316;width:3px;height:3px;border-radius:50%;position:absolute;opacity:0;animation:ember-float 0.8s infinite 0.2s;"></span>
+        <span style="left:7px;background:#ef4444;width:2px;height:2px;border-radius:50%;position:absolute;opacity:0;animation:ember-float 0.8s infinite 0.4s;"></span>
+      </div>
+    </div>
+    <span class="cta-btn">Cast Your Vote</span>
+    <span class="demo-hint">Tendrils + glow + embers</span>
+  </div>
+</div>
+
+<!-- Comparison -->
+<div class="rounded-xl border border-zinc-200 bg-white overflow-hidden mt-8">
+  <table class="w-full text-xs">
+    <thead>
+      <tr class="border-b border-zinc-100">
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground"></th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Technique</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Scale</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Complexity</th>
+        <th class="text-left px-3 py-2 font-bold text-muted-foreground">Vibe</th>
+      </tr>
+    </thead>
+    <tbody class="text-foreground">
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">F1 Tendrils</td>
+        <td class="px-3 py-2">Layered SVG paths</td>
+        <td class="px-3 py-2">1.3x</td>
+        <td class="px-3 py-2 text-amber-600">Medium</td>
+        <td class="px-3 py-2 text-muted-foreground">Campfire / organic</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">F2 Emoji</td>
+        <td class="px-3 py-2">Native emoji + CSS dance</td>
+        <td class="px-3 py-2">1.35x</td>
+        <td class="px-3 py-2 text-emerald-600">Low</td>
+        <td class="px-3 py-2 text-muted-foreground">Playful / Spoonfury brand</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">F3 Glow</td>
+        <td class="px-3 py-2">Radial gradient + pulse</td>
+        <td class="px-3 py-2">1.25x</td>
+        <td class="px-3 py-2 text-emerald-600">Low</td>
+        <td class="px-3 py-2 text-muted-foreground">Heat haze / premium</td>
+      </tr>
+      <tr class="border-b border-zinc-50">
+        <td class="px-3 py-2 font-bold">F4 Embers</td>
+        <td class="px-3 py-2">Floating dots</td>
+        <td class="px-3 py-2">1.3x</td>
+        <td class="px-3 py-2 text-emerald-600">Low</td>
+        <td class="px-3 py-2 text-muted-foreground">Sparks / alive</td>
+      </tr>
+      <tr>
+        <td class="px-3 py-2 font-bold">F5 Full Combo</td>
+        <td class="px-3 py-2">Tendrils + glow + embers</td>
+        <td class="px-3 py-2">1.35x</td>
+        <td class="px-3 py-2 text-red-500">High</td>
+        <td class="px-3 py-2 text-muted-foreground">Maximum drama</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

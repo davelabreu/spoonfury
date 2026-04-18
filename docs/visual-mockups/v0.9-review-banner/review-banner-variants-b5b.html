@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Banner — B5b Steam Ring Explorations</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwindcss.config = {
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(40,33%,98%)',
+        foreground: 'hsl(20,14%,8%)',
+        card: 'hsl(0,0%,100%)',
+        muted: { DEFAULT: 'hsl(35,20%,95%)', foreground: 'hsl(20,10%,46%)' },
+        saffron: { DEFAULT: 'hsl(24,80%,50%)', dark: 'hsl(24,80%,42%)' },
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background: hsl(40,33%,98%); font-family: system-ui, -apple-system, sans-serif; }
+  .label { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: hsl(20,10%,46%); margin-bottom: 4px; }
+  .sublabel { font-size: 11px; color: hsl(20,10%,56%); margin-bottom: 12px; }
+
+  @keyframes ring-pulse {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(99,102,241,0)); }
+    50% { filter: drop-shadow(0 0 6px rgba(99,102,241,0.25)); }
+  }
+  @keyframes ring-pulse-green {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(16,185,129,0)); }
+    50% { filter: drop-shadow(0 0 6px rgba(16,185,129,0.25)); }
+  }
+  @keyframes ring-pulse-violet {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(139,92,246,0)); }
+    50% { filter: drop-shadow(0 0 6px rgba(139,92,246,0.25)); }
+  }
+  @keyframes ring-pulse-amber {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(245,158,11,0)); }
+    50% { filter: drop-shadow(0 0 6px rgba(245,158,11,0.25)); }
+  }
+  @keyframes ring-pulse-red {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(239,68,68,0)); }
+    50% { filter: drop-shadow(0 0 6px rgba(239,68,68,0.25)); }
+  }
+  .ring-glow-indigo { animation: ring-pulse 2.5s ease-in-out infinite; }
+  .ring-glow-green { animation: ring-pulse-green 2.5s ease-in-out infinite; }
+  .ring-glow-violet { animation: ring-pulse-violet 2.5s ease-in-out infinite; }
+  .ring-glow-amber { animation: ring-pulse-amber 2.5s ease-in-out infinite; }
+  .ring-glow-red { animation: ring-pulse-red 2.5s ease-in-out infinite; }
+  .ring-animate { transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+</style>
+</head>
+<body class="p-6 max-w-2xl mx-auto space-y-10">
+
+<h1 class="text-2xl font-bold text-foreground mb-1">B5b — Steam Ring Explorations</h1>
+<p class="text-sm text-muted-foreground mb-8">Large ring with percentage + encouraging Steam-style tier phrase. Each variant tries a different way to present the sentiment text and HUD energy.</p>
+
+<!-- ============================================================ -->
+<!-- TIER REFERENCE -->
+<!-- ============================================================ -->
+<div class="rounded-lg border border-zinc-200 bg-white px-4 py-3 text-xs text-muted-foreground mb-6">
+  <span class="font-bold text-foreground">Tier reference:</span>
+  95-100% Overwhelmingly Positive &middot;
+  80-94% Very Positive &middot;
+  70-79% Mostly Positive &middot;
+  40-69% Mixed &middot;
+  &lt;40% Needs Work
+</div>
+
+<!-- ============================================================ -->
+<!-- S1: Ring with sub-label inside -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">S1 / Label Inside Ring</div>
+  <p class="sublabel">Percentage + tiny "APPROVAL" text stacked inside the ring. Steam phrase lives in the text area. Clean separation.</p>
+
+  <div class="space-y-3">
+    <!-- 100% — Overwhelmingly Positive -->
+    <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+      <div class="px-4 py-4 flex items-center gap-5">
+        <div class="relative h-16 w-16 shrink-0 ring-glow-indigo">
+          <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e0e7ff" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s1-indigo)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0" class="ring-animate"/>
+            <defs><linearGradient id="s1-indigo" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-base font-black text-indigo-600 leading-none">100<span class="text-[8px]">%</span></span>
+            <span class="text-[7px] font-bold uppercase tracking-widest text-indigo-400 mt-0.5">approval</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-foreground">Community Review</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span>
+            </div>
+            <a href="#" class="text-xs font-semibold text-indigo-500 underline underline-offset-2">Cast your vote</a>
+          </div>
+          <p class="text-xs font-semibold text-indigo-600">Overwhelmingly Positive</p>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold text-emerald-700">+2 approve</span>
+            <span class="font-semibold text-red-600">-0 need work</span>
+            <span class="text-[11px] ml-auto text-muted-foreground">2 of 3 min votes</span>
+          </div>
+          <p class="text-[11px] text-muted-foreground">Needs 1 more vote (min 3) and 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 75% — Mostly Positive -->
+    <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-4 py-4 flex items-center gap-5">
+        <div class="relative h-16 w-16 shrink-0 ring-glow-amber">
+          <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#fef3c7" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s1-amber)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="24" class="ring-animate"/>
+            <defs><linearGradient id="s1-amber" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-base font-black text-amber-600 leading-none">75<span class="text-[8px]">%</span></span>
+            <span class="text-[7px] font-bold uppercase tracking-widest text-amber-400 mt-0.5">approval</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-foreground">Community Review</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Round 2</span>
+            </div>
+            <a href="#" class="text-xs font-semibold text-amber-600 underline underline-offset-2">Cast your vote</a>
+          </div>
+          <p class="text-xs font-semibold text-amber-600">Mostly Positive</p>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold text-emerald-700">+3 approve</span>
+            <span class="font-semibold text-red-600">-1 need work</span>
+            <span class="text-[11px] ml-auto text-muted-foreground">4 votes in</span>
+          </div>
+          <p class="text-[11px] text-muted-foreground">Needs 80% approval to advance &mdash; currently at 75%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 33% — Needs Work -->
+    <div class="rounded-xl bg-card shadow-sm border border-red-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+      <div class="px-4 py-4 flex items-center gap-5">
+        <div class="relative h-16 w-16 shrink-0 ring-glow-red">
+          <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#fee2e2" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s1-red)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="65" class="ring-animate"/>
+            <defs><linearGradient id="s1-red" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#f87171"/></linearGradient></defs>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-base font-black text-red-500 leading-none">33<span class="text-[8px]">%</span></span>
+            <span class="text-[7px] font-bold uppercase tracking-widest text-red-300 mt-0.5">approval</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-foreground">Community Review</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-100 text-red-700">Round 1</span>
+            </div>
+            <a href="#" class="text-xs font-semibold text-red-500 underline underline-offset-2">Cast your vote</a>
+          </div>
+          <p class="text-xs font-semibold text-red-500">Needs a Tweak</p>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold text-emerald-700">+1 approve</span>
+            <span class="font-semibold text-red-600">-2 need work</span>
+            <span class="text-[11px] ml-auto text-muted-foreground">3 votes in</span>
+          </div>
+          <p class="text-[11px] text-muted-foreground">Needs 80% approval to advance &mdash; currently at 33%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="border-black/5 my-8">
+
+<!-- ============================================================ -->
+<!-- S2: Phrase inside ring, % above -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">S2 / Phrase Under Ring</div>
+  <p class="sublabel">Percentage inside ring. Steam phrase sits below the ring as a standalone caption. More "badge with label" energy.</p>
+
+  <div class="space-y-3">
+    <!-- 100% -->
+    <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+      <div class="px-4 py-4 flex items-center gap-5">
+        <div class="flex flex-col items-center gap-1 shrink-0">
+          <div class="relative h-14 w-14 ring-glow-indigo">
+            <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e0e7ff" stroke-width="2"/>
+              <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s2-indigo)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0" class="ring-animate"/>
+              <defs><linearGradient id="s2-indigo" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span class="text-sm font-black text-indigo-600 leading-none">100<span class="text-[8px]">%</span></span>
+            </div>
+          </div>
+          <span class="text-[8px] font-bold uppercase tracking-widest text-indigo-500 text-center leading-tight max-w-[60px]">Overwhelmingly Positive</span>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-foreground">Community Review</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span>
+            </div>
+            <a href="#" class="text-xs font-semibold text-indigo-500 underline underline-offset-2">Cast your vote</a>
+          </div>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold text-emerald-700">+2 approve</span>
+            <span class="font-semibold text-red-600">-0 need work</span>
+            <span class="text-[11px] ml-auto text-muted-foreground">2 of 3 min votes</span>
+          </div>
+          <p class="text-[11px] text-muted-foreground">Needs 1 more vote (min 3) and 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 75% -->
+    <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-4 py-4 flex items-center gap-5">
+        <div class="flex flex-col items-center gap-1 shrink-0">
+          <div class="relative h-14 w-14 ring-glow-amber">
+            <svg class="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.5" fill="none" stroke="#fef3c7" stroke-width="2"/>
+              <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s2-amber)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="24" class="ring-animate"/>
+              <defs><linearGradient id="s2-amber" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span class="text-sm font-black text-amber-600 leading-none">75<span class="text-[8px]">%</span></span>
+            </div>
+          </div>
+          <span class="text-[8px] font-bold uppercase tracking-widest text-amber-500 text-center leading-tight max-w-[60px]">Mostly Positive</span>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-foreground">Community Review</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Round 2</span>
+            </div>
+            <a href="#" class="text-xs font-semibold text-amber-600 underline underline-offset-2">Cast your vote</a>
+          </div>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold text-emerald-700">+3 approve</span>
+            <span class="font-semibold text-red-600">-1 need work</span>
+            <span class="text-[11px] ml-auto text-muted-foreground">4 votes in</span>
+          </div>
+          <p class="text-[11px] text-muted-foreground">Needs 80% approval to advance &mdash; currently at 75%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="border-black/5 my-8">
+
+<!-- ============================================================ -->
+<!-- S3: HUD style — dark glassmorphism -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">S3 / HUD Glassmorphism</div>
+  <p class="sublabel">Dark frosted card. Neon-tinted ring and text. Full Steam energy. "APPROVAL" inside ring, tier phrase as headline.</p>
+
+  <div class="space-y-3">
+    <!-- 100% -->
+    <div class="rounded-xl overflow-hidden border border-white/[0.06]" style="background: linear-gradient(135deg, rgba(30,27,46,0.92), rgba(22,20,36,0.96)); backdrop-filter: blur(12px);">
+      <div class="h-[2px] bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400"></div>
+      <div class="px-5 py-4 flex items-center gap-5">
+        <div class="relative h-16 w-16 shrink-0" style="filter: drop-shadow(0 0 8px rgba(129,140,248,0.3));">
+          <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s3-indigo)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0" class="ring-animate"/>
+            <defs><linearGradient id="s3-indigo" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#818cf8"/><stop offset="100%" stop-color="#c084fc"/></linearGradient></defs>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-base font-black leading-none" style="color: #a5b4fc;">100<span class="text-[8px]">%</span></span>
+            <span class="text-[7px] font-bold uppercase tracking-widest mt-0.5" style="color: rgba(165,180,252,0.5);">approval</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold" style="color: #e0e7ff;">Overwhelmingly Positive</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style="background: rgba(129,140,248,0.15); color: #a5b4fc;">Round 1</span>
+            </div>
+            <a href="#" class="text-xs font-semibold underline underline-offset-2" style="color: #818cf8;">Cast your vote</a>
+          </div>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold" style="color: #6ee7b7;">+2 approve</span>
+            <span class="font-semibold" style="color: #fca5a5;">-0 need work</span>
+            <span class="text-[11px] ml-auto" style="color: rgba(255,255,255,0.35);">2 of 3 min votes</span>
+          </div>
+          <p class="text-[11px]" style="color: rgba(255,255,255,0.3);">Needs 1 more vote (min 3) and 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 85% — Very Positive -->
+    <div class="rounded-xl overflow-hidden border border-white/[0.06]" style="background: linear-gradient(135deg, rgba(30,27,46,0.92), rgba(22,20,36,0.96)); backdrop-filter: blur(12px);">
+      <div class="h-[2px] bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-300"></div>
+      <div class="px-5 py-4 flex items-center gap-5">
+        <div class="relative h-16 w-16 shrink-0" style="filter: drop-shadow(0 0 8px rgba(52,211,153,0.3));">
+          <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s3-green)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0" class="ring-animate"/>
+            <defs><linearGradient id="s3-green" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#2dd4bf"/></linearGradient></defs>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-base font-black leading-none" style="color: #6ee7b7;">85<span class="text-[8px]">%</span></span>
+            <span class="text-[7px] font-bold uppercase tracking-widest mt-0.5" style="color: rgba(110,231,183,0.5);">approval</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold" style="color: #d1fae5;">Very Positive</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style="background: rgba(52,211,153,0.15); color: #6ee7b7;">Round 1</span>
+            </div>
+            <span class="text-xs font-semibold" style="color: rgba(110,231,183,0.6);">&#10003; You voted</span>
+          </div>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold" style="color: #6ee7b7;">+6 approve</span>
+            <span class="font-semibold" style="color: #fca5a5;">-1 need work</span>
+            <span class="text-[11px] ml-auto" style="color: rgba(255,255,255,0.35);">7 votes in</span>
+          </div>
+          <p class="text-[11px]" style="color: rgba(255,255,255,0.3);">80% approval reached &mdash; awaiting moderator review</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 50% — Mixed -->
+    <div class="rounded-xl overflow-hidden border border-white/[0.06]" style="background: linear-gradient(135deg, rgba(30,27,46,0.92), rgba(22,20,36,0.96)); backdrop-filter: blur(12px);">
+      <div class="h-[2px] bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-5 py-4 flex items-center gap-5">
+        <div class="relative h-16 w-16 shrink-0" style="filter: drop-shadow(0 0 8px rgba(251,191,36,0.3));">
+          <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s3-amber)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="49" class="ring-animate"/>
+            <defs><linearGradient id="s3-amber" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient></defs>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-base font-black leading-none" style="color: #fbbf24;">50<span class="text-[8px]">%</span></span>
+            <span class="text-[7px] font-bold uppercase tracking-widest mt-0.5" style="color: rgba(251,191,36,0.5);">approval</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold" style="color: #fef3c7;">Acquired Taste</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style="background: rgba(251,191,36,0.15); color: #fbbf24;">Round 2</span>
+            </div>
+            <a href="#" class="text-xs font-semibold underline underline-offset-2" style="color: #fbbf24;">Cast your vote</a>
+          </div>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold" style="color: #6ee7b7;">+2 approve</span>
+            <span class="font-semibold" style="color: #fca5a5;">-2 need work</span>
+            <span class="text-[11px] ml-auto" style="color: rgba(255,255,255,0.35);">4 votes in</span>
+          </div>
+          <p class="text-[11px]" style="color: rgba(255,255,255,0.3);">Needs 80% approval to advance &mdash; currently at 50%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 33% — Needs a Tweak -->
+    <div class="rounded-xl overflow-hidden border border-white/[0.06]" style="background: linear-gradient(135deg, rgba(30,27,46,0.92), rgba(22,20,36,0.96)); backdrop-filter: blur(12px);">
+      <div class="h-[2px] bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+      <div class="px-5 py-4 flex items-center gap-5">
+        <div class="relative h-16 w-16 shrink-0" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.3));">
+          <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s3-red)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="65" class="ring-animate"/>
+            <defs><linearGradient id="s3-red" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f87171"/><stop offset="100%" stop-color="#ef4444"/></linearGradient></defs>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-base font-black leading-none" style="color: #fca5a5;">33<span class="text-[8px]">%</span></span>
+            <span class="text-[7px] font-bold uppercase tracking-widest mt-0.5" style="color: rgba(252,165,165,0.5);">approval</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold" style="color: #fee2e2;">Needs a Tweak</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style="background: rgba(248,113,113,0.15); color: #fca5a5;">Round 1</span>
+            </div>
+            <a href="#" class="text-xs font-semibold underline underline-offset-2" style="color: #f87171;">Cast your vote</a>
+          </div>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold" style="color: #6ee7b7;">+1 approve</span>
+            <span class="font-semibold" style="color: #fca5a5;">-2 need work</span>
+            <span class="text-[11px] ml-auto" style="color: rgba(255,255,255,0.35);">3 votes in</span>
+          </div>
+          <p class="text-[11px]" style="color: rgba(255,255,255,0.3);">Needs 80% approval to advance &mdash; currently at 33%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="border-black/5 my-8">
+
+<!-- ============================================================ -->
+<!-- S4: Light card + Steam phrase as accent line -->
+<!-- ============================================================ -->
+<section>
+  <div class="label">S4 / Light Card + Accent Phrase Line</div>
+  <p class="sublabel">Best of both worlds — keeps the warm Spoonfury card, but the Steam phrase gets its own dedicated accent line with a subtle left-border pip. Feels like a review quote.</p>
+
+  <div class="space-y-3">
+    <!-- 100% -->
+    <div class="rounded-xl bg-card shadow-sm border border-indigo-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-indigo-500 via-violet-400 to-purple-400"></div>
+      <div class="px-4 py-4 flex items-center gap-5">
+        <div class="relative h-16 w-16 shrink-0 ring-glow-indigo">
+          <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e0e7ff" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s4-indigo)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0" class="ring-animate"/>
+            <defs><linearGradient id="s4-indigo" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-base font-black text-indigo-600 leading-none">100<span class="text-[8px]">%</span></span>
+            <span class="text-[7px] font-bold uppercase tracking-widest text-indigo-400 mt-0.5">approval</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-foreground">Community Review</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Round 1</span>
+            </div>
+            <a href="#" class="text-xs font-semibold text-indigo-500 underline underline-offset-2">Cast your vote</a>
+          </div>
+          <!-- Steam phrase accent line -->
+          <div class="flex items-center gap-2 border-l-2 border-indigo-300 pl-2.5">
+            <span class="text-xs font-bold text-indigo-600 italic">Overwhelmingly Positive</span>
+            <span class="text-[10px] text-muted-foreground">&mdash; Flawless Execution</span>
+          </div>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold text-emerald-700">+2 approve</span>
+            <span class="font-semibold text-red-600">-0 need work</span>
+            <span class="text-[11px] ml-auto text-muted-foreground">2 of 3 min votes</span>
+          </div>
+          <p class="text-[11px] text-muted-foreground">Needs 1 more vote (min 3) and 80% approval to advance</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 85% — Very Positive -->
+    <div class="rounded-xl bg-card shadow-sm border border-emerald-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400"></div>
+      <div class="px-4 py-4 flex items-center gap-5">
+        <div class="relative h-16 w-16 shrink-0 ring-glow-green">
+          <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#d1fae5" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s4-green)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0" class="ring-animate"/>
+            <defs><linearGradient id="s4-green" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient></defs>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-base font-black text-emerald-600 leading-none">85<span class="text-[8px]">%</span></span>
+            <span class="text-[7px] font-bold uppercase tracking-widest text-emerald-400 mt-0.5">approval</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-foreground">Threshold reached</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Passed</span>
+            </div>
+            <span class="text-xs font-semibold text-emerald-500">&#10003; You voted</span>
+          </div>
+          <div class="flex items-center gap-2 border-l-2 border-emerald-300 pl-2.5">
+            <span class="text-xs font-bold text-emerald-600 italic">Very Positive</span>
+            <span class="text-[10px] text-muted-foreground">&mdash; Highly Recommended</span>
+          </div>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold text-emerald-700">+6 approve</span>
+            <span class="font-semibold text-red-600">-1 need work</span>
+            <span class="text-[11px] ml-auto text-muted-foreground">7 votes in</span>
+          </div>
+          <p class="text-[11px] text-muted-foreground">80% approval reached &mdash; awaiting moderator review</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 50% — Mixed -->
+    <div class="rounded-xl bg-card shadow-sm border border-amber-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300"></div>
+      <div class="px-4 py-4 flex items-center gap-5">
+        <div class="relative h-16 w-16 shrink-0 ring-glow-amber">
+          <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#fef3c7" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s4-amber)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="49" class="ring-animate"/>
+            <defs><linearGradient id="s4-amber" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-base font-black text-amber-600 leading-none">50<span class="text-[8px]">%</span></span>
+            <span class="text-[7px] font-bold uppercase tracking-widest text-amber-400 mt-0.5">approval</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-foreground">Community Review</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Round 2</span>
+            </div>
+            <a href="#" class="text-xs font-semibold text-amber-600 underline underline-offset-2">Cast your vote</a>
+          </div>
+          <div class="flex items-center gap-2 border-l-2 border-amber-300 pl-2.5">
+            <span class="text-xs font-bold text-amber-600 italic">Acquired Taste</span>
+            <span class="text-[10px] text-muted-foreground">&mdash; Adventurous Palates Only</span>
+          </div>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold text-emerald-700">+2 approve</span>
+            <span class="font-semibold text-red-600">-2 need work</span>
+            <span class="text-[11px] ml-auto text-muted-foreground">4 votes in</span>
+          </div>
+          <p class="text-[11px] text-muted-foreground">Needs 80% approval to advance &mdash; currently at 50%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 33% — Needs a Tweak -->
+    <div class="rounded-xl bg-card shadow-sm border border-red-100 overflow-hidden">
+      <div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-300"></div>
+      <div class="px-4 py-4 flex items-center gap-5">
+        <div class="relative h-16 w-16 shrink-0 ring-glow-red">
+          <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="#fee2e2" stroke-width="2"/>
+            <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s4-red)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="65" class="ring-animate"/>
+            <defs><linearGradient id="s4-red" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#f87171"/></linearGradient></defs>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-base font-black text-red-500 leading-none">33<span class="text-[8px]">%</span></span>
+            <span class="text-[7px] font-bold uppercase tracking-widest text-red-300 mt-0.5">approval</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-foreground">Community Review</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-100 text-red-700">Round 1</span>
+            </div>
+            <a href="#" class="text-xs font-semibold text-red-500 underline underline-offset-2">Cast your vote</a>
+          </div>
+          <div class="flex items-center gap-2 border-l-2 border-red-300 pl-2.5">
+            <span class="text-xs font-bold text-red-500 italic">Needs a Tweak</span>
+            <span class="text-[10px] text-muted-foreground">&mdash; Almost There</span>
+          </div>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="font-semibold text-emerald-700">+1 approve</span>
+            <span class="font-semibold text-red-600">-2 need work</span>
+            <span class="text-[11px] ml-auto text-muted-foreground">3 votes in</span>
+          </div>
+          <p class="text-[11px] text-muted-foreground">Needs 80% approval to advance &mdash; currently at 33%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="border-black/5 my-8">
+
+<!-- ============================================================ -->
+<!-- MOD QUEUE / OWNER — S3 and S4 -->
+<!-- ============================================================ -->
+<h2 class="text-lg font-bold text-foreground mb-1">Mod Queue + Owner Views</h2>
+<p class="text-xs text-muted-foreground mb-6">Shield-check ring for mod queue. Owner-personalized copy. Shown in S3 (dark) and S4 (light).</p>
+
+<!-- S3 mod queue owner -->
+<div class="label">S3 / Owner — Mod Queue</div>
+<div class="rounded-xl overflow-hidden border border-white/[0.06] mb-4" style="background: linear-gradient(135deg, rgba(30,27,46,0.92), rgba(22,20,36,0.96)); backdrop-filter: blur(12px);">
+  <div class="h-[2px] bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400"></div>
+  <div class="px-5 py-4 flex items-center gap-5">
+    <div class="relative h-16 w-16 shrink-0" style="filter: drop-shadow(0 0 8px rgba(167,139,250,0.3));">
+      <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+        <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+        <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s3-violet)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0" class="ring-animate"/>
+        <defs><linearGradient id="s3-violet" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#c084fc"/></linearGradient></defs>
+      </svg>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <svg class="h-5 w-5" style="color: #c4b5fd;" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+    </div>
+    <div class="flex-1 space-y-1.5">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-bold" style="color: #ede9fe;">Your recipe is in the moderator queue</span>
+        <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style="background: rgba(167,139,250,0.15); color: #c4b5fd;">Mod queue</span>
+      </div>
+      <div class="flex items-center gap-2 pl-0.5">
+        <span class="text-xs italic" style="color: rgba(196,181,253,0.7);">Overwhelmingly Positive &mdash; your community loves this one</span>
+      </div>
+      <div class="flex items-center gap-4 text-sm">
+        <span class="font-semibold" style="color: #6ee7b7;">+5 approve</span>
+        <span class="font-semibold" style="color: #fca5a5;">-0 need work</span>
+        <span class="text-[11px] ml-auto" style="color: rgba(255,255,255,0.35);">100% approval</span>
+      </div>
+      <p class="text-[11px]" style="color: rgba(255,255,255,0.3);">Passed community review &mdash; a moderator will take a look soon</p>
+    </div>
+  </div>
+</div>
+
+<!-- S4 mod queue owner -->
+<div class="label">S4 / Owner — Mod Queue</div>
+<div class="rounded-xl bg-card shadow-sm border border-violet-100 overflow-hidden mb-4">
+  <div class="h-1 bg-gradient-to-r from-violet-500 via-purple-400 to-fuchsia-400"></div>
+  <div class="px-4 py-4 flex items-center gap-5">
+    <div class="relative h-16 w-16 shrink-0 ring-glow-violet">
+      <svg class="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+        <circle cx="18" cy="18" r="15.5" fill="none" stroke="#ede9fe" stroke-width="2"/>
+        <circle cx="18" cy="18" r="15.5" fill="none" stroke="url(#s4-violet)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="0" class="ring-animate"/>
+        <defs><linearGradient id="s4-violet" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+      </svg>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <svg class="h-5 w-5 text-violet-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+    </div>
+    <div class="flex-1 space-y-2">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-bold text-foreground">Your recipe is in the moderator queue</span>
+        <span class="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">Mod queue</span>
+      </div>
+      <div class="flex items-center gap-2 border-l-2 border-violet-300 pl-2.5">
+        <span class="text-xs font-bold text-violet-600 italic">Overwhelmingly Positive</span>
+        <span class="text-[10px] text-muted-foreground">&mdash; your community loves this one</span>
+      </div>
+      <div class="flex items-center gap-4 text-sm">
+        <span class="font-semibold text-emerald-700">+5 approve</span>
+        <span class="font-semibold text-red-600">-0 need work</span>
+        <span class="text-xs ml-auto font-semibold text-violet-600">100%</span>
+      </div>
+      <p class="text-[11px] text-muted-foreground">Passed community review &mdash; a moderator will take a look soon</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
