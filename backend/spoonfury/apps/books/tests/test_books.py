@@ -81,3 +81,26 @@ def test_serializer_includes_is_default(auth_client, user):
     results = response.data if isinstance(response.data, list) else response.data.get("results", response.data)
     default_books = [b for b in results if b["is_default"]]
     assert len(default_books) == 1
+
+
+@pytest.mark.django_db
+def test_fork_auto_adds_to_default_collection(auth_client, user):
+    other = User.objects.create_user(username="forkauthor", password="testpass123")
+    parent = Recipe.objects.create(
+        title="Original Pasta", description="desc", serves="4",
+        ingredients=[{"name": "pasta", "quantity": "1", "unit": "lb", "note": ""}],
+        instructions="cook it", category="pasta_noodles", author=other,
+    )
+    url = reverse("recipe-fork", kwargs={"slug": parent.slug})
+    response = auth_client.post(url, {
+        "title": "Original Pasta (my version)",
+        "description": "desc",
+        "serves": "4",
+        "ingredients": [{"name": "pasta", "quantity": "1", "unit": "lb", "note": ""}],
+        "instructions": "cook it",
+        "notes": "",
+    }, format="json")
+    assert response.status_code == 201
+    forked_slug = response.data["slug"]
+    default_book = RecipeBook.objects.get(owner=user, is_default=True)
+    assert default_book.recipes.filter(slug=forked_slug).exists()
