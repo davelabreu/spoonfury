@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { IngredientChecklist } from "@/components/IngredientChecklist";
-import { ForkModal } from "@/components/ForkModal";
+import { toast } from "sonner";
 import { ShareModal } from "@/components/ShareModal";
 import { PublishModal } from "@/components/PublishModal";
 import { CookModeIngredients } from "@/components/CookModeIngredients";
@@ -46,7 +46,7 @@ export function RecipePage() {
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [error, setError] = useState("");
-  const [forking, setForking] = useState(false);
+  const [forkingInProgress, setForkingInProgress] = useState(false);
   const [books, setBooks] = useState<Book[]>([]);
   const [saveMsg, setSaveMsg] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -115,6 +115,32 @@ export function RecipePage() {
     } catch {
       setError("Failed to delete recipe.");
       setDeleting(false);
+    }
+  };
+
+  const handleFork = async () => {
+    if (!token || !recipe) return;
+    setForkingInProgress(true);
+    try {
+      await api.post(`/recipes/${recipe.slug}/fork/`, {
+        title: `${recipe.title} (my version)`,
+        description: recipe.description,
+        serves: recipe.serves,
+        ingredients: recipe.ingredients,
+        instructions: recipe.instructions,
+        notes: recipe.notes || "",
+      }, token);
+      toast("Saved to Forked Recipes", {
+        action: {
+          label: "Change",
+          onClick: () => navigate("/kitchen"),
+        },
+      });
+    } catch (err: unknown) {
+      const e = err as { data?: { detail?: string } };
+      toast.error(e.data?.detail || "Failed to fork. Try again.");
+    } finally {
+      setForkingInProgress(false);
     }
   };
 
@@ -374,7 +400,7 @@ export function RecipePage() {
                       <div className="flex items-center gap-2">
                         <Select onValueChange={(value) => { if (value) addToBook(Number(value)); }}>
                           <SelectTrigger className="w-[140px] h-9 bg-white/50 border-indigo-100 text-indigo-900 focus:ring-indigo-100">
-                            <SelectValue placeholder="Add to book…" />
+                            <SelectValue placeholder="Add to collection…" />
                           </SelectTrigger>
                           <SelectContent>
                             {books.map(b => (
@@ -386,11 +412,7 @@ export function RecipePage() {
                         </Select>
                         {saveMsg && <span className="text-sm font-medium text-indigo-600 animate-in fade-in slide-in-from-left-1">{saveMsg}</span>}
                       </div>
-                    ) : (
-                      <Button variant="ghost" size="sm" asChild className="text-indigo-400">
-                        <Link to="/books" className="underline underline-offset-4">Create a book first</Link>
-                      </Button>
-                    )}
+                    ) : null}
 
                     <div className="flex-1" />
 
@@ -417,8 +439,8 @@ export function RecipePage() {
                   <span className="text-[10px] uppercase font-bold text-indigo-400/80 tracking-wider">Actions</span>
                   <div className="flex items-center gap-2">
                     {token && (
-                      <Button variant="outline" size="sm" onClick={() => setForking(true)} className="border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50">
-                        🍴 Make it mine
+                      <Button variant="outline" size="sm" onClick={handleFork} disabled={forkingInProgress} className="border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50">
+                        {forkingInProgress ? "Forking..." : "🍴 Make it mine"}
                       </Button>
                     )}
                     <Button type="button" variant="outline" size="sm" onClick={() => setSharing(true)} className="border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50 gap-1.5">
@@ -594,14 +616,6 @@ export function RecipePage() {
           token={token!}
           onClose={() => setPublishModalOpen(false)}
           onPublished={(updated) => { setRecipe(updated); setPublishModalOpen(false); }}
-        />
-      )}
-      {forking && (
-        <ForkModal
-          recipe={recipe}
-          token={token!}
-          onClose={() => setForking(false)}
-          onSuccess={() => navigate("/kitchen")}
         />
       )}
       {sharing && (

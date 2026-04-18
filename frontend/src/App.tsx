@@ -6,7 +6,6 @@ import { RecipePage } from "@/pages/RecipePage";
 import { EditRecipePage } from "@/pages/EditRecipePage";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
-import { BooksPage } from "@/pages/BooksPage";
 import { CollectionDetailPage } from "@/pages/CollectionDetailPage";
 import { CreateRecipePage } from "@/pages/CreateRecipePage";
 import { HomePage } from "@/pages/HomePage";
