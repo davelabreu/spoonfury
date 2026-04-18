@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ShoppingProvider } from "@/contexts/ShoppingContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,8 +6,7 @@ import { RecipePage } from "@/pages/RecipePage";
 import { EditRecipePage } from "@/pages/EditRecipePage";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
-import { BooksPage } from "@/pages/BooksPage";
-import { BookDetailPage } from "@/pages/BookDetailPage";
+import { CollectionDetailPage } from "@/pages/CollectionDetailPage";
 import { CreateRecipePage } from "@/pages/CreateRecipePage";
 import { HomePage } from "@/pages/HomePage";
 import { ShoppingListPage } from "@/pages/ShoppingListPage";
@@ -15,6 +14,7 @@ import { MyKitchenPage } from "@/pages/MyKitchenPage";
 import { ModerationPage } from "@/pages/ModerationPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import { NavBar } from "@/components/NavBar";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function App() {
   return (
@@ -31,15 +31,23 @@ export default function App() {
                 <Route path="/recipes/:slug" element={<RecipePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-                <Route path="/books" element={<BooksPage />} />
-                <Route path="/books/share/:token" element={<BookDetailPage shared />} />
-                <Route path="/books/:id" element={<BookDetailPage />} />
+                <Route path="/books" element={<Navigate to="/kitchen" replace />} />
+                <Route path="/collections/share/:token" element={<CollectionDetailPage shared />} />
+                <Route path="/collections/:id" element={<CollectionDetailPage />} />
                 <Route path="/shopping-list" element={<ShoppingListPage />} />
                 <Route path="/kitchen" element={<MyKitchenPage />} />
                 <Route path="/moderation" element={<ModerationPage />} />
                 <Route path="/@:username" element={<ProfilePage />} />
               </Routes>
             </main>
+            <Toaster
+              position="bottom-center"
+              mobileOffset={{ bottom: 24, left: 16, right: 16 }}
+              toastOptions={{
+                className:
+                  "!bg-white !text-zinc-900 !border !border-zinc-200 !shadow-2xl !px-6 !py-4 !text-base !rounded-xl sm:!min-w-[420px] sm:!max-w-[480px]",
+              }}
+            />
           </BrowserRouter>
         </TooltipProvider>
       </ShoppingProvider>

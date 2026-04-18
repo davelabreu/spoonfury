@@ -25,6 +25,15 @@ class RecipeBookViewSet(viewsets.ModelViewSet):
         serializer = RecipeBookDetailSerializer(instance, context={"request": request})
         return Response(serializer.data)
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.default_role:
+            return Response(
+                {"detail": "Cannot delete a default collection."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().destroy(request, *args, **kwargs)
+
     @action(detail=False, methods=["get"], url_path="share/(?P<share_token>[^/.]+)")
     def share(self, request, share_token=None):
         book = get_object_or_404(RecipeBook, share_token=share_token, is_public=True)
