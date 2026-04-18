@@ -271,10 +271,10 @@ export function EditRecipePage() {
       </div>
 
       <div className="flex gap-3 pt-6">
-        <Button onClick={submit} className="flex-1 h-11 bg-saffron hover:bg-saffron-dark text-white border-0 font-bold text-base shadow-lg shadow-saffron/20 transition-all">
-          Save changes
+        <Button onClick={submit} size="lg" className="flex-1">
+          Save Recipe
         </Button>
-        <Button variant="outline" onClick={() => navigate(`/recipes/${slug}`)} className="h-11 px-8 rounded-xl">
+        <Button variant="outline" size="lg" onClick={() => navigate(`/recipes/${slug}`)} className="px-8">
           Cancel
         </Button>
       </div>

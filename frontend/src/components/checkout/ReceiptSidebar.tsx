@@ -1,6 +1,6 @@
 // frontend/src/components/checkout/ReceiptSidebar.tsx
 import { getCategoryFallback } from "@/lib/categoryFallback";
-import { getEstimatedPrice, calculateSummary, FEES } from "@/lib/pricing";
+import { getEstimatedPrice, calculateSummary } from "@/lib/pricing";
 import { buildInstacartUrl } from "@/lib/instacart";
 import type { Fulfillment } from "@/lib/pricing";
 import type { RecipeGroup } from "@/types";
