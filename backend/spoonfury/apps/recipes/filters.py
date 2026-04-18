@@ -79,10 +79,16 @@ class RecipeFilter(django_filters.FilterSet):
         conjoined=True,  # AND logic — recipe must have ALL specified tags
     )
     ingredient = django_filters.CharFilter(method="filter_by_ingredient")
+    forked_from = django_filters.CharFilter(method="filter_by_parent_slug")
 
     class Meta:
         model = Recipe
-        fields = ["category", "status", "tags", "ingredient"]
+        fields = ["category", "status", "tags", "ingredient", "forked_from"]
+
+    def filter_by_parent_slug(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(parent_recipe__slug=value)
 
     def filter_by_ingredient(self, queryset, name, value):
         if not value:

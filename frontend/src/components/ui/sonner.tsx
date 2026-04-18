@@ -6,9 +6,9 @@ function Toaster({ ...props }: ToasterProps) {
       className="toaster group"
       style={
         {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
+          "--normal-bg": "#ffffff",
+          "--normal-text": "#18181b",
+          "--normal-border": "#e4e4e7",
         } as React.CSSProperties
       }
       {...props}

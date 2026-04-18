@@ -47,6 +47,7 @@ export function RecipePage() {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [error, setError] = useState("");
   const [forkingInProgress, setForkingInProgress] = useState(false);
+  const [forked, setForked] = useState(false);
   const [books, setBooks] = useState<Book[]>([]);
   const [saveMsg, setSaveMsg] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -91,6 +92,18 @@ export function RecipePage() {
       .catch(() => {});
   }, [token, recipe]);
 
+  // Check if the current user has already forked this recipe
+  useEffect(() => {
+    if (!token || !recipe || !username) return;
+    if (recipe.author_username === username) return;
+    api.get(`/recipes/?forked_from=${recipe.slug}&page_size=5`, token)
+      .then((data: { results?: Recipe[] }) => {
+        const results = data.results ?? [];
+        if (results.some(r => r.author_username === username)) setForked(true);
+      })
+      .catch(() => {});
+  }, [token, recipe?.slug, username]);
+
   const isOwner = recipe && username && recipe.author_username === username;
 
   const addToBook = async (bookId: number) => {
@@ -130,11 +143,14 @@ export function RecipePage() {
         instructions: recipe.instructions,
         notes: recipe.notes || "",
       }, token);
-      toast("Saved to Forked Recipes", {
+      setForked(true);
+      toast("Forked! Saved to Forked Recipes", {
+        description: "Head to My Kitchen to start tweaking it.",
         action: {
-          label: "Change",
+          label: "Change collection",
           onClick: () => navigate("/kitchen"),
         },
+        duration: 6000,
       });
     } catch (err: unknown) {
       const e = err as { data?: { detail?: string } };
@@ -439,8 +455,17 @@ export function RecipePage() {
                   <span className="text-[10px] uppercase font-bold text-indigo-400/80 tracking-wider">Actions</span>
                   <div className="flex items-center gap-2">
                     {token && (
-                      <Button variant="outline" size="sm" onClick={handleFork} disabled={forkingInProgress} className="border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50">
-                        {forkingInProgress ? "Forking..." : "🍴 Make it mine"}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={forked ? () => navigate("/kitchen") : handleFork}
+                        disabled={forkingInProgress}
+                        className={forked
+                          ? "border-green-200 bg-green-50 text-green-700 hover:bg-green-100"
+                          : "border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50"
+                        }
+                      >
+                        {forkingInProgress ? "Forking..." : forked ? "✓ Forked!" : "🍴 Make it mine"}
                       </Button>
                     )}
                     <Button type="button" variant="outline" size="sm" onClick={() => setSharing(true)} className="border-indigo-200 bg-white/50 text-indigo-700 hover:bg-indigo-50 gap-1.5">

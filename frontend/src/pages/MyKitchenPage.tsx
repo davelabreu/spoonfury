@@ -9,14 +9,25 @@
  */
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { LayoutGrid, List } from "lucide-react";
+import { LayoutGrid, List, MoreHorizontal, Trash2, FolderInput } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { WeeklyPlanner } from "@/components/planner/WeeklyPlanner";
+import { toast } from "sonner";
 import { getCategoryFallback } from "@/lib/categoryFallback";
 import type { Recipe, Book, PublishGate, ReviewProgress } from "@/types";
 
@@ -40,8 +51,6 @@ function GateChecklist({ gate }: { gate: PublishGate }) {
     { label: "Category", met: gate.hasCategory },
   ];
 
-  const metCount = items.filter(i => i.met).length;
-
   return (
     <div className="flex flex-wrap gap-1.5 mt-2">
       {items.map(item => (
@@ -56,16 +65,13 @@ function GateChecklist({ gate }: { gate: PublishGate }) {
           {item.met ? "✓" : "○"} {item.label}
         </span>
       ))}
-      <span className="text-[10px] font-bold text-muted-foreground ml-auto">
-        {metCount}/4
-      </span>
     </div>
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, isForked }: { status: string; isForked?: boolean }) {
   const config: Record<string, { label: string; className: string }> = {
-    draft: { label: "Draft", className: "bg-gray-100 text-gray-600" },
+    draft: { label: isForked ? "Forked Draft" : "Draft", className: isForked ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-600" },
     in_review: { label: "In Review", className: "bg-blue-100 text-blue-700" },
     mod_queue: { label: "In Moderation", className: "bg-purple-100 text-purple-700" },
     revision_requested: { label: "Revision Needed", className: "bg-orange-100 text-orange-700" },
@@ -195,99 +201,169 @@ function ReviewProgressLine({ progress }: { progress: ReviewProgress }) {
   );
 }
 
-function CompactRow({ recipe, showGate }: { recipe: Recipe; showGate?: boolean }) {
-  const gate = showGate ? getPublishGate(recipe) : null;
-  const gateCount = gate ? Object.values(gate).filter(Boolean).length : null;
+function CompactRow({ recipe, collections, onMove, onDelete }: {
+  recipe: Recipe;
+  collections?: Book[];
+  onMove?: (slug: string, bookId: number) => void;
+  onDelete?: (slug: string) => void;
+}) {
   const fallback = getCategoryFallback(recipe.category);
 
   return (
-    <Link
-      to={`/recipes/${recipe.slug}`}
-      className="flex items-center gap-2.5 px-3 py-2 bg-background hover:bg-accent transition-colors"
-    >
-      <span className="text-sm w-5 text-center shrink-0">{fallback.emoji}</span>
-      <span className="text-xs font-semibold flex-1 truncate">{recipe.title}</span>
-      {recipe.fork_count > 0 && (
-        <span className="text-[9px] text-amber-600 shrink-0">🍴 {recipe.fork_count}</span>
+    <div className="flex items-center gap-2.5 px-3 py-2 bg-background hover:bg-accent transition-colors">
+      <Link to={`/recipes/${recipe.slug}`} className="flex items-center gap-2.5 flex-1 min-w-0">
+        <span className="text-sm w-5 text-center shrink-0">{fallback.emoji}</span>
+        <span className="text-xs font-semibold flex-1 truncate">{recipe.title}</span>
+        {recipe.fork_count > 0 && (
+          <span className="text-[9px] text-amber-600 shrink-0">🍴 {recipe.fork_count}</span>
+        )}
+        {recipe.vouch_count > 0 && (
+          <span className="text-[9px] text-violet-600 shrink-0">✨ {recipe.vouch_count}</span>
+        )}
+        <span className="text-[9px] px-1.5 py-0.5 bg-muted rounded-full text-muted-foreground shrink-0 hidden sm:inline">
+          {recipe.category.replace(/_/g, " ").split(" ")[0]}
+        </span>
+        <StatusBadge status={recipe.status} isForked={!!recipe.parent_recipe_slug} />
+      </Link>
+      {(onMove || onDelete) && (
+        <div className="flex items-center gap-1 shrink-0">
+          {onMove && collections && collections.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title="Move to collection">
+                  <FolderInput className="h-3.5 w-3.5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[160px]">
+                {collections.map(c => (
+                  <DropdownMenuItem key={c.id} onClick={() => onMove(recipe.slug, c.id)}>
+                    <span className="text-xs">{c.title}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          {onDelete && (
+            <button
+              onClick={() => onDelete(recipe.slug)}
+              className="p-1 rounded hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-colors"
+              title="Delete recipe"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
       )}
-      {recipe.vouch_count > 0 && (
-        <span className="text-[9px] text-violet-600 shrink-0">✨ {recipe.vouch_count}</span>
-      )}
-      <span className="text-[9px] px-1.5 py-0.5 bg-muted rounded-full text-muted-foreground shrink-0 hidden sm:inline">
-        {recipe.category.replace(/_/g, " ").split(" ")[0]}
-      </span>
-      <StatusBadge status={recipe.status} />
-      {gateCount !== null && (
-        <span className="text-[9px] text-muted-foreground shrink-0">{gateCount}/4</span>
-      )}
-    </Link>
+    </div>
   );
 }
 
 /** Card for a single recipe in the kitchen or published section. */
-function RecipeCard({ recipe, showGate }: { recipe: Recipe; showGate?: boolean }) {
-  const gate = getPublishGate(recipe);
+function RecipeCard({ recipe, showGate, collections, onMove, onDelete }: {
+  recipe: Recipe;
+  showGate?: boolean;
+  collections?: Book[];
+  onMove?: (slug: string, bookId: number) => void;
+  onDelete?: (slug: string) => void;
+}) {
+  const gate = showGate ? getPublishGate(recipe) : null;
   const fallback = getCategoryFallback(recipe.category);
   const [imgError, setImgError] = useState(false);
   const showImage = recipe.image_url && !imgError;
 
   return (
-    <Link
-      to={`/recipes/${recipe.slug}`}
-      className="flex rounded-xl overflow-hidden border hover:border-foreground/20 hover:shadow-sm transition-all"
-    >
-      {/* Left: small thumbnail or category fallback */}
-      <div className="w-[72px] sm:w-[88px] shrink-0 relative">
-        {showImage ? (
-          <img
-            src={recipe.image_url}
-            alt={recipe.title}
-            className="w-full h-full object-cover"
-            onError={() => setImgError(true)}
-          />
-        ) : (
-          <div className={`w-full h-full bg-gradient-to-br ${fallback.gradient} flex items-center justify-center`}>
-            <span className="text-2xl drop-shadow-sm">{fallback.emoji}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Right: text content */}
-      <div className="flex-1 p-3 sm:p-4 flex flex-col justify-center min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm truncate">{recipe.title}</h3>
-            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-              {recipe.description || "No description yet…"}
-            </p>
-            {recipe.published_at && (
-              <p className="text-[10px] text-muted-foreground mt-1">
-                Published {new Date(recipe.published_at).toLocaleDateString()}
-              </p>
-            )}
-            {recipe.status === "revision_requested" && (
-              <p className="text-[10px] text-orange-600 mt-1">
-                Moderator requested changes — view recipe for details
-              </p>
-            )}
-          </div>
-          <div className="flex flex-col items-end gap-1 shrink-0">
-            <StatusBadge status={recipe.status} />
-            <Badge variant="secondary" className="text-[10px]">{recipe.category}</Badge>
-            {recipe.status === "in_review" && recipe.review_progress && (
-              <ReviewProgressLine progress={recipe.review_progress} />
-            )}
-            {recipe.vouch_count > 0 && (
-              <span className="text-[10px] text-violet-600">✨ {recipe.vouch_count}</span>
-            )}
-            {recipe.fork_count > 0 && (
-              <span className="text-[10px] text-muted-foreground">🍴 {recipe.fork_count}</span>
-            )}
-          </div>
+    <div className="flex rounded-xl overflow-hidden border hover:border-foreground/20 hover:shadow-sm transition-all relative">
+      <Link to={`/recipes/${recipe.slug}`} className="flex flex-1 min-w-0">
+        {/* Left: small thumbnail or category fallback */}
+        <div className="w-[72px] sm:w-[88px] shrink-0 relative">
+          {showImage ? (
+            <img
+              src={recipe.image_url}
+              alt={recipe.title}
+              className="w-full h-full object-cover"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div className={`w-full h-full bg-gradient-to-br ${fallback.gradient} flex items-center justify-center`}>
+              <span className="text-2xl drop-shadow-sm">{fallback.emoji}</span>
+            </div>
+          )}
         </div>
-        {showGate && <GateChecklist gate={gate} />}
-      </div>
-    </Link>
+
+        {/* Right: text content */}
+        <div className="flex-1 p-3 sm:p-4 flex flex-col justify-center min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-sm truncate">{recipe.title}</h3>
+              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                {recipe.description || "No description yet…"}
+              </p>
+              {recipe.published_at && (
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Published {new Date(recipe.published_at).toLocaleDateString()}
+                </p>
+              )}
+              {recipe.status === "revision_requested" && (
+                <p className="text-[10px] text-orange-600 mt-1">
+                  Moderator requested changes — view recipe for details
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              {/* Spacer to clear the hamburger menu */}
+              {(onMove || onDelete) && <div className="h-7" />}
+              <StatusBadge status={recipe.status} isForked={!!recipe.parent_recipe_slug} />
+              <Badge variant="secondary" className="text-[10px]">{recipe.category}</Badge>
+              {recipe.status === "in_review" && recipe.review_progress && (
+                <ReviewProgressLine progress={recipe.review_progress} />
+              )}
+              {recipe.vouch_count > 0 && (
+                <span className="text-[10px] text-violet-600">✨ {recipe.vouch_count}</span>
+              )}
+              {recipe.fork_count > 0 && (
+                <span className="text-[10px] text-muted-foreground">🍴 {recipe.fork_count}</span>
+              )}
+            </div>
+          </div>
+          {gate && <GateChecklist gate={gate} />}
+        </div>
+      </Link>
+      {(onMove || onDelete) && (
+        <div className="absolute top-2 right-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="p-1.5 rounded-lg bg-background/80 backdrop-blur-sm border border-border/50 text-muted-foreground hover:text-foreground hover:bg-background transition-colors shadow-sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[180px]">
+              {onMove && collections && collections.length > 0 && (
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <FolderInput className="h-3.5 w-3.5 mr-2" />
+                    <span className="text-xs">Move to collection</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="min-w-[160px]">
+                    {collections.map(c => (
+                      <DropdownMenuItem key={c.id} onClick={() => onMove(recipe.slug, c.id)}>
+                        <span className="text-xs">{c.title}</span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              )}
+              {onMove && onDelete && <DropdownMenuSeparator />}
+              {onDelete && (
+                <DropdownMenuItem onClick={() => onDelete(recipe.slug)} className="text-red-600 focus:text-red-600">
+                  <Trash2 className="h-3.5 w-3.5 mr-2" />
+                  <span className="text-xs">Delete recipe</span>
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -387,6 +463,30 @@ export function MyKitchenPage() {
     } catch {}
   };
 
+  const handleMoveToCollection = async (recipeSlug: string, bookId: number) => {
+    if (!token) return;
+    try {
+      await api.post(`/books/${bookId}/add-recipe/`, { recipe_slug: recipeSlug }, token);
+      const col = collections.find(c => c.id === bookId);
+      toast(`Added to ${col?.title ?? "collection"}`);
+    } catch {
+      toast.error("Failed to add to collection.");
+    }
+  };
+
+  const handleDeleteRecipe = async (recipeSlug: string) => {
+    if (!token) return;
+    const recipe = myRecipes.find(r => r.slug === recipeSlug);
+    if (!confirm(`Delete "${recipe?.title ?? recipeSlug}" permanently?`)) return;
+    try {
+      await api.delete(`/recipes/${recipeSlug}/`, token);
+      setRecipes(prev => prev.filter(r => r.slug !== recipeSlug));
+      toast("Recipe deleted.");
+    } catch {
+      toast.error("Failed to delete recipe.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -396,7 +496,7 @@ export function MyKitchenPage() {
   }
 
   return (
-    <div className={`mx-auto space-y-8 ${activeTab === 'planner' ? 'max-w-6xl' : 'max-w-2xl'}`}>
+    <div className="mx-auto space-y-8 max-w-6xl">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">My Kitchen</h1>
         <p className="text-muted-foreground">Manage your recipes and plan your weekly meals.</p>
@@ -581,13 +681,13 @@ export function MyKitchenPage() {
             ) : draftView === "card" ? (
               <div className="space-y-3">
                 {sortedDrafts.map(r => (
-                  <RecipeCard key={r.slug} recipe={r} showGate />
+                  <RecipeCard key={r.slug} recipe={r} showGate collections={collections} onMove={handleMoveToCollection} onDelete={handleDeleteRecipe} />
                 ))}
               </div>
             ) : (
               <div className="flex flex-col gap-px bg-muted rounded-lg overflow-hidden">
                 {sortedDrafts.map(r => (
-                  <CompactRow key={r.slug} recipe={r} showGate />
+                  <CompactRow key={r.slug} recipe={r} collections={collections} onMove={handleMoveToCollection} onDelete={handleDeleteRecipe} />
                 ))}
               </div>
             )}
@@ -605,13 +705,13 @@ export function MyKitchenPage() {
               {draftView === "card" ? (
                 <div className="space-y-3">
                   {sortedInReview.map(r => (
-                    <RecipeCard key={r.slug} recipe={r} />
+                    <RecipeCard key={r.slug} recipe={r} collections={collections} onMove={handleMoveToCollection} onDelete={handleDeleteRecipe} />
                   ))}
                 </div>
               ) : (
                 <div className="flex flex-col gap-px bg-muted rounded-lg overflow-hidden">
                   {sortedInReview.map(r => (
-                    <CompactRow key={r.slug} recipe={r} />
+                    <CompactRow key={r.slug} recipe={r} collections={collections} onMove={handleMoveToCollection} onDelete={handleDeleteRecipe} />
                   ))}
                 </div>
               )}
@@ -629,13 +729,13 @@ export function MyKitchenPage() {
               {draftView === "card" ? (
                 <div className="space-y-3">
                   {sortedInModeration.map(r => (
-                    <RecipeCard key={r.slug} recipe={r} />
+                    <RecipeCard key={r.slug} recipe={r} collections={collections} onMove={handleMoveToCollection} onDelete={handleDeleteRecipe} />
                   ))}
                 </div>
               ) : (
                 <div className="flex flex-col gap-px bg-muted rounded-lg overflow-hidden">
                   {sortedInModeration.map(r => (
-                    <CompactRow key={r.slug} recipe={r} />
+                    <CompactRow key={r.slug} recipe={r} collections={collections} onMove={handleMoveToCollection} onDelete={handleDeleteRecipe} />
                   ))}
                 </div>
               )}

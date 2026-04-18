@@ -40,7 +40,14 @@ export default function App() {
                 <Route path="/@:username" element={<ProfilePage />} />
               </Routes>
             </main>
-            <Toaster position="bottom-center" />
+            <Toaster
+              position="bottom-center"
+              mobileOffset={{ bottom: 24, left: 16, right: 16 }}
+              toastOptions={{
+                className:
+                  "!bg-white !text-zinc-900 !border !border-zinc-200 !shadow-2xl !px-6 !py-4 !text-base !rounded-xl sm:!min-w-[420px] sm:!max-w-[480px]",
+              }}
+            />
           </BrowserRouter>
         </TooltipProvider>
       </ShoppingProvider>
