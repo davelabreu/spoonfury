@@ -12,10 +12,10 @@ class RecipeBookSerializer(serializers.ModelSerializer):
         model = RecipeBook
         fields = [
             "id", "title", "cover_image", "owner_username",
-            "is_public", "is_default", "share_token", "share_url",
+            "is_public", "default_role", "share_token", "share_url",
             "recipe_count", "created_at",
         ]
-        read_only_fields = ["share_token", "owner_username", "is_default", "created_at"]
+        read_only_fields = ["share_token", "owner_username", "default_role", "created_at"]
 
     def get_recipe_count(self, obj):
         return obj.recipes.count()

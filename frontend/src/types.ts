@@ -62,7 +62,7 @@ export interface Book {
   title: string;
   description?: string;
   is_public: boolean;
-  is_default?: boolean;
+  default_role?: string;
   recipe_count?: number;
   recipes?: Recipe[];
 }

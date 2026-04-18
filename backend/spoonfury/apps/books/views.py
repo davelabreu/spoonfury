@@ -27,9 +27,9 @@ class RecipeBookViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.is_default:
+        if instance.default_role:
             return Response(
-                {"detail": "Cannot delete the default collection."},
+                {"detail": "Cannot delete a default collection."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         return super().destroy(request, *args, **kwargs)

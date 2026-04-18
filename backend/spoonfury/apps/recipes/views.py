@@ -82,6 +82,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
 
+    def perform_create(self, serializer):
+        recipe = serializer.save()
+        # Auto-add new original recipes to the user's kitchen sink collection
+        from spoonfury.apps.books.models import RecipeBook, BookRecipe
+        sink, _ = RecipeBook.objects.get_or_create(
+            owner=self.request.user,
+            default_role="kitchen_sink",
+            defaults={"title": f"@{self.request.user.username}'s Kitchen Sink"},
+        )
+        order = sink.bookrecipe_set.count()
+        BookRecipe.objects.get_or_create(
+            book=sink, recipe=recipe, defaults={"order": order}
+        )
+
     def perform_update(self, serializer):
         if serializer.instance.author != self.request.user:
             raise PermissionDenied("You can only edit your own recipes.")

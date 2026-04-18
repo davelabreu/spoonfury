@@ -65,11 +65,11 @@ def fork_recipe(request, slug):
         **fork_data,
     )
 
-    # Auto-add to user's default collection
+    # Auto-add to user's forked recipes collection
     from spoonfury.apps.books.models import RecipeBook, BookRecipe
     default_book, _ = RecipeBook.objects.get_or_create(
         owner=request.user,
-        is_default=True,
+        default_role="forked",
         defaults={"title": "Forked Recipes"},
     )
     order = default_book.bookrecipe_set.count()
