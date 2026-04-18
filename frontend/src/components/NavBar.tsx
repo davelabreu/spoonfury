@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
-import { Menu, X, Utensils, ShoppingCart, BookOpen, LogOut, Palette, UserCircle } from "lucide-react";
+import { Menu, X, Utensils, ShoppingCart, LogOut, Palette, UserCircle } from "lucide-react";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/contexts/AuthContext";
 import { useShopping, SHOPPING_LIST_UPDATED } from "@/contexts/ShoppingContext";
@@ -19,7 +19,6 @@ import type { Ingredient } from "@/types";
 
 const STICKERS = [
   { label: "Stir the Pot", to: "/", color: "bg-[#FF6B6B]", icon: Utensils, isSpecial: true },
-  { label: "My Books", to: "/books", color: "bg-[#4ECDC4]", authRequired: true },
   { label: "+ Recipe", to: "/recipes/new", color: "bg-[#FFE66D]", authRequired: true },
   { label: "My Kitchen", to: "/kitchen", color: "bg-[#FFB347]", authRequired: true },
 ];
@@ -193,10 +192,6 @@ function UsernameBadge({ username, className, onSignOut, onSwitchTheme, switchTh
           My Profile
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate("/books")} className="gap-2 cursor-pointer">
-          <BookOpen className="w-4 h-4" />
-          My Books
-        </DropdownMenuItem>
         {isStaff && (
           <>
             <DropdownMenuSeparator />
