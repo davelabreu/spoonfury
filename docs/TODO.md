@@ -197,14 +197,21 @@ Items identified during v0.5 security audit to move from prototype to production
 
 ## Recipe Ratings & Reviews (v0.9.1 — Part B)
 
-Part A (v0.9) surfaced vouch counts and made historical reviews public. Part B extends the system into a living ratings feature.
+Part A (v0.9) surfaced vouch counts and made historical reviews public. Part B extended the system into a full 5-spoon rating feature.
 
-**Scope:**
-- **Post-publish voting.** `review_vote` endpoint accepts votes for `status in ("in_review", "published")`. Published recipes accumulate vouches from any logged-in user (except author).
-- **5-spoon rating.** Replace the boolean `RecipeReview.is_positive` with a 1–5 integer rating (spoons). Migration converts legacy `is_positive=True` → 4 spoons, `is_positive=False` → 2 spoons (or similar — decide during spec).
-- **Drive-by negativity mitigation.** Require a comment on low ratings (e.g., any rating ≤ 2). Optional: weighted scoring that favors reviewers who have also forked or cooked the recipe.
-- **Update the published detail-line copy.** "Vouched for by N cooks in the test kitchen" no longer fits once post-publish votes are counted — revise to something like "N cooks have vouched for this recipe."
+**Shipped (v0.9.1):**
+- ~~**Post-publish voting.** `review_vote` endpoint accepts votes for `status in ("in_review", "published")`.~~
+- ~~**5-spoon rating.** Replaced binary PASS/REVISE with 1–5 spoon rating for both in_review and published recipes.~~
+- ~~**Spoon Gate formula.** >= 5 reviews with >= 4.0 avg to advance to mod_queue (replaces 3-vote / 80% binary).~~
+- ~~**Micro Center 3-column review layout.** Rating Snapshot bars, Overall Rating, interactive spoon picker.~~
+- ~~**Recipe header spoon rating.** Avg rating + tier phrase (Chef's Kiss, Community Pick, etc.) replaces vouch line.~~
+- ~~**Recipe page polish.** Description + stat pills moved above hero image, About card removed, updated_at in API.~~
+
+**Remaining:**
+- **Drive-by negativity mitigation.** Require a comment on low ratings (e.g., any rating <= 2). Optional: weighted scoring that favors reviewers who have also forked or cooked the recipe.
 - **"Kitchen Tested" signature treatment (Option C from brainstorm).** Named visual badge with reviewer avatars.
+- **Comment threads.** Top-level comments + replies on published recipes (separate from review comments).
+- **Cook time field.** `prep_time` model field on Recipe — currently a frontend placeholder ("Cook time TBD").
 
 **Data retention:** Part A's durability guarantees (one vote per reviewer per recipe, forever) continue to apply. A reviewer who voted during in_review cannot vote again after publish.
 

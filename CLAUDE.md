@@ -23,7 +23,7 @@ To maintain our architecture, AI agents MUST adhere to these negative constraint
 ## 🏗️ Project Overview
 Spoonfury — a recipe-first social platform. Core mechanic: **Fork** a recipe, make it yours, build curated digital recipe books.
 
-**Status**: Prototype v0.5 (Recipe filtering: Tag model, 15 categories, django-filter, Shadcn CreateRecipePage with TagInput autocomplete).
+**Status**: Prototype v0.9.1 (5-spoon rating system, Spoon Gate formula, Micro Center review layout, recipe page polish).
 
 ## 🧠 Core Architecture
 - **Data Model**: Recipe (fork lineage) -> Tag (M2M, 4 kinds) -> User -> RecipeBook -> ShoppingList.
