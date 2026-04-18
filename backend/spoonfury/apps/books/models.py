@@ -15,6 +15,7 @@ class RecipeBook(models.Model):
     recipes = models.ManyToManyField(Recipe, through="BookRecipe", blank=True)
     is_public = models.BooleanField(default=False)
     share_token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    is_default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

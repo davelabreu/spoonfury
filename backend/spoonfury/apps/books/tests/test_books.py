@@ -45,3 +45,9 @@ def test_private_book_not_accessible_without_token(api_client, auth_client):
 
     response = api_client.get(reverse("book-detail", kwargs={"pk": book_id}))
     assert response.status_code in [401, 403]
+
+
+@pytest.mark.django_db
+def test_recipebook_has_is_default_field(user):
+    book = RecipeBook.objects.create(title="Forked Recipes", owner=user)
+    assert book.is_default is False
