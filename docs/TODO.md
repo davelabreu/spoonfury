@@ -134,15 +134,10 @@ Shipped: Phase 1 (inputs/textareas), Phase 2 (selects/buttons), Phase 3 (modals 
   without requiring a page navigation.
 - BuyNowSheet UX/UI improvements deferred.
 
-### Books → Collections (rebrand + My Kitchen integration)
+### ~~Books → Collections (rebrand + My Kitchen integration)~~ — DONE (v0.10)
 
-"My Books" feels redundant now that My Kitchen exists. Rebrand books as **Collections** and fold them into My Kitchen as a section.
-
-- Rename `RecipeBook` concept to "Collection" in the UI (backend model name can stay).
-- Add a **"Forked Recipes"** default collection, auto-created per user.
-- Fork flow defaults to "Forked Recipes" collection — no book picker needed for the common case. Users can change collection or create a new one, but the default should Just Work.
-- Remove standalone `/books` page — collections live inside My Kitchen.
-- Update NavBar links, ForkModal, and any references to "books".
+~~"My Books" feels redundant now that My Kitchen exists. Rebrand books as **Collections** and fold them into My Kitchen as a section.~~
+Shipped: Collections section in My Kitchen, one-click fork with toast, default "Forked Recipes" collection, BookDetailPage → CollectionDetailPage.
 
 ---
 

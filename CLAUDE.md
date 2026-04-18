@@ -23,7 +23,7 @@ To maintain our architecture, AI agents MUST adhere to these negative constraint
 ## 🏗️ Project Overview
 Spoonfury — a recipe-first social platform. Core mechanic: **Fork** a recipe, make it yours, build curated digital recipe books.
 
-**Status**: Prototype v0.9.1 (5-spoon rating system, Spoon Gate formula, Micro Center review layout, recipe page polish).
+**Status**: Prototype v0.10 (Collections rebrand, one-click fork, My Kitchen integration).
 
 ## 🧠 Core Architecture
 - **Data Model**: Recipe (fork lineage) -> Tag (M2M, 4 kinds) -> User -> RecipeBook -> ShoppingList.
@@ -68,6 +68,7 @@ Active plans live in `docs/plans/active/`. Shipped features are archived in `doc
 ### Active
 | Feature | Spec | Impl |
 |---------|------|------|
+| v0.10 Books → Collections | `active/2026-04-18-books-to-collections.spec.md` | `active/2026-04-18-books-to-collections.impl.md` |
 | v0.85 Kitchen Controls | `active/2026-04-11-kitchen-controls.spec.md` | `active/2026-04-11-kitchen-controls.impl.md` |
 | v0.9 Vouch Retention | `active/2026-04-12-vouch-retention.spec.md` | `active/2026-04-12-vouch-retention.impl.md` |
 
