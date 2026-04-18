@@ -6,41 +6,38 @@ Quick orientation file. Update at the end of each session.
 
 ## Last Session
 
-**Date:** 2026-04-17  
-**Focus:** 5-spoon rating system, Spoon Gate formula, recipe page polish  
-**Branch:** `master`  
-**Status:** Implementation complete, ready for human testing
+**Date:** 2026-04-18  
+**Focus:** v0.10 Books → Collections rebrand  
+**Branch:** `master` (merged from `feat/books-to-collections`)  
+**Status:** Shipped and merged
 
 ### What was built
-- **5-Spoon Rating System**: Replaced binary PASS/REVISE review gate with 1-5 spoon rating for both in_review and published recipes. Backend `rating` field on RecipeReview, unified `review_vote` endpoint.
-- **Spoon Gate Formula**: >= 5 reviews with >= 4.0 avg to advance to mod_queue (was 3 votes / 80% binary).
-- **Micro Center 3-Column Review Layout**: Rating Snapshot bar chart, Overall Rating with big number + spoon icons, interactive 5-spoon picker. Same layout for both in_review and published.
-- **Review Banner Overhaul**: Ring shows avg rating instead of approval %, tier phrases based on avg (Chef's Kiss >= 4.8, Community Pick >= 4.0, etc.), 5 vote slot pills, spoon + reviews badges replace thumbs up/down.
-- **Recipe Header**: Spoon rating + tier phrase replaces "Vouched for by N cooks" line. Description + serves/cook-time pills moved above hero image. About card removed.
-- **API**: `updated_at` added to recipe serializer. Rating distribution + avg rating in review list response.
+- **Collections rebrand**: Recipe Books renamed to Collections throughout the app. BooksPage removed, absorbed into My Kitchen.
+- **System collections**: Kitchen Sink (auto-assigned for original recipes) + Forked Recipes (auto-assigned on fork). Both protected from deletion.
+- **Custom collections**: Create, rename, delete. Edit dialog with icon presets (Quick Meals, Meal Prep, Slow Cooking, Vegetarian, Clean Eating) and 42-char description.
+- **Collection cards**: C2 accent stripe style with left color bar, emoji icons, type badges (Originals/Forked), inline expand preview.
+- **Recipe management**: Vertical dots menu on card + compact views with Edit Recipe, Share, Move to Collection, Delete. Works in both Test Kitchen and Published sections.
+- **Fork UX**: One-click fork (no modal), "Forked!" button persistence across navigation, toast notifications via Sonner.
+- **Status badges**: "Original Draft" (orange), "Forked Draft" (indigo), distinct from Published (green).
+- **Collection sorting**: Kitchen Sink always first, Forked second, custom alphabetical.
 
 ### Backend changes
-- Modified: `models.py` (rating field), `views_review.py` (unified rating, Spoon Gate), `serializers.py` (updated_at), `test_review.py` (all tests updated)
-- Migration: `0014_recipereview_rating.py`
+- Modified: `books/models.py` (default_role, icon, description fields), `books/serializers.py`, `books/views.py`, `recipes/views.py` (perform_create auto-add to sink), `recipes/views_fork.py`, `recipes/filters.py` (forked_from filter), `users/signals.py` (create default collections on registration)
+- Migrations: 0002–0007 (is_default → default_role, icon/description)
 
 ### Frontend changes
-- Modified: `ReviewBanner.tsx`, `ReviewPanel.tsx`, `RecipePage.tsx`, `index.css`, `types.ts`
-- Visual mockups organized into `docs/visual-mockups/v0.9-review-banner/`
+- Modified: `MyKitchenPage.tsx` (major — collections UI, recipe management, edit dialog), `RecipePage.tsx` (fork UX), `App.tsx` (Sonner toaster, route updates), `types.ts`, `NavBar.tsx`
+- Removed: `BooksPage.tsx`, `ForkModal.tsx`
+- Added: `ui/sonner.tsx`
+- Renamed: `BookDetailPage.tsx` → `CollectionDetailPage.tsx`
+- Visual mockups: `docs/visual-mockups/v0.10-collection-cards/`
 
 ---
 
 ## Current State
 
 **Branch:** `master`  
-**Version:** v0.9.1 (5-Spoon Rating System)
-
-### To test
-1. Visit a published recipe — verify spoon rating + tier phrase shows in header, description appears above image.
-2. Submit a 1-5 spoon review on a published recipe — verify the 3-column layout works (Rating Snapshot, Overall Rating, Rate this Recipe).
-3. Submit a review on an in_review recipe — verify it uses the same 5-spoon picker (no more PASS/REVISE).
-4. Check that the review banner shows avg rating in the ring, 5 vote slot pills, and correct tier phrases.
-5. Verify rating snapshot bars fill proportionally (e.g., 2 votes on 5-spoon + 2 on 4-spoon = both at 50%).
-6. Test on mobile — description + stat pills should appear above image, not buried at bottom.
+**Version:** v0.10 (Collections rebrand)
 
 ---
 

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collection Card Styles — Spoonfury v0.10</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: hsl(40 33% 98%); color: hsl(20 14% 8%); padding: 32px; }
+
+  h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 32px; }
+
+  .option-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #eee;
+    cursor: pointer;
+  }
+  .option-header h2 { font-size: 16px; font-weight: 700; }
+  .option-header .tag {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    padding: 3px 10px; border-radius: 99px;
+  }
+  .selected-tag { display: none; font-size: 10px; font-weight: 700; color: #16a34a; background: #dcfce7; padding: 3px 10px; border-radius: 99px; }
+  .option.selected .selected-tag { display: inline-block; }
+  .option { margin-bottom: 40px; padding: 20px; border-radius: 16px; border: 2px solid transparent; transition: all 0.2s; }
+  .option:hover { border-color: #e5e7eb; }
+  .option.selected { border-color: hsl(24 80% 50%); background: hsl(24 80% 50% / 0.03); }
+
+  /* Current gradient cards */
+  .gradient-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .gradient-card {
+    padding: 12px; border-radius: 10px; color: white; cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .gradient-card:hover { transform: scale(1.02); }
+  .gradient-card .title { font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gradient-card .count { font-size: 11px; opacity: 0.8; }
+
+  /* A: Ghost rows */
+  .ghost-list { display: flex; flex-direction: column; gap: 2px; }
+  .ghost-row {
+    display: flex; align-items: center; gap: 14px; padding: 10px 14px;
+    border-radius: 12px; transition: background 0.15s; cursor: pointer;
+  }
+  .ghost-row:hover { background: hsl(35 30% 95% / 0.7); }
+  .ghost-bar { width: 3px; height: 36px; border-radius: 99px; }
+  .ghost-bar.sink { background: hsl(24 80% 50%); }
+  .ghost-bar.forked { background: #6366f1; }
+  .ghost-bar.custom { background: #94a3b8; }
+  .ghost-row .info h3 { font-size: 13px; font-weight: 600; line-height: 1; }
+  .ghost-row .info p { font-size: 11px; color: #888; margin-top: 4px; }
+  .ghost-chevron { color: #ccc; opacity: 0; transition: opacity 0.15s; font-size: 14px; margin-left: auto; }
+  .ghost-row:hover .ghost-chevron { opacity: 1; }
+
+  /* B: Glassmorphic pills */
+  .pill-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 18px; border-radius: 99px;
+    border: 1px solid hsl(30 20% 90%); background: white;
+    cursor: pointer; transition: all 0.15s;
+    font-size: 13px; font-weight: 600;
+  }
+  .pill:hover { border-color: hsl(24 80% 50%); background: hsl(24 80% 50% / 0.04); }
+  .pill .pill-count {
+    font-size: 10px; font-weight: 600; background: hsl(35 20% 95%);
+    padding: 2px 8px; border-radius: 99px; color: #888;
+  }
+  .pill .pill-icon { font-size: 14px; }
+
+  /* C: Soft Bento */
+  .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .bento-card {
+    padding: 20px; border-radius: 14px; background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06); cursor: pointer;
+    transition: box-shadow 0.2s; position: relative; overflow: hidden;
+  }
+  .bento-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+  .bento-card .big-count {
+    position: absolute; top: -6px; right: 4px;
+    font-size: 48px; font-weight: 800; opacity: 0.04; pointer-events: none;
+  }
+  .bento-card h3 { font-size: 14px; font-weight: 700; letter-spacing: -0.3px; }
+  .bento-card .meta { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  .bento-card .type-badge {
+    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 2px 8px; border-radius: 6px; border: 1px solid;
+  }
+  .bento-card .type-badge.originals { color: hsl(24 80% 50%); border-color: hsl(24 80% 50% / 0.3); background: hsl(24 80% 50% / 0.06); }
+  .bento-card .type-badge.forked { color: #6366f1; border-color: #6366f1; background: rgba(99,102,241,0.06); }
+  .bento-card .count-text { font-size: 11px; color: #888; }
+
+  /* D: Current gradient (for comparison) */
+
+  .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+  .pros-cons .pros, .pros-cons .cons { font-size: 11px; padding: 12px; border-radius: 10px; }
+  .pros-cons .pros { background: #f0fdf4; }
+  .pros-cons .cons { background: #fef2f2; }
+  .pros-cons h4 { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+  .pros-cons ul { padding-left: 16px; }
+  .pros-cons li { margin-bottom: 4px; }
+
+  @media (max-width: 640px) {
+    .gradient-grid { grid-template-columns: repeat(2, 1fr); }
+    .bento-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<h1>Collection Card Styles</h1>
+<p class="subtitle">Click any option to select it. Imagine these at the top of My Kitchen.</p>
+
+<!-- Option A: Ghost rows -->
+<div class="option" data-choice="a" onclick="toggleSelect(this)">
+  <div class="option-header">
+    <h2>A. Ghost Rows</h2>
+    <span class="tag" style="color: #6366f1; background: #eef2ff;">Minimalist</span>
+    <span class="selected-tag">Selected</span>
+  </div>
+
+  <div class="ghost-list">
+    <div class="ghost-row">
+      <div class="ghost-bar sink"></div>
+      <div class="info">
+        <h3>@david's Kitchen Sink</h3>
+        <p>12 recipes &middot; Personal</p>
+      </div>
+      <span class="ghost-chevron">&rsaquo;</span>
+    </div>
+    <div class="ghost-row">
+      <div class="ghost-bar forked"></div>
+      <div class="info">
+        <h3>Forked Recipes</h3>
+        <p>5 recipes &middot; Personal</p>
+      </div>
+      <span class="ghost-chevron">&rsaquo;</span>
+    </div>
+    <div class="ghost-row">
+      <div class="ghost-bar custom"></div>
+      <div class="info">
+        <h3>Weeknight Wins</h3>
+        <p>8 recipes &middot; Personal</p>
+      </div>
+      <span class="ghost-chevron">&rsaquo;</span>
+    </div>
+    <div class="ghost-row">
+      <div class="ghost-bar custom"></div>
+      <div class="info">
+        <h3>Holiday Baking</h3>
+        <p>3 recipes &middot; Shared</p>
+      </div>
+      <span class="ghost-chevron">&rsaquo;</span>
+    </div>
+  </div>
+
+  <div class="pros-cons">
+    <div class="pros"><h4>Strengths</h4><ul>
+      <li>Ultra-clean, makes the page feel spacious</li>
+      <li>Color bar distinguishes system vs. custom collections</li>
+      <li>Great for long lists of collections</li>
+    </ul></div>
+    <div class="cons"><h4>Trade-offs</h4><ul>
+      <li>Less visual punch — collections don't "pop"</li>
+      <li>Vertical list takes more space than a grid</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- Option B: Glassmorphic pills -->
+<div class="option" data-choice="b" onclick="toggleSelect(this)">
+  <div class="option-header">
+    <h2>B. Glassmorphic Pills</h2>
+    <span class="tag" style="color: #d97706; background: #fffbeb;">High-Density</span>
+    <span class="selected-tag">Selected</span>
+  </div>
+
+  <div class="pill-grid">
+    <div class="pill">
+      <span class="pill-icon">🍳</span>
+      @david's Kitchen Sink
+      <span class="pill-count">12</span>
+    </div>
+    <div class="pill">
+      <span class="pill-icon">🍴</span>
+      Forked Recipes
+      <span class="pill-count">5</span>
+    </div>
+    <div class="pill">
+      <span class="pill-icon">🌙</span>
+      Weeknight Wins
+      <span class="pill-count">8</span>
+    </div>
+    <div class="pill">
+      <span class="pill-icon">🎄</span>
+      Holiday Baking
+      <span class="pill-count">3</span>
+    </div>
+    <div class="pill">
+      <span class="pill-icon">🥗</span>
+      Meal Prep
+      <span class="pill-count">6</span>
+    </div>
+  </div>
+
+  <div class="pros-cons">
+    <div class="pros"><h4>Strengths</h4><ul>
+      <li>Most compact — see many collections at a glance</li>
+      <li>Feels like browsing tags in a library</li>
+      <li>Scales well as collections grow</li>
+    </ul></div>
+    <div class="cons"><h4>Trade-offs</h4><ul>
+      <li>No room for metadata (public/private, description)</li>
+      <li>Less "card" feel — might feel too flat for a dashboard</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- Option C: Soft Bento -->
+<div class="option" data-choice="c" onclick="toggleSelect(this)">
+  <div class="option-header">
+    <h2>C. Soft Bento Cards</h2>
+    <span class="tag" style="color: #059669; background: #ecfdf5;">Premium</span>
+    <span class="selected-tag">Selected</span>
+  </div>
+
+  <div class="bento-grid">
+    <div class="bento-card">
+      <div class="big-count">12</div>
+      <h3>@david's Kitchen Sink</h3>
+      <div class="meta">
+        <span class="type-badge originals">Originals</span>
+        <span class="count-text">12 recipes</span>
+      </div>
+    </div>
+    <div class="bento-card">
+      <div class="big-count">5</div>
+      <h3>Forked Recipes</h3>
+      <div class="meta">
+        <span class="type-badge forked">Forked</span>
+        <span class="count-text">5 recipes</span>
+      </div>
+    </div>
+    <div class="bento-card">
+      <div class="big-count">8</div>
+      <h3>Weeknight Wins</h3>
+      <div class="meta">
+        <span class="count-text">8 recipes &middot; Personal</span>
+      </div>
+    </div>
+    <div class="bento-card">
+      <div class="big-count">3</div>
+      <h3>Holiday Baking</h3>
+      <div class="meta">
+        <span class="count-text">3 recipes &middot; Shared</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pros-cons">
+    <div class="pros"><h4>Strengths</h4><ul>
+      <li>Clean and premium — no borders, soft shadow</li>
+      <li>Watermark count adds visual texture without clutter</li>
+      <li>Type badges distinguish system from custom collections</li>
+    </ul></div>
+    <div class="cons"><h4>Trade-offs</h4><ul>
+      <li>Takes more vertical space than pills</li>
+      <li>3-column grid may need adjustment on mobile</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- Option D: Current gradient (reference) -->
+<div class="option" data-choice="d" onclick="toggleSelect(this)">
+  <div class="option-header">
+    <h2>D. Current Gradient Cards</h2>
+    <span class="tag" style="color: #888; background: #f1f5f9;">Current</span>
+    <span class="selected-tag">Selected</span>
+  </div>
+
+  <div class="gradient-grid">
+    <div class="gradient-card" style="background: linear-gradient(135deg, #f59e0b, #ea580c);">
+      <div class="title">@david's Kitchen Sink</div>
+      <div class="count">12 recipes</div>
+    </div>
+    <div class="gradient-card" style="background: linear-gradient(135deg, #6366f1, #9333ea);">
+      <div class="title">Forked Recipes</div>
+      <div class="count">5 recipes</div>
+    </div>
+    <div class="gradient-card" style="background: linear-gradient(135deg, #2dd4bf, #059669);">
+      <div class="title">Weeknight Wins</div>
+      <div class="count">8 recipes</div>
+    </div>
+    <div class="gradient-card" style="background: linear-gradient(135deg, #f472b6, #e11d48);">
+      <div class="title">Holiday Baking</div>
+      <div class="count">3 recipes</div>
+    </div>
+  </div>
+
+  <div class="pros-cons">
+    <div class="pros"><h4>Strengths</h4><ul>
+      <li>Bold and colorful — collections stand out</li>
+      <li>Compact 4-column grid</li>
+      <li>Already implemented</li>
+    </ul></div>
+    <div class="cons"><h4>Trade-offs</h4><ul>
+      <li>Heavy visual weight — dominates the page</li>
+      <li>Random gradients don't convey meaning</li>
+      <li>Can feel "boxy" with many collections</li>
+    </ul></div>
+  </div>
+</div>
+
+<script>
+function toggleSelect(el) {
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+</script>
+
+</body>
+</html>

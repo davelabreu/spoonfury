@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soft Bento Variations — Spoonfury v0.10</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: hsl(40 33% 98%); color: hsl(20 14% 8%); padding: 32px; }
+
+  h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 32px; }
+
+  .option { margin-bottom: 44px; padding: 24px; border-radius: 16px; border: 2px solid transparent; transition: all 0.2s; cursor: pointer; }
+  .option:hover { border-color: #e5e7eb; }
+  .option.selected { border-color: hsl(24 80% 50%); background: hsl(24 80% 50% / 0.03); }
+
+  .option-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .option-header h2 { font-size: 16px; font-weight: 700; }
+  .option-header .tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 3px 10px; border-radius: 99px; }
+  .selected-tag { display: none; font-size: 10px; font-weight: 700; color: #16a34a; background: #dcfce7; padding: 3px 10px; border-radius: 99px; }
+  .option.selected .selected-tag { display: inline-block; }
+
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+  .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  .pros-cons .pros, .pros-cons .cons { font-size: 11px; padding: 12px; border-radius: 10px; }
+  .pros-cons .pros { background: #f0fdf4; }
+  .pros-cons .cons { background: #fef2f2; }
+  .pros-cons h4 { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+  .pros-cons ul { padding-left: 16px; }
+  .pros-cons li { margin-bottom: 4px; }
+
+  /* ── C1: Classic Bento ── */
+  .c1-card {
+    padding: 20px; border-radius: 14px; background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: box-shadow 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .c1-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+  .c1-card .big-count { position: absolute; top: -6px; right: 4px; font-size: 48px; font-weight: 800; opacity: 0.04; pointer-events: none; }
+  .c1-card h3 { font-size: 14px; font-weight: 700; letter-spacing: -0.3px; }
+  .c1-card .meta { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  .type-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 6px; border: 1px solid; }
+  .type-badge.originals { color: hsl(24 80% 50%); border-color: hsl(24 80% 50% / 0.3); background: hsl(24 80% 50% / 0.06); }
+  .type-badge.forked { color: #6366f1; border-color: #6366f180; background: rgba(99,102,241,0.06); }
+  .count-text { font-size: 11px; color: #888; }
+
+  /* ── C2: Bento with left accent stripe ── */
+  .c2-card {
+    padding: 16px 20px; border-radius: 14px; background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05); transition: box-shadow 0.2s;
+    border-left: 3px solid transparent; display: flex; align-items: center; gap: 14px;
+  }
+  .c2-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+  .c2-card.sink { border-left-color: hsl(24 80% 50%); }
+  .c2-card.forked { border-left-color: #6366f1; }
+  .c2-card.custom { border-left-color: #94a3b8; }
+  .c2-icon { font-size: 22px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: hsl(35 30% 95%); flex-shrink: 0; }
+  .c2-card .info { flex: 1; min-width: 0; }
+  .c2-card .info h3 { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .c2-card .info p { font-size: 11px; color: #888; margin-top: 2px; }
+  .c2-count { font-size: 20px; font-weight: 800; color: #d4d4d8; flex-shrink: 0; }
+
+  /* ── C3: Bento with subtle tint backgrounds ── */
+  .c3-card {
+    padding: 18px; border-radius: 14px; transition: transform 0.15s, box-shadow 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .c3-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+  .c3-card.sink { background: hsl(24 80% 50% / 0.06); }
+  .c3-card.forked { background: rgba(99,102,241,0.06); }
+  .c3-card.custom-teal { background: rgba(20,184,166,0.06); }
+  .c3-card.custom-rose { background: rgba(244,63,94,0.06); }
+  .c3-card .emoji { font-size: 24px; margin-bottom: 10px; }
+  .c3-card h3 { font-size: 14px; font-weight: 700; }
+  .c3-card .bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .c3-card .count-pill { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: rgba(0,0,0,0.06); color: #666; }
+
+  /* ── C4: Compact Bento 4-col ── */
+  .c4-card {
+    padding: 14px 16px; border-radius: 12px; background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.15s;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .c4-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.08); }
+  .c4-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .c4-dot.sink { background: hsl(24 80% 50%); }
+  .c4-dot.forked { background: #6366f1; }
+  .c4-dot.custom { background: #94a3b8; }
+  .c4-card .info { flex: 1; min-width: 0; }
+  .c4-card .info h3 { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .c4-card .info p { font-size: 10px; color: #999; margin-top: 1px; }
+
+  @media (max-width: 640px) {
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<h1>Soft Bento Variations</h1>
+<p class="subtitle">Four riffs on the Bento card style. Click to select your favorite.</p>
+
+<!-- C1: Classic -->
+<div class="option" onclick="toggleSelect(this)">
+  <div class="option-header">
+    <h2>C1. Classic Bento</h2>
+    <span class="tag" style="color: #059669; background: #ecfdf5;">Original from before</span>
+    <span class="selected-tag">Selected</span>
+  </div>
+  <div class="grid-3">
+    <div class="c1-card">
+      <div class="big-count">12</div>
+      <h3>@david's Kitchen Sink</h3>
+      <div class="meta"><span class="type-badge originals">Originals</span><span class="count-text">12 recipes</span></div>
+    </div>
+    <div class="c1-card">
+      <div class="big-count">5</div>
+      <h3>Forked Recipes</h3>
+      <div class="meta"><span class="type-badge forked">Forked</span><span class="count-text">5 recipes</span></div>
+    </div>
+    <div class="c1-card">
+      <div class="big-count">8</div>
+      <h3>Weeknight Wins</h3>
+      <div class="meta"><span class="count-text">8 recipes &middot; Personal</span></div>
+    </div>
+    <div class="c1-card">
+      <div class="big-count">3</div>
+      <h3>Holiday Baking</h3>
+      <div class="meta"><span class="count-text">3 recipes &middot; Shared</span></div>
+    </div>
+  </div>
+  <div class="pros-cons">
+    <div class="pros"><h4>Strengths</h4><ul><li>Clean white cards, premium feel</li><li>Watermark count adds texture</li><li>Type badges for system collections</li></ul></div>
+    <div class="cons"><h4>Trade-offs</h4><ul><li>All white — can blend into page background</li><li>3-col may feel sparse with few collections</li></ul></div>
+  </div>
+</div>
+
+<!-- C2: Accent stripe with icons -->
+<div class="option" onclick="toggleSelect(this)">
+  <div class="option-header">
+    <h2>C2. Accent Stripe + Icons</h2>
+    <span class="tag" style="color: #d97706; background: #fffbeb;">Structured</span>
+    <span class="selected-tag">Selected</span>
+  </div>
+  <div class="grid-3">
+    <div class="c2-card sink">
+      <div class="c2-icon">🍳</div>
+      <div class="info"><h3>@david's Kitchen Sink</h3><p>Personal &middot; Originals</p></div>
+      <div class="c2-count">12</div>
+    </div>
+    <div class="c2-card forked">
+      <div class="c2-icon">🍴</div>
+      <div class="info"><h3>Forked Recipes</h3><p>Personal &middot; Forked</p></div>
+      <div class="c2-count">5</div>
+    </div>
+    <div class="c2-card custom">
+      <div class="c2-icon">🌙</div>
+      <div class="info"><h3>Weeknight Wins</h3><p>Personal</p></div>
+      <div class="c2-count">8</div>
+    </div>
+    <div class="c2-card custom">
+      <div class="c2-icon">🎄</div>
+      <div class="info"><h3>Holiday Baking</h3><p>Shared</p></div>
+      <div class="c2-count">3</div>
+    </div>
+  </div>
+  <div class="pros-cons">
+    <div class="pros"><h4>Strengths</h4><ul><li>Left stripe instantly signals collection type</li><li>Emoji icons add personality</li><li>Large muted count as design element</li></ul></div>
+    <div class="cons"><h4>Trade-offs</h4><ul><li>Horizontal layout needs wider cards</li><li>May look busy at small sizes</li></ul></div>
+  </div>
+</div>
+
+<!-- C3: Tinted backgrounds -->
+<div class="option" onclick="toggleSelect(this)">
+  <div class="option-header">
+    <h2>C3. Soft Tinted Cards</h2>
+    <span class="tag" style="color: #7c3aed; background: #f5f3ff;">Warm & Colorful</span>
+    <span class="selected-tag">Selected</span>
+  </div>
+  <div class="grid-3">
+    <div class="c3-card sink">
+      <div class="emoji">🍳</div>
+      <h3>@david's Kitchen Sink</h3>
+      <div class="bottom">
+        <span class="type-badge originals">Originals</span>
+        <span class="count-pill">12</span>
+      </div>
+    </div>
+    <div class="c3-card forked">
+      <div class="emoji">🍴</div>
+      <h3>Forked Recipes</h3>
+      <div class="bottom">
+        <span class="type-badge forked">Forked</span>
+        <span class="count-pill">5</span>
+      </div>
+    </div>
+    <div class="c3-card custom-teal">
+      <div class="emoji">🌙</div>
+      <h3>Weeknight Wins</h3>
+      <div class="bottom">
+        <span class="count-text">Personal</span>
+        <span class="count-pill">8</span>
+      </div>
+    </div>
+    <div class="c3-card custom-rose">
+      <div class="emoji">🎄</div>
+      <h3>Holiday Baking</h3>
+      <div class="bottom">
+        <span class="count-text">Shared</span>
+        <span class="count-pill">3</span>
+      </div>
+    </div>
+  </div>
+  <div class="pros-cons">
+    <div class="pros"><h4>Strengths</h4><ul><li>Softer version of gradient cards — color without heaviness</li><li>Each card has its own tinted identity</li><li>Hover lift feels interactive</li></ul></div>
+    <div class="cons"><h4>Trade-offs</h4><ul><li>Custom collections need a color assignment strategy</li><li>More visual weight than pure white</li></ul></div>
+  </div>
+</div>
+
+<!-- C4: Compact 4-col -->
+<div class="option" onclick="toggleSelect(this)">
+  <div class="option-header">
+    <h2>C4. Compact Bento (4-col)</h2>
+    <span class="tag" style="color: #0891b2; background: #ecfeff;">Dense & Tidy</span>
+    <span class="selected-tag">Selected</span>
+  </div>
+  <div class="grid-4">
+    <div class="c4-card">
+      <div class="c4-dot sink"></div>
+      <div class="info"><h3>@david's Kitchen Sink</h3><p>12 recipes</p></div>
+    </div>
+    <div class="c4-card">
+      <div class="c4-dot forked"></div>
+      <div class="info"><h3>Forked Recipes</h3><p>5 recipes</p></div>
+    </div>
+    <div class="c4-card">
+      <div class="c4-dot custom"></div>
+      <div class="info"><h3>Weeknight Wins</h3><p>8 recipes</p></div>
+    </div>
+    <div class="c4-card">
+      <div class="c4-dot custom"></div>
+      <div class="info"><h3>Holiday Baking</h3><p>3 recipes</p></div>
+    </div>
+  </div>
+  <div class="pros-cons">
+    <div class="pros"><h4>Strengths</h4><ul><li>Most compact bento — 4 columns, minimal height</li><li>Color dot is subtle but informative</li><li>Clean, no visual noise</li></ul></div>
+    <div class="cons"><h4>Trade-offs</h4><ul><li>Less personality — no emoji, no type badges</li><li>Very understated — may not "feel" like collections</li></ul></div>
+  </div>
+</div>
+
+<script>
+function toggleSelect(el) {
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+</script>
+
+</body>
+</html>

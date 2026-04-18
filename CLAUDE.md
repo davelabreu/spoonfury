@@ -68,13 +68,13 @@ Active plans live in `docs/plans/active/`. Shipped features are archived in `doc
 ### Active
 | Feature | Spec | Impl |
 |---------|------|------|
-| v0.10 Books → Collections | `active/2026-04-18-books-to-collections.spec.md` | `active/2026-04-18-books-to-collections.impl.md` |
 | v0.85 Kitchen Controls | `active/2026-04-11-kitchen-controls.spec.md` | `active/2026-04-11-kitchen-controls.impl.md` |
 | v0.9 Vouch Retention | `active/2026-04-12-vouch-retention.spec.md` | `active/2026-04-12-vouch-retention.impl.md` |
 
 ### Completed
 | Feature | Spec | Impl |
 |---------|------|------|
+| v0.10 Books → Collections | `completed/2026-04-18-books-to-collections.spec.md` | `completed/2026-04-18-books-to-collections.impl.md` |
 | v0.7 Community Review Gate | `completed/2026-04-03-community-review-gate.spec.md` | `completed/2026-04-03-community-review-gate.impl.md` |
 | v0.6 Test Kitchen & Privacy | `completed/2026-03-08-test-kitchen.spec.md` | `completed/2026-03-08-test-kitchen.impl.md` |
 | v0.5.2 Shopping Cart Rework | `completed/2026-03-22-shopping-cart-rework.spec.md` | `completed/2026-03-22-shopping-cart-rework.impl.md` |
