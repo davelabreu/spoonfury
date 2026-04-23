@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { api } from "@/lib/api";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { ReviewsResponse, RecipeStatus } from "@/types";
