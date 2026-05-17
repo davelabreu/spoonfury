@@ -4,6 +4,18 @@ Dev log for Spoonfury. **Focus** statements are top-level human summaries of dev
 
 ---
 
+## 2026-05-17 — PM Agent Session & Vercel Prep Cleanup
+
+**Focus:** Revisiting Spoonfury for a quick PM agent session to prepare for next steps. And cleaning up.
+
+- **FANG-style PM beta-readiness review** persisted into `docs/TODO.md` as a new top-level `🚦 Beta Readiness — Pre-Beta UI / Visual Overhaul` section. Verdict: alpha-plus, not yet beta-ready. The fork mechanic feels like a button click instead of a brand-defining moment, and Cook Mode is the most under-celebrated feature in the app (wake lock + amber banner where there should be a full environment shift).
+- **Five priorities written down for the next session**: (1) hero moments for the brand verbs Fork and Cook, (2) visual rhythm consistency across surfaces, (3) onboarding + empty states that teach the fork verb, (4) non-visual beta-blockers (error handling, social login, analytics), (5) mobile pass on every page. Strategic recommendation: build the tentpole celebration moments first, let the design system emerge from those anchors — start with Cook Mode.
+- **Vercel deployment prep cleanup** — uncommitted backend changes from prior exploration are now part of master: `whitenoise` middleware + compressed-manifest static storage, `dj-database-url` for `DATABASE_URL`-style connection strings, `.vercel.app` added to `ALLOWED_HOSTS`, CORS regex for Vercel subdomains, `.vercel` and `.env*.local` ignored. Backend is now deploy-capable on Vercel even though no `vercel.ts` / project link is wired yet.
+- **Plugins enabled** in `.claude/settings.json`: `context7` (live docs lookup), `code-review`, `playwright`.
+- **HEARTBEAT updated** with the new "Up Next" priority order, anchored to the PM critique rather than the old comment-threads-first plan.
+
+---
+
 ## 2026-04-04 — v0.7 UI Polish & Review Pipeline Hardening
 
 **Focus:** Wrapping up the community review system, how it flows and feels including comments review and addition to main page Stir the Pot, and moderation system scaffold for Spoonfury.

@@ -32,3 +32,6 @@ frontend/dist/
 docs/references/
 spoonfury_REAL.sql
 03-15-2026_spoonfury_transfer.sql
+
+.vercel
+.env*.local

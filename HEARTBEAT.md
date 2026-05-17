@@ -6,48 +6,35 @@ Quick orientation file. Update at the end of each session.
 
 ## Last Session
 
-**Date:** 2026-04-18  
-**Focus:** v0.10 Books → Collections rebrand  
-**Branch:** `master` (merged from `feat/books-to-collections`)  
-**Status:** Shipped and merged
+**Date:** 2026-05-17
+**Focus:** Revisiting Spoonfury for a quick PM agent session to prepare for next steps. And cleaning up.
+**Branch:** `master`
+**Status:** No code shipped — strategy + housekeeping only.
 
-### What was built
-- **Collections rebrand**: Recipe Books renamed to Collections throughout the app. BooksPage removed, absorbed into My Kitchen.
-- **System collections**: Kitchen Sink (auto-assigned for original recipes) + Forked Recipes (auto-assigned on fork). Both protected from deletion.
-- **Custom collections**: Create, rename, delete. Edit dialog with icon presets (Quick Meals, Meal Prep, Slow Cooking, Vegetarian, Clean Eating) and 42-char description.
-- **Collection cards**: C2 accent stripe style with left color bar, emoji icons, type badges (Originals/Forked), inline expand preview.
-- **Recipe management**: Vertical dots menu on card + compact views with Edit Recipe, Share, Move to Collection, Delete. Works in both Test Kitchen and Published sections.
-- **Fork UX**: One-click fork (no modal), "Forked!" button persistence across navigation, toast notifications via Sonner.
-- **Status badges**: "Original Draft" (orange), "Forked Draft" (indigo), distinct from Published (green).
-- **Collection sorting**: Kitchen Sink always first, Forked second, custom alphabetical.
-
-### Backend changes
-- Modified: `books/models.py` (default_role, icon, description fields), `books/serializers.py`, `books/views.py`, `recipes/views.py` (perform_create auto-add to sink), `recipes/views_fork.py`, `recipes/filters.py` (forked_from filter), `users/signals.py` (create default collections on registration)
-- Migrations: 0002–0007 (is_default → default_role, icon/description)
-
-### Frontend changes
-- Modified: `MyKitchenPage.tsx` (major — collections UI, recipe management, edit dialog), `RecipePage.tsx` (fork UX), `App.tsx` (Sonner toaster, route updates), `types.ts`, `NavBar.tsx`
-- Removed: `BooksPage.tsx`, `ForkModal.tsx`
-- Added: `ui/sonner.tsx`
-- Renamed: `BookDetailPage.tsx` → `CollectionDetailPage.tsx`
-- Visual mockups: `docs/visual-mockups/v0.10-collection-cards/`
+### What happened
+- **FANG-style PM review for beta readiness.** Verdict: "alpha-plus, not beta-ready." Strong product DNA, uneven choreography. Fork mechanic feels like a button click instead of a moment. Cook Mode is the most under-celebrated feature in the app (wake lock + amber banner where there should be a full environment shift).
+- **Critique persisted to `docs/TODO.md`** as a new top-level `🚦 Beta Readiness — Pre-Beta UI / Visual Overhaul` section. Covers: hero moments for Fork + Cook, visual rhythm consistency, onboarding + empty states, non-visual blockers (error handling / social login / analytics), mobile pass. Strategic recommendation: build celebration moments first, let the design system emerge from them — and **start with Cook Mode**.
+- **Vercel deployment prep landed** (was uncommitted from prior work): `whitenoise` middleware + storage, `dj-database-url` for `DATABASE_URL`, `.vercel.app` in ALLOWED_HOSTS, CORS regex for Vercel subdomains, `.vercel` + `.env*.local` in `.gitignore`.
+- **Plugins enabled**: `context7`, `code-review`, `playwright` added to `.claude/settings.json`.
 
 ---
 
 ## Current State
 
-**Branch:** `master`  
+**Branch:** `master`
 **Version:** v0.10 (Collections rebrand)
+**Deployment posture:** Backend now Vercel-deploy-capable (settings + requirements), though no `vercel.ts` / project link is wired yet.
 
 ---
 
 ## Up Next (priority order)
 
-1. **Comment threads** — top-level comments + replies on published recipes.
-2. **Drive-by negativity mitigation** — require comments on low ratings (<=2 spoons).
-3. **Cook time field** — `prep_time` model field (currently frontend placeholder).
-4. **"Kitchen Tested" badge** — named visual badge with reviewer avatars.
-5. **User communication** — tagging and messaging between users.
-6. **Social login** — Google/Apple OAuth via django-allauth.
+1. **Cook Mode overhaul** — full environment shift (chrome dim, large-type instructions, step focus, sticky ingredients, nav indicator). Highest-leverage screen. See `docs/TODO.md` → Beta Readiness §1.
+2. **Fork celebration** — confetti / lineage animation / "tell @author" nudge. Brand North Star verb deserves more than a toast.
+3. **Error handling pass** — no more infinite "Loading..." on failed fetches.
+4. **Analytics instrumentation** — fork, cook-mode-enter, add-to-list, share, signup. Must be in place before beta testers land.
+5. **Social login** — Google/Apple OAuth via django-allauth.
+6. **Onboarding flow + empty states** — teach the fork verb on first visit.
+7. **Comment threads** — top-level comments + replies on published recipes.
 
-See `docs/TODO.md` for full detail on each.
+See `docs/TODO.md` → 🚦 Beta Readiness section for the full PM critique and strategic tradeoff.

@@ -5,6 +5,42 @@ Deferred items that need focused effort in future sessions.
 Organized by category — add new items under the right heading.
 
 ---
+
+## 🚦 Beta Readiness — Pre-Beta UI / Visual Overhaul (FUTURE SESSION)
+
+High-level PM critique from a "FANG PM" review on 2026-05-17. Spoonfury is "alpha-plus," not yet beta-ready. Strong product DNA, uneven choreography. The fork mechanic is the moat, but today it feels like a button click — not a moment. Cook Mode is the most under-celebrated feature in the app: a wake lock + amber banner where there should be a full environment shift. Spoonfury has flashes of delight but isn't yet legible to a first-time user.
+
+### The 5 things to fix before beta
+
+**1. Hero moments for the two brand verbs: Fork and Cook.**
+- **Fork** (today: a Sonner toast). Should be: confetti / spoon-burst, a "lineage" mini-animation showing the branch off `@author`, optional "tell @author you forked it" nudge. This is the North Star verb — celebrate it like Twitter celebrates a retweet.
+- **Cook Mode** (today: button toggle + amber banner + drawer). Should be: full chrome dim, instructions auto-expand to large type, step-by-step focus (active step glows, others fade), sticky ingredient strip with check haptics, persistent "cooking" indicator in nav, optional timer affordance per step. Right now Cook Mode looks like a *setting* instead of an *experience*. Highest-leverage single screen in the app.
+
+**2. Visual rhythm consistency.** Each surface has its own dialect — fused hero on RecipePage, 4-section blueprint on CreateRecipePage, accent-stripe cards on MyKitchen, fridge-sticker NavBar. Pick a system (type scale, density, motion vocabulary) and align all surfaces. The fridge-sticker motif is the visual signature — let it echo (polaroid recipe cards? handwritten section dividers? sticker-style status badges?). Right now it's a flourish on the nav, not a worldview.
+
+**3. Onboarding + empty states.** A new tester at `/` doesn't know what Spoonfury *is*. The word "fork" isn't culinary. Need a 3-card welcome (Fork → Tweak → Cook) and empty-state choreography in My Kitchen that *teaches the fork* rather than saying "no recipes yet."
+
+**4. Beta-blockers that aren't visual.**
+- **Error handling**: infinite "Loading..." on failed fetches torches trust on a flaky connection. Documented known issue — must fix before beta.
+- **Social login** (Google/Apple): every friction point compounds with beta testers. Expect 30–50% drop at the username/password gate.
+- **Analytics**: cannot run a useful beta without funnel events. Add Posthog / Plausible / Vercel Analytics *before* users land. Instrument at minimum: fork, cook-mode-enter, add-to-list, share, signup.
+
+**5. Mobile pass on every page.** RecipePage = 661 lines, MyKitchen = 1021 — likely some desktop-first assumptions baked in. Beta testers will live on phones.
+
+### Strategic tradeoff (order of operations)
+
+Two paths for the overhaul:
+- **(a)** Build the design system first, then retrofit celebrations into it.
+- **(b)** Build the tentpole celebration moments first (fork, cook-mode-enter, first-collection, first-shop), let the system emerge from those anchors.
+
+**Recommendation: (b).** The celebration moments are the marketable screenshots, the brand voice gets locked in by what's celebrated (not by tokens), and top-down systems without anchored hero moments tend to settle into generic shadcn aesthetics. **Start with Cook Mode.**
+
+### Defer until beta starts
+
+Comment threads, "Kitchen Tested" badge, user messaging, drive-by negativity mitigation. These need real-user behavior to design well. Ship beta, watch, then build.
+
+---
+
 ## Recipes
 - May need more information such as estimated cook time (active and passive), effort estimation, whatever
 
